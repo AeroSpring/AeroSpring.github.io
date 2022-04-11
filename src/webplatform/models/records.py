@@ -1,13 +1,15 @@
 from pydantic import BaseModel
+#from typing   import List, Optional
 
+#from ..models.tabs import TabBase, Tab
 
 
 class RecordBase(BaseModel):
-    content : str
     user_id : int
-
-#    tab_id  : int
-#    tab     : str
+    tab_id  : int
+    content : str
+#   tab     : str
+#   tabs    : List[Tab]
 
 
 class Record(RecordBase):

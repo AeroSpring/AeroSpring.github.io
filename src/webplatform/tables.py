@@ -4,12 +4,12 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
-tab_record_table = sa.Table(
-    'tab_record',
-    Base.metadata,
-    sa.Column( 'tab_id'   , sa.Integer, sa.ForeignKey("tabs.id"   ) ),
-    sa.Column( 'record_id', sa.Integer, sa.ForeignKey("records.id") )
-)
+#tab_record_table = sa.Table(
+#    'tab_record',
+#    Base.metadata,
+#    sa.Column( 'tab_id'   , sa.Integer, sa.ForeignKey("tabs.id"   ) ),
+#    sa.Column( 'record_id', sa.Integer, sa.ForeignKey("records.id") )
+#)
 
 
 class User(Base):
@@ -27,8 +27,7 @@ class Tab(Base):
     id            = sa.Column(sa.Integer, primary_key = True)
     name          = sa.Column(sa.String , nullable = True)
     user_id       = sa.Column(sa.Integer, sa.ForeignKey('users.id'))
-
-    record_id     = sa.Column(sa.Integer, sa.ForeignKey('records.id'), nullable = True)
+#   record_id     = sa.Column(sa.Integer, sa.ForeignKey('records.id'), nullable = True)
 
 
 class Record(Base):
@@ -36,10 +35,9 @@ class Record(Base):
 
     id            = sa.Column(sa.Integer, primary_key = True)
     user_id       = sa.Column(sa.Integer, sa.ForeignKey('users.id'))
+    tab_id        = sa.Column(sa.Integer, sa.ForeignKey('tabs.id' ))
     content       = sa.Column(sa.Text   , unique = True, nullable = False)
-
-#    tab_id        = sa.Column(sa.Integer, sa.ForeignKey('tabs.id' ))
-#    tab           = relationship("Tab", secondary = tab_record_table, backref = "records")
+#   tab           = relationship("Tab", secondary = tab_record_table, backref = "records")
 
 
 class Operation(Base):

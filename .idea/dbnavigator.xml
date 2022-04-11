@@ -24,31 +24,22 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes>
-      <connection connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305">
-        <schema name="main" object-types="table, view, constraint, index, column, dataset trigger" />
-      </connection>
-    </loaded-nodes>
+    <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="6539637e-0fe7-4a9e-89e3-7ab588956305">
-      <console name="database" type="STANDARD" schema="" session="Main" />
+    <connection id="ea059158-37f1-4b6a-a379-5bba13b1e528">
+      <console name="database" type="STANDARD" schema="main" session="Main" />
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" object-ref="schemas/main/tables/tabs" />
-      <object connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" object-ref="schemas/main/tables/users" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="6539637e-0fe7-4a9e-89e3-7ab588956305" />
+    <connection id="ea059158-37f1-4b6a-a379-5bba13b1e528" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" dataset="main.operations" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" dataset="main.records" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" dataset="main.users" active-filter-id="EMPTY_FILTER" />
-    <filter-actions connection-id="6539637e-0fe7-4a9e-89e3-7ab588956305" dataset="main.tabs" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="ea059158-37f1-4b6a-a379-5bba13b1e528" dataset="main.records" active-filter-id="EMPTY_FILTER" />
+    <filter-actions connection-id="ea059158-37f1-4b6a-a379-5bba13b1e528" dataset="main.tabs" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.EditorStateManager">
     <last-used-providers />
@@ -79,7 +70,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="6539637e-0fe7-4a9e-89e3-7ab588956305" active="true" signed="true">
+      <connection id="ea059158-37f1-4b6a-a379-5bba13b1e528" active="true" signed="false">
         <database>
           <name value="database" />
           <description value="" />
@@ -123,10 +114,10 @@
           <charset value="UTF-8" />
           <session-management value="true" />
           <ddl-file-binding value="true" />
-          <database-logging value="false" />
+          <database-logging value="true" />
           <connect-automatically value="true" />
           <restore-workspace value="true" />
-          <restore-workspace-deep value="true" />
+          <restore-workspace-deep value="false" />
           <environment-type value="default" />
           <connectivity-timeout value="5" />
           <idle-time-to-disconnect value="30" />

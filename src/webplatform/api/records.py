@@ -16,21 +16,28 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model = List[Record])
+@router.get('/{tab_id}', response_model = List[Record])
 def get_records(
+        tab_id  : int,
         user    : User           = Depends(get_current_user),
         service : RecordsService = Depends(),
 ):
-    return service.get_list(user_id = user.id)
+    return service.get_list(user_id = user.id, tab_id = tab_id)
 
 
+#@router.get('/{tab_id}&{record_id}', response_model = Record)
 @router.get('/{record_id}', response_model = Record)
 def get_record(
+#       tab_id      : int,
         record_id   : int,
         user        : User           = Depends(get_current_user),
         service     : RecordsService = Depends(),
 ) -> object:
-    return service.get(user_id = user.id, record_id = record_id)
+    return service.get(
+        user_id   = user.id,
+#       tab_id    = tab_id,
+        record_id = record_id
+    )
 
 
 @router.post('/', response_model = Record)

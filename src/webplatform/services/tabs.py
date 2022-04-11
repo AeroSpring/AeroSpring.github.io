@@ -1,10 +1,11 @@
-from typing           import List
-from fastapi          import Depends, HTTPException, status
-from sqlalchemy.orm   import Session
+from typing             import List
+from fastapi            import Depends, HTTPException, status
+from sqlalchemy.orm     import Session
 
-from ..               import tables
-from ..database       import get_session
-from ..models.tabs    import TabCreate, TabUpdate
+from ..                 import tables
+from ..database         import get_session
+from ..models.tabs      import TabCreate, TabUpdate
+from ..services.records import RecordsService
 
 
 class TabsService:
@@ -45,7 +46,6 @@ class TabsService:
     def create(self, user_id: int, tab_data: TabCreate) -> tables.Tab:
         tab = tables.Tab(
             name      = tab_data.name,
-            record_id = tab_data.record_id,
             user_id   = user_id,
         )
         self.session.add(tab)
@@ -70,4 +70,19 @@ class TabsService:
         tab = self._get(user_id, tab_id)
         self.session.delete(tab)
         self.session.commit()
+
+        # Records list of deleted tab
+        query = (
+            self.session
+            .query(tables.Record)
+            .filter_by(
+                user_id = user_id,
+                tab_id  = tab_id,
+            )
+        )
+        records = query.all()
+        for rec in records:
+            #if rec.tab_id == tab_id:
+            self.session.delete(rec)
+            self.session.commit()
 

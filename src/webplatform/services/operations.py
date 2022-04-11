@@ -2,8 +2,8 @@ from typing              import List, Optional
 from fastapi             import Depends, HTTPException, status
 from sqlalchemy.orm      import Session
 
-from .. import tables
-from ..database import get_session
+from ..                  import tables
+from ..database          import get_session
 from ..models.operations import OperationKind, OperationCreate, OperationUpdate
 
 

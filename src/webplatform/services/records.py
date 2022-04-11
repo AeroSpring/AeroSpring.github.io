@@ -13,11 +13,14 @@ class RecordsService:
         self.session = session
 
 
-    def get_list(self, user_id: int) -> List[tables.Record]:
+    def get_list(self, user_id: int, tab_id: int) -> List[tables.Record]:
         query = (
             self.session
             .query(tables.Record)
-            .filter_by(user_id = user_id)
+            .filter_by(
+                user_id = user_id,
+                tab_id  = tab_id,
+            )
         )
         records = query.all()
         return records

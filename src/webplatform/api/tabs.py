@@ -24,13 +24,13 @@ def get_tabs(
     return service.get_list(user_id = user.id)
 
 
-#@router.get('/{tab_id}', response_model = Tab)
-#def get_tab(
-#        tab_id  : int,
-#        user    : User        = Depends(get_current_user),
-#        service : TabsService = Depends(),
-#) -> object:
-#    return service.get(user_id = user.id, tab_id = tab_id)
+@router.get('/{tab_id}', response_model = Tab)
+def get_tab(
+        tab_id  : int,
+        user    : User        = Depends(get_current_user),
+        service : TabsService = Depends(),
+) -> object:
+    return service.get(user_id = user.id, tab_id = tab_id)
 
 
 @router.post('/', response_model = Tab)
