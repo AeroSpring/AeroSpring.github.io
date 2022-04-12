@@ -5,7 +5,6 @@ from sqlalchemy.orm     import Session
 from ..                 import tables
 from ..database         import get_session
 from ..models.tabs      import TabCreate, TabUpdate
-from ..services.records import RecordsService
 
 
 class TabsService:
@@ -85,4 +84,3 @@ class TabsService:
             #if rec.tab_id == tab_id:
             self.session.delete(rec)
             self.session.commit()
-
