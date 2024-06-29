@@ -1,0 +1,46 @@
+<body>
+    <canvas id="render-canvas"></canvas>
+    <style>
+        body, #render-canvas {
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script>
+        // Извлечение тега canvas
+        let canvas = window.document.querySelector('canvas');
+        // Создание движка
+        let engine = new BABYLON.Engine(canvas);
+        // Создание сцены и присоединение её к движку
+        let scene = new BABYLON.Scene(engine);
+        // Создание света
+        let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
+        light.intensity = 0.7;
+
+        // Подключение WebXR
+        scene.createDefaultXRExperienceAsync({
+            uiOptions: {
+                sessionMode: 'immersive-ar',
+                referenceSpaceType: 'local-floor',
+            }
+        });
+
+        // Создание куба
+        let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
+        box.material = new BABYLON.StandartMaterial('material', scene);
+        box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
+
+        // Позиционирование
+        box.position.y = 1;
+        box.position.z = 1;
+
+        // Степень непрозрачности
+        box.hasVertexAlpha = true;
+        box.visibility = 0.7;
+
+        engine.runRenderLoop(() => scene.render());
+    </script>
+</body>
