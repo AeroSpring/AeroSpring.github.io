@@ -30,7 +30,12 @@
 				scale="0.25 0.25 0.25"
 				gltf-model="obj/Fan/Fan.glb"
                 animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;"
-			></a-entity>
+            ></a-entity>
+            <a-sound 
+                src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav" 
+                autoplay="true" 
+                position="-3 1 -4">
+            </a-sound>
 		</a-marker>
 		<a-entity camera></a-entity>
 	</a-scene>
