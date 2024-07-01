@@ -26,9 +26,10 @@
 		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
 			<a-entity
 				position="0 0 0"
-                rotation="0 -90 90"
+                rotation="0 -90 -90"
 				scale="0.2 0.2 0.2"
 				gltf-model="obj/Fan/Fan.glb"
+                animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;"
 			></a-entity>
 		</a-marker>
 		<a-entity camera></a-entity>
