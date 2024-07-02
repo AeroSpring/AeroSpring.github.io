@@ -1,0 +1,64 @@
+<!-- Copyright (c) 2024 8th Wall, Inc. -->
+<!-- body.html is optional; elements will be added to your html body after app.js is loaded. -->
+<div id="nextbutton" style="display: none; z-index: 10">
+    <h2>Next Animation</h2>
+</div>
+<a-scene
+    next-button
+    xrextras-gesture-detector
+    landing-page="
+        mediaSrc: #animatedModel;
+        mediaAnimation: chicken;
+        sceneEnvMap: pastel;
+        textShadow: True"
+    xrextras-loading
+    xrextras-runtime-error
+    renderer="colorManagement:true"
+    xrweb>
+
+    <!-- We can define assets here to be loaded when A-Frame initializes -->
+    <a-assets>
+        <a-asset-item id="animatedModel" src="./assets/Fan/Fan.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- The raycaster will emit mouse events on scene objects specified with the cantap class -->
+    <a-camera
+        id="camera"
+        position="0 8 8"
+        raycaster="objects: .cantap"
+        cursor="
+            fuse: false;
+            rayOrigin: mouse;">
+    </a-camera>
+
+    <a-entity
+        light="
+            type: directional;
+            intensity: 0.8;
+            castShadow: true;
+            shadowMapHeight:2048;
+            shadowMapWidth:2048;
+            shadowCameraTop: 10;
+            target: #model;"
+        position="1 4.3 2.5"
+        xrextras-attach="target: model; offset: 1 15 3;"
+        shadow>
+    </a-entity>
+
+    <a-light type="ambient" intensity="0.5"></a-light>
+
+    <!--  if using the animation-mixer component, make sure to load the external library in head.html-->
+    <a-entity
+        id="model"
+        gltf-model="#animatedModel"
+        class="cantap"
+        scale="3 3 3"
+        animation-mixer="clip: idle; loop: repeat"
+        xrextras-hold-drag
+        xrextras-two-finger-rotate
+        xrextras-pinch-scale
+        shadow="receive: false">
+    </a-entity>
+
+    <a-plane id="ground" position="0 0 0" rotation="-90 0 0" width="50" height="50" material="shader: shadow" shadow></a-plane>
+</a-scene>
