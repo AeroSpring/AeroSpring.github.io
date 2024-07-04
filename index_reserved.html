@@ -1,5 +1,5 @@
 
-!<-- 93 index.html -->
+!<-- 96 index.html -->
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -26,28 +26,17 @@
 	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
 	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 	<script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
-
 	<a-scene embedded arjs>
-
         <a-assets>
-            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.gltf"></a-asset-item>
+            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.glb"></a-asset-item>
         </a-assets>
-				gltf-model="#animaModel"
-
-		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+        <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
 			<a-entity
 				position="0 0 0"
-                rotation="0 0 0"
-				scale="0.25 0.25 0.25"
-
-				gltf-model="obj/Interactive/Interactive.gltf"
-				gltf-model="obj/Fan/Fan.gltf"
-				gltf-model="obj/Fan/Fan.glb"
-
-				animation-mixer="clip: *; autoplay: true; loop: true"
-                animation-mixer="clip: Old_fan.004_propeller_0Action; autoplay: true; loop: true"
-
-                animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;"
+                rotation="180 0 0"
+				scale="0.4 0.4 0.4"
+				gltf-model="#animaModel"
+                animation-mixer="clip: ConeAction; autoplay: true; loop: true"
             ></a-entity>
             <a-sound 
                 src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav" 
