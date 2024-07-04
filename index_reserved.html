@@ -29,6 +29,12 @@
 //	<script src="js/aframe-extras.js"></script>
 
 	<a-scene embedded arjs>
+		
+        <a-assets>
+            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.gltf"></a-asset-item>
+        </a-assets>
+				gltf-model="#animaModel"
+
 		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
 			<a-entity
 				position="0 0 0"
