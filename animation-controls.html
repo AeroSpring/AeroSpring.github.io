@@ -5,7 +5,7 @@
     <script src="js/aframe-extras.js"></script>
     <script src="js/aframe-text-geometry-component.min.js"></script>
     <script>
-      var prevData = "clip: idle; crossFadeDuration: .3";;
+      var prevData = "clip: idle; crossFadeDuration: .3";
       var listenerAdded = false;
       var scene = document.querySelector('a-scene');
       var playOnce = false;
@@ -22,7 +22,7 @@
 
           this.el.addEventListener('click', () => {
             if (this.el != jumpBut){
-              bot.setAttribute("animation-mixer",this.data);
+              bot.setAttribute("animation-mixer", this.data);
               scene.removeEventListener('animation-loop', jumpTrans);
               prevData = this.data;
             }
@@ -37,7 +37,7 @@
               };
               console.log("prev data from jump button = " + prevData);
               setTimeout (function(){
-                scene.addEventListener('animation-loop',jumpTrans);
+                scene.addEventListener('animation-loop', jumpTrans);
               }, 500);
             }
           });
@@ -174,5 +174,5 @@
       </script>
 
   </body>
-  
+
 </html>
