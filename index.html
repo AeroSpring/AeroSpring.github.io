@@ -25,12 +25,12 @@
 	<script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
 	<a-scene embedded arjs>
         <a-assets>
-            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.glb"></a-asset-item>
+            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.gltf"></a-asset-item>
         </a-assets>
         <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
 			<a-entity
 				position="0 0 0"
-                rotation="0 0 0"
+                rotation="90 0 0"
 				scale="0.4 0.4 0.4"
 				gltf-model="#animaModel"
                 animation-mixer="clip: ConeAction; autoplay: true; loop: true"
