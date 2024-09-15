@@ -30,20 +30,20 @@
     <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
 			<!-- Plane to display the imafe -->
 			<a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
-			<!-- _ НаМеня ВнизПоЭкрану
+			<!-- ToRight ToUp ToDown
       position="0 0 0"
 			-->
       <a-entity
         position="0 0 0"
         rotation="0 0 0"
-				scale="1 1 1"
+				scale="0.3 0.3 0.3"
 				gltf-model="#animaModel"
         animation-mixer="clip: ConeAction; autoplay: true; loop: true"
       ></a-entity>
       <a-entity
-        position="1 0 0"
+        position="1 0 1"
         rotation="0 0 0"
-				scale="1 1 1"
+				scale="0.3 0.3 0.3"
 				gltf-model="#animaModel"
         animation-mixer="clip: CubeAction; autoplay: true; loop: true"
       ></a-entity>
