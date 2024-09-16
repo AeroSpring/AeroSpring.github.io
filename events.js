@@ -20,7 +20,7 @@ AFRAME.registerComponent('markerhandler', {
                 aEntity.setAttribute('animation-mixer', animationMixer);
 
             //}
-            //alert('Clicked at: ', evt.detail.intersection.point);
-            //console.log('I was clicked at: ', evt.detail.intersection.point);
+            alert('Clicked at: ', evt.detail.intersection.point);
+            //console.log('CClicked at: ', evt.detail.intersection.point);
         });
 }});
