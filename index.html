@@ -1,59 +1,33 @@
-<!DOCTYPE html>
-<html lang="ru">
-<style>
-  .arjs-loader {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+<!doctype HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    </head>
+    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    
+    <!-- import events.js script -->
+    <script src="https://rawgit.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/events.js"></script>
+    
+    <body style='margin : 0px; overflow: hidden;'>
+        <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
+        <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'>
 
-  .arjs-loader div {
-    text-align: center;
-    font-size: 1.25em;
-    color: white;
-  }
-</style>
-<body style="margin : 0px; overflow: hidden;">
-	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-	<script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
-	<a-scene embedded arjs>
-    <a-assets>
-      <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.glb"></a-asset-item>
-    </a-assets>
-    <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
-			<!-- Plane to display the imafe -->
-			<a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
-			<!-- ToRight ToUp ToDown
-      position="0 0 0"
-			-->
-      <a-entity
-        position="0 0.5 0"
-        rotation="0 0 0"
-				scale="0.25 0.25 0.25"
-				gltf-model="#animaModel"
-        animation-mixer="clip: ConeAction; autoplay: true; loop: true"
-      ></a-entity>
-      <a-entity
-        position="1 0.5 0"
-        rotation="0 0 0"
-				scale="0.25 0.25 0.25"
-				gltf-model="#animaModel"
-        animation-mixer="clip: CubeAction; autoplay: true; loop: true"
-      ></a-entity>
-      <a-sound
-        src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav"
-        autoplay="true"
-        position="-3 1 -4">
-      </a-sound>
-    </a-marker>
-    <a-entity camera></a-entity>
-  </a-scene>
-</body>
+        <a-assets>
+            <a-asset-item id="animated-asset" src="https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/models/CesiumMan.gltf"></a-asset-item>
+        </a-assets>
+
+        <a-marker markerhandler emitevents="true" cursor="rayOrigin: mouse" id="animated-marker" type='barcode' value='6'>
+            <a-entity
+                id="animated-model"
+                gltf-model="#animated-asset"
+                scale="2">
+            </a-entity>
+        </a-marker>
+
+        <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
+        <a-entity camera></a-entity>
+        </a-scene>
+    </body>
 </html>
