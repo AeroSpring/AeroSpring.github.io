@@ -9,8 +9,10 @@ AFRAME.registerComponent('markerhandler', {
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             if (aEntity && intersectedElement === aEntity) {
                 const scale = aEntity.getAttribute('scale');
-                Object.keys(scale).forEach((key) => scale[key] = scale[key] - 1);
+                Object.keys(scale).forEach((key) => scale[key] = scale[key] + 1);
                 aEntity.setAttribute('scale', scale);
             }
         });
 }});
+
+//src="https://rawgit.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/events.js"
