@@ -8,10 +8,18 @@ AFRAME.registerComponent('markerhandler', {
         animatedMarker.addEventListener('click', function(ev, _target){
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             if (aEntity && intersectedElement === aEntity) {
-                const animationMixer = aEntity.getAttribute('animation-mixer');
-                Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
-                aEntity.setAttribute('animation-mixer', animationMixer);
+
+                const rotation = aEntity.getAttribute('animation-mixer');
+                var arrayOfStrings = rotation.split(/\s/);
+                Object.keys(rotation).forEach((key) => rotation[key] = (Number(arrayOfStrings[0]) + 45) + " 0 0");
+                aEntity.setAttribute('rotation', rotation);
+
+                //const animationMixer = aEntity.getAttribute('animation-mixer');
+                //Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
+                //aEntity.setAttribute('animation-mixer', animationMixer);
+
             }
-            console.log('I was clicked at: ', evt.detail.intersection.point);
+            alert('Clicked at: ', evt.detail.intersection.point);
+            //console.log('I was clicked at: ', evt.detail.intersection.point);
         });
 }});
