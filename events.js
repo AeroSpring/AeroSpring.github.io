@@ -11,7 +11,7 @@ AFRAME.registerComponent('markerhandler', {
 
                 const rotation = aEntity.getAttribute('animation-mixer');
                 var arrayOfStrings = rotation.split(/\s/);
-                Object.keys(rotation).forEach((key) => rotation[key] = (Number(arrayOfStrings[0]) + 45) + " 0 0");
+                Object.keys(rotation).forEach((key) => rotation[key] = "0 " + (Number(arrayOfStrings[1]) + 45) + " 0");
                 aEntity.setAttribute('rotation', rotation);
 
                 //const animationMixer = aEntity.getAttribute('animation-mixer');
