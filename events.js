@@ -14,9 +14,9 @@ AFRAME.registerComponent('markerhandler', {
                 Object.keys(rotation).forEach((key) => rotation[key] = "0 0 " + (Number(arrayOfStrings[2]) + 45));
                 aEntity.setAttribute('rotation', rotation);
 
-                //const animationMixer = aEntity.getAttribute('animation-mixer');
-                //Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
-                //aEntity.setAttribute('animation-mixer', animationMixer);
+                const animationMixer = aEntity.getAttribute('animation-mixer');
+                Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
+                aEntity.setAttribute('animation-mixer', animationMixer);
 
             //}
             alert('Clicked at: ', evt.detail.intersection.point);
