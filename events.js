@@ -4,9 +4,9 @@ AFRAME.registerComponent('markerhandler', {
         const animatedMarker = document.querySelector("#animated-marker");
         const aEntity = document.querySelector("#animated-model");
 
-        alert('From script');
+        //alert('From script');
 
-        animatedMarker.addEventListener('click', function(ev){//, target){
+        animatedMarker.addEventListener('click', function(ev, target){
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
@@ -20,7 +20,7 @@ AFRAME.registerComponent('markerhandler', {
                 aEntity.setAttribute('animation-mixer', animationMixer);
 
             //}
-            alert('Clicked at: ', evt.detail.intersection.point);
+            //alert('Clicked at: ', evt.detail.intersection.point);
             //console.log('I was clicked at: ', evt.detail.intersection.point);
         });
 }});
