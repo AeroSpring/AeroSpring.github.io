@@ -5,13 +5,13 @@ AFRAME.registerComponent('markerhandler', {
         const aEntity = document.querySelector("#animated-model");
 
         // every click, we make our model grow in size :)
-        animatedMarker.addEventListener('click', function(ev, target){
+        animatedMarker.addEventListener('click', function(ev){//, target){
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
                 const rotation = aEntity.getAttribute('animation-mixer');
                 var arrayOfStrings = rotation.split(/\s/);
-                Object.keys(rotation).forEach((key) => rotation[key] = "0 " + (Number(arrayOfStrings[1]) + 45) + " 0");
+                Object.keys(rotation).forEach((key) => rotation[key] = "0 0 " + (Number(arrayOfStrings[2]) + 45));
                 aEntity.setAttribute('rotation', rotation);
 
                 //const animationMixer = aEntity.getAttribute('animation-mixer');
