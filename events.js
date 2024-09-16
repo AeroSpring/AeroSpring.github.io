@@ -4,6 +4,8 @@ AFRAME.registerComponent('markerhandler', {
         const animatedMarker = document.querySelector("#animated-marker");
         const aEntity = document.querySelector("#animated-model");
 
+        alert('From script');
+
         animatedMarker.addEventListener('click', function(ev){//, target){
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
