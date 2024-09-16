@@ -7,7 +7,7 @@ AFRAME.registerComponent('markerhandler', {
         // every click, we make our model grow in size :)
         animatedMarker.addEventListener('click', function(ev, target){
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
-            if (aEntity && intersectedElement === aEntity) {
+            //if (aEntity && intersectedElement === aEntity) {
 
                 const rotation = aEntity.getAttribute('animation-mixer');
                 var arrayOfStrings = rotation.split(/\s/);
@@ -18,7 +18,7 @@ AFRAME.registerComponent('markerhandler', {
                 //Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
                 //aEntity.setAttribute('animation-mixer', animationMixer);
 
-            }
+            //}
             alert('Clicked at: ', evt.detail.intersection.point);
             //console.log('I was clicked at: ', evt.detail.intersection.point);
         });
