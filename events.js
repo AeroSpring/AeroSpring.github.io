@@ -9,7 +9,7 @@ AFRAME.registerComponent('markerhandler', {
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             if (aEntity && intersectedElement === aEntity) {
                 const rotation = aEntity.getAttribute('rotation');
-                Object.keys(rotation).forEach((key) => rotation[key] = rotation[key] + 45);
+                Object.keys(rotation).forEach((key) => rotation[key] = rotation[key] - 90);
                 aEntity.setAttribute('rotation', rotation);
             }
         });
