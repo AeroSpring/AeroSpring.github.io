@@ -41,7 +41,7 @@
 
                     animatedMarker.addEventListener('click', function(ev){//, target){
 
-                        alert('Message from script № 2');
+                        alert('Message from script № 3');
 
                         const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
                         if (aEntity && intersectedElement === aEntity) {
@@ -65,7 +65,7 @@
       </script>
     
     <body style="margin : 0px; overflow: hidden;">
-        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;">
+        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
 
             <a-assets>
                 <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
