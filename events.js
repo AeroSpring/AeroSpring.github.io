@@ -11,7 +11,7 @@ AFRAME.registerComponent('markerhandler', {
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
-                const rotation = aEntity.getAttribute('animation-mixer');
+                const rotation = aEntity.getAttribute('rotation');
                 var arrayOfStrings = rotation.split(/\s/);
                 Object.keys(rotation).forEach((key) => rotation[key] = "0 0 " + (Number(arrayOfStrings[2]) + 45));
                 aEntity.setAttribute('rotation', rotation);
