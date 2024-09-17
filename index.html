@@ -41,7 +41,7 @@
 
                     animatedMarker.addEventListener('click', function(ev, target){
 
-                        alert('Message from script № 5');
+                        alert('Message from script № 1');
 
                         const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
                         if (aEntity && intersectedElement === aEntity) {
@@ -65,13 +65,13 @@
       </script>
     
     <body style="margin : 0px; overflow: hidden;">
-        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;" markerhandler>
+        <a-scene markerhandler embedded arjs="trackingMethod: best; debugUIEnabled: false;">
 
             <a-assets>
                 <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
             </a-assets>
 
-            <a-marker markerhandler emitevents="true" cursor="rayOrigin: mouse" id="animated-marker" type="pattern" url="/markers/pattern-qr-code.patt">
+            <a-marker emitevents="true" cursor="rayOrigin: mouse" id="animated-marker" type="pattern" url="/markers/pattern-qr-code.patt">
                 <!-- Plane to display the imafe -->
                 <!--
                 <a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
