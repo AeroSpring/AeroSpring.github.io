@@ -6,18 +6,18 @@ AFRAME.registerComponent('markerhandler', {
 
         //alert('From script');
 
-        animatedMarker.addEventListener('click', function(ev){//, target){
+        animatedMarker.addEventListener('click', function(ev, target){
             alert('Clicked at: ', evt.detail.intersection.point);
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
-                const rotation = aEntity.getAttribute('rotation');
-                var arrayOfStrings = rotation.split(/\s/);
-                Object.keys(rotation).forEach((key) => rotation[key] = "0 0 " + (Number(arrayOfStrings[2]) + 45));
-                aEntity.setAttribute('rotation', rotation);
+                const position = aEntity.getAttribute('position');
+                var arrayOfStrings = position.split(/\s/);
+                Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
+                aEntity.setAttribute('position', position);
 
                 const animationMixer = aEntity.getAttribute('animation-mixer');
-                Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; autoplay: true; loop: false");
+                Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; loop: false");
                 aEntity.setAttribute('animation-mixer', animationMixer);
 
             //}
