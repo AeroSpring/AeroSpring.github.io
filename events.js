@@ -8,7 +8,7 @@ AFRAME.registerComponent('markerhandler', {
 
         animatedMarker.addEventListener('click', function(ev, target){
             //alert('Clicked at: ', evt.detail.intersection.point);
-            alert('From script');
+            alert('Message from script №1');
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
