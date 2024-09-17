@@ -1,51 +1,52 @@
 <!DOCTYPE html>
-<html lang="ru">
-    <style>
-    .arjs-loader {
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+<html>
+  <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+  <!-- we import arjs version without NFT but with marker + location based support -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script>
+    window.onload = function () {
+      document
+        .querySelector(".say-hi-button")
+        .addEventListener("click", function () {
+          // here you can change also a-scene or a-entity properties, like
+          // changing your 3D model source, size, position and so on
+          // or you can just open links, trigger actions...
+          alert("Hi there!");
+        });
+    };
+  </script>
+  <style>
+    .buttons {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 5em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
     }
 
-    .arjs-loader div {
-        text-align: center;
-        font-size: 1.25em;
-        color: white;
+    .say-hi-button {
+      padding: 0.25em;
+      border-radius: 4px;
+      border: none;
+      background: white;
+      color: black;
+      width: 4em;
+      height: 2em;
     }
-    </style>
-
-    <head>
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    </head>
-	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-    <script src="https://rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
-    <script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
-    
-    <!-- import events.js script 
-    <script src="https://rawgit.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/events.js"></script>
-    -->
-    <script src="./events.js"></script>
-    
-    <body style="margin : 0px; overflow: hidden;">
-        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;">
-
+  </style>
+  <body style="margin : 0px; overflow: hidden;">
+    <div class="buttons">
+      <button class="say-hi-button">SAY HI!</button>
+    </div>
+    <a-scene embedded arjs>
         <a-assets>
             <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
         </a-assets>
-
-        <a-marker markerhandler emitevents="true" cursor="rayOrigin: mouse" id="animated-marker" type="pattern" url="/markers/pattern-qr-code.patt">
-			<!-- Plane to display the imafe -->
-			<!-- -->
-            <a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
-            <!-- -->
-
+        <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
             <a-entity
                 id="animated-model"
                 position="0 0.5 0"
@@ -53,10 +54,8 @@
                 scale="0.25 0.25 0.25"
                 gltf-model="#animated-asset"
             ></a-entity>
-        </a-marker>
-
-        <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
-        <a-entity camera></a-entity>
-        </a-scene>
-    </body>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
 </html>
