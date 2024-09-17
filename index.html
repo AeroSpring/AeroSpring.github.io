@@ -27,38 +27,11 @@
     <script src="https://rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
     <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
     <script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
-    <script>
-        AFRAME.registerComponent('markerhandler') = function() {
-            const animatedMarker = document.querySelector("#animated-marker");
-            const aEntity = document.querySelector("#animated-model");
-
-            //alert('From script');
-
-            animatedMarker.addEventListener('click', function(ev, target){
-                alert('Clicked at: ', evt.detail.intersection.point);
-                const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
-                //if (aEntity && intersectedElement === aEntity) {
-
-                    const position = aEntity.getAttribute('position');
-                    var arrayOfStrings = position.split(/\s/);
-                    Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
-                    aEntity.setAttribute('position', position);
-
-                    const animationMixer = aEntity.getAttribute('animation-mixer');
-                    Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; loop: false");
-                    aEntity.setAttribute('animation-mixer', animationMixer);
-
-                //}
-                alert('Clicked at: ', evt.detail.intersection.point);
-                //console.log('CClicked at: ', evt.detail.intersection.point);
-            });
-        };
-    </script>
 
     <!-- import events.js script 
     <script src="https://rawgit.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/events.js"></script>
-    <script src="./events.js"></script>
     -->
+    <script src="./events.js"></script>
     
     <body style="margin : 0px; overflow: hidden;">
         <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;">

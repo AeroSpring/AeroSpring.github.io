@@ -7,7 +7,8 @@ AFRAME.registerComponent('markerhandler', {
         //alert('From script');
 
         animatedMarker.addEventListener('click', function(ev, target){
-            alert('Clicked at: ', evt.detail.intersection.point);
+            //alert('Clicked at: ', evt.detail.intersection.point);
+            alert('From script');
             const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
             //if (aEntity && intersectedElement === aEntity) {
 
@@ -22,6 +23,6 @@ AFRAME.registerComponent('markerhandler', {
 
             //}
             alert('Clicked at: ', evt.detail.intersection.point);
-            //console.log('CClicked at: ', evt.detail.intersection.point);
+            //console.log('Clicked at: ', evt.detail.intersection.point);
         });
 }});
