@@ -57,6 +57,7 @@
             <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
         </a-assets>
         <a-marker 
+
             markerhandler 
             emitevents="true" 
             cursor="fuse: true; rayOrigin: mouse" 
@@ -65,12 +66,26 @@
             type="pattern"
             url="/markers/pattern-qr-code.patt">
 
-            <a-entity id="rotate" gltf-model="#animated-asset" scale="130 130 130" position="0 -0.5 -0.5" cursor-animator>
-                <a-animation begin="click" attribute="rotation" to="0 360 0" delay="500" dur="10000"></a-animation>
+            <a-entity 
+                id="rotate" 
+                gltf-model="#animated-asset" 
+                scale="0.25 0.25 0.25"
+                position="0 0.5 0" 
+                cursor-animator>
+
+                <a-animation 
+                    begin="click" 
+                    attribute="rotation" 
+                    to="0 360 0" 
+                    delay="500" 
+                    dur="10000"
+                ></a-animation>
             </a-entity>
 
         </a-marker>
+
         <a-entity camera> <a-cursor></a-cursor> </a-entity>
+        
     </a-scene>
 </body>
 
