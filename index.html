@@ -39,7 +39,7 @@
                 const aEntity = document.querySelector("#animated-model");
 
                 this.el.addEventListener('click', function (evt) {
-                    
+
 
                     //console.log('fuse: true; rayOrigin: mouse');
 
@@ -52,8 +52,8 @@
                     //aEntity.setAttribute('position', position);
 
                     const animationMixer = aEntity.getAttribute('animation-mixer');
-                    Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; loop: false");
-                    aEntity.setAttribute('animation-mixer', animationMixer);
+                    //Object.keys(animationMixer) = "clip: ConeAction; loop: false";
+                    aEntity.setAttribute('animation-mixer', "clip: ConeAction; autoplay: true; loop: false");
 
                 });
             }
