@@ -52,15 +52,22 @@
                 <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
             </a-assets>
 
-            <a-entity camera look-controls>
-                <a-entity cursor="fuse: true; fuseTimeout: 500"
-                    position="0 0 -1"
-                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: black; shader: flat">
-                </a-entity>
-            </a-entity>
+            <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+                <!-- Plane to display the imafe -->
+                <!--
+                <a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
+                -->
 
-            <a-entity id="box" cursor-listener geometry="primitive: box" material="color: blue"></a-entity>
+                <a-entity camera look-controls>
+                    <a-entity cursor="fuse: true; fuseTimeout: 500"
+                        position="0 0 -1"
+                        geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                        material="color: black; shader: flat">
+                    </a-entity>
+                </a-entity>
+    
+                <a-entity id="box" cursor-listener geometry="primitive: box" material="color: blue"></a-entity>
+            </a-marker>
 
         </a-scene>
     </body>
