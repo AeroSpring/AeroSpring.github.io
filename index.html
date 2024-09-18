@@ -53,8 +53,6 @@
             });
 
         }
-//        <a-entity id="raycaster" raycaster></a-entity>
-//        <a-entity geometry material raycaster-listen></a-entity>
     </script>
 
 
@@ -63,10 +61,9 @@
     <body style="margin : 0px; overflow: hidden;">
         <a-scene embedded arjs>
             
-            <a-entity raycaster="objects: .clickable" cursor></a-entity>
-            <a-entity class="clickable" geometry="primitive: box" position="1 0 0"></a-entity>
-            <a-entity class="not-clickable" geometry="primitive: sphere" position="-1 0 0"></a-entity>
-
+            <a-entity id="raycaster" raycaster></a-entity>
+            <a-entity geometry material raycaster-listen></a-entity>
+            
         </a-scene>
     </body>
 </html>
