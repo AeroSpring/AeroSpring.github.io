@@ -36,7 +36,7 @@
 
                 init: function () {
                     this.el.addEventListener('raycaster-intersection', function () {
-                        console.log('Player hit something!');
+                        alert('Что-то произошло № 1');
                     });
                 }
             });
@@ -44,7 +44,7 @@
     </script>
     
     <body style="margin : 0px; overflow: hidden;">
-        <a-scene embedded arjs">
+        <a-scene embedded arjs>
 
             <a-entity id="player">
                 <a-entity 
