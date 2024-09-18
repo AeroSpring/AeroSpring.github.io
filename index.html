@@ -42,10 +42,10 @@
 
                     //alert('fuse: true; rayOrigin: mouse');
 
-                    const position = aEntity.getAttribute('position');
-                    var arrayOfStrings = position.split(/\s/);
-                    Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
-                    aEntity.setAttribute('position', position);
+                    //const position = aEntity.getAttribute('position');
+                    //var arrayOfStrings = position.split(/\s/);
+                    //Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
+                    //aEntity.setAttribute('position', position);
 
                     const animationMixer = aEntity.getAttribute('animation-mixer');
                     Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; loop: false");
@@ -68,7 +68,7 @@
 </head>
 
 <body style='margin : 0px; overflow: hidden;'>
-    <a-scene embedded arjs="sourceType: webcam;" raycaster-autorefresh>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
 
         <a-assets>
             <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
@@ -88,12 +88,13 @@
                 gltf-model="#animated-asset"
                 position="0 0.5 0"
                 scale="0.25 0.25 0.25"
-                animation-mixer="clip: ConeAction; loop: false"
+                animation-mixer="clip: ConeAction; autoplay: false; loop: false"
                 cursor-animator>
 
                 <a-animation
                     begin="click"
                     attribute="rotation" to="0 360 0" delay="0" dur="1000"
+                    attribute="position" to="0 1 0" delay="0" dur="1000"
                 ></a-animation>
             </a-entity>
         </a-marker>
