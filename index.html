@@ -33,7 +33,7 @@
         AFRAME.registerComponent('cursor-animator', {
             init: function () {
                 this.el.addEventListener('click', function (evt) {
-                    alert('click entity');
+                    alert('click xrselect');
 
                 });
             }
@@ -60,7 +60,7 @@
 
             markerhandler 
             emitevents="true" 
-            cursor="rayOrigin: entity" 
+            cursor="rayOrigin: xrselect" 
             id="animated-marker"
             preset='custom' 
             type="pattern"
