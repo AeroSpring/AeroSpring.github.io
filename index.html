@@ -31,14 +31,12 @@
     <script>
         window.onload = function () {
             // Component to change to a sequential color on click.
-            AFRAME.registerComponent('cursor-listener', {
+            AFRAME.registerComponent('collider-check', {
+                dependencies: ['raycaster'],
+
                 init: function () {
-                    var lastIndex = -1;
-                    var COLORS = ['red', 'green', 'blue'];
-                    this.el.addEventListener('click', function (evt) {
-                        lastIndex = (lastIndex + 1) % COLORS.length;
-                        this.setAttribute('material', 'color', COLORS[lastIndex]);
-                        console.log('I was clicked at: ', evt.detail.intersection.point);
+                    this.el.addEventListener('raycaster-intersection', function () {
+                        console.log('Player hit something!');
                     });
                 }
             });
@@ -46,22 +44,17 @@
     </script>
     
     <body style="margin : 0px; overflow: hidden;">
-        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;">
+        <a-scene embedded arjs">
 
-            <a-assets>
-                <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
-            </a-assets>
+            <a-entity id="player">
+                <a-entity 
+                    collider-check raycaster="objects: .collidable; showLine:true;" 
+                    position="0 1 0"
+                ></a-entity
+            ></a-entity>
 
-            <a-entity id="box" cursor-listener geometry="primitive: box" material="color: blue"></a-entity>
+            <a-entity class="collidable" geometry="primitive: box"  position="0 1 -3"></a-entity>
 
-            <a-entity camera look-controls>
-                <a-entity cursor="fuse: true; fuseTimeout: 500"
-                    position="0 0 -1"
-                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: black; shader: flat">
-                </a-entity>
-            </a-entity>
-            
         </a-scene>
     </body>
 </html>
