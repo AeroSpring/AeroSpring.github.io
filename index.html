@@ -31,27 +31,17 @@
     <script>
         window.onload = function () {
 
-            AFRAME.registerComponent('raycaster-listen', {
+            AFRAME.registerComponent('cursor-listener', {
                 init: function () {
-                    // Use events to figure out what raycaster is listening so we don't have to
-                    // hardcode the raycaster.
-                    this.el.addEventListener('raycaster-intersected', evt => {
-                        this.raycaster = evt.detail.el;
+                    var lastIndex = -1;
+                    var COLORS = ['red', 'green', 'blue'];
+                    this.el.addEventListener('click', function (evt) {
+                        lastIndex = (lastIndex + 1) % COLORS.length;
+                        this.setAttribute('material', 'color', COLORS[lastIndex]);
+                        alert('I was clicked at: ', evt.detail.intersection.point);
                     });
-                    this.el.addEventListener('raycaster-intersected-cleared', evt => {
-                        this.raycaster = null;
-                    });
-                },
-
-                tick: function () {
-                    if (!this.raycaster) { return; }  // Not intersecting.
-
-                    let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
-                    if (!intersection) { return; }
-                    alert(intersection.point);
                 }
             });
-
         }
     </script>
 
@@ -61,13 +51,19 @@
     <body style="margin : 0px; overflow: hidden;">
         <a-scene embedded arjs>
 
-            <a-entity raycaster="objects: .clickable" cursor></a-entity>
-            <a-entity class="clickable" geometry="primitive: box" position="1 0 0" scale="0.25 0.25 0.25"></a-entity>
-            <a-entity class="not-clickable" geometry="primitive: sphere" position="-1 0 0" scale="0.25 0.25 0.25"></a-entity>
+            <a-entity position="0 0 0">
+                <a-entity camera look-controls wasd-controls>
+                    <a-entity position="0 0 -3"
+                        geometry="primitive: ring; radiusInner: 0.1; radiusOuter: 0.2;"
+                        material="color: #f04661; shader: flat; opacity:0.2;"
+                        cursor="maxDistance: 30; fuse: true">
 
-            <a-entity id="raycaster" raycaster></a-entity>
-            <a-entity geometry material raycaster-listen></a-entity>
-            
+                        <a-animation begin="click" easing="ease-in" attribute="scale" fill="forwards" from="0.2 0.2 0.2" to="1 1 1" dur="150"></a-animation>
+                        <a-animation begin="fusing" easing="ease-in" attribute="scale" fill="backwards" from="1 1 1" to="0.2 0.2 0.2" dur="1500"></a-animation>
+                    </a-entity>
+                </a-entity>
+            </a-entity>
+                        
         </a-scene>
     </body>
 </html>
