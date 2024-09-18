@@ -88,12 +88,11 @@
                 gltf-model="#animated-asset"
                 position="0 0.5 0"
                 scale="0.25 0.25 0.25"
-                animation-mixer="clip: ConeAction; autoplay: false; loop: false"
+                animation-mixer="clip: CubeAction; autoplay: true; loop: false"
                 cursor-animator>
 
                 <a-animation
                     begin="click"
-                    attribute="rotation" to="0 360 0" delay="0" dur="1000"
                     attribute="position" to="0 1 0" delay="0" dur="1000"
                 ></a-animation>
             </a-entity>
