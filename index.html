@@ -30,30 +30,42 @@
 
     <script>
         window.onload = function () {
-            // Component to change to a sequential color on click.
-            AFRAME.registerComponent('collider-check', {
-                dependencies: ['raycaster'],
 
+            AFRAME.registerComponent('raycaster-listen', {
                 init: function () {
-                    this.el.addEventListener('raycaster-intersection', function () {
-                        alert('Что-то произошло № 1');
+                    // Use events to figure out what raycaster is listening so we don't have to
+                    // hardcode the raycaster.
+                    this.el.addEventListener('raycaster-intersected', evt => {
+                        this.raycaster = evt.detail.el;
                     });
+                    this.el.addEventListener('raycaster-intersected-cleared', evt => {
+                        this.raycaster = null;
+                    });
+                },
+
+                tick: function () {
+                    if (!this.raycaster) { return; }  // Not intersecting.
+
+                    let intersection = this.raycaster.components.raycaster.getIntersection(this.el);
+                    if (!intersection) { return; }
+                    alert(intersection.point);
                 }
             });
+
         }
+//        <a-entity id="raycaster" raycaster></a-entity>
+//        <a-entity geometry material raycaster-listen></a-entity>
     </script>
-    
+
+
+
+
     <body style="margin : 0px; overflow: hidden;">
         <a-scene embedded arjs>
-
-            <a-entity id="player">
-                <a-entity 
-                    collider-check raycaster="objects: .collidable; showLine:true;" 
-                    position="0 1 0"
-                ></a-entity
-            ></a-entity>
-
-            <a-entity class="collidable" geometry="primitive: box"  position="0 1 -3"></a-entity>
+            
+            <a-entity raycaster="objects: .clickable" cursor></a-entity>
+            <a-entity class="clickable" geometry="primitive: box" position="1 0 0"></a-entity>
+            <a-entity class="not-clickable" geometry="primitive: sphere" position="-1 0 0"></a-entity>
 
         </a-scene>
     </body>
