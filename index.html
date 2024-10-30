@@ -28,6 +28,7 @@
     <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
     <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
     <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
+    <script src="./dist/aframe-mouse-cursor-component.min.js"></script>
 </head>
 
 <body style='margin : 0px; overflow: hidden;'>
@@ -38,7 +39,6 @@
         </a-assets>
 
         <a-marker
-            markerhandler
             emitevents="true"
             cursor="fuse: true; rayOrigin: mouse"
             id="animated-marker"
@@ -66,7 +66,7 @@
             </a-entity>
         </a-marker>
 
-        <a-entity camera>
+        <a-entity camera look-controls mouse-cursor>
             <a-cursor></a-cursor>
         </a-entity>
 
