@@ -34,9 +34,8 @@
   -->
 </head>
 
-<body style='margin : 0px; overflow: hidden;'>
-
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+<body class="a-body">
+  <a-scene class="fullscreen" canvas="" inspector="" keyboard-shortcuts="" screenshot="" vr-mode-ui="" auto-enter-vr="">
 
     <a-assets>
         <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
@@ -80,7 +79,7 @@
       </a-entity>
 
       <a-entity
-        text="value: Mark 8; color: #BBB"
+        text="value: Mark 9; color: #BBB"
         position="-0.9 0.2 -3"
         scale="1.5 1.5 1.5"
       ></a-entity>
@@ -96,7 +95,7 @@
 </body>
 
 <script>
-  var textOutput = "8";
+  var textOutput = "9";
   document.getElementById("textOutput").innerHTML = textOutput;
 </script>
 
