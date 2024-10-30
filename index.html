@@ -25,74 +25,52 @@
 </head>
 
 <head>
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
-  <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
-  <script src="./dist/aframe-mouse-cursor-component.min.js"></script>
-  <!-- import events.js script
-  <script src="./events.js"></script>
-  -->
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
 </head>
 
 <body style='margin : 0px; overflow: hidden;'>
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
 
-    <p>Mark <span id="textOutput"></span> </p>
+        <a-assets>
+            <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
+        </a-assets>
 
-    <a-assets>
-        <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
-    </a-assets>
+        <a-marker
+            markerhandler
+            emitevents="true"
+            cursor="fuse: true; rayOrigin: mouse"
+            id="animated-marker"
+            preset='custom'
+            type="pattern"
+            url="/markers/pattern-qr-code.patt">
 
-    <a-marker
-      id="animated-marker"
-      preset='custom'
-      type="pattern"
-      url="/markers/pattern-qr-code.patt">
+            <a-entity
+                id="animated-model"
+                gltf-model="#animated-asset"
+                position="0 0.5 0"
+                scale="0.25 0.25 0.25"
+                animation-mixer="clip: CubeAction; autoplay: true; loop: false"
+                cursor-animator>
 
-          <!--
-          <a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
-          -->
+                <a-animation
+                    begin="click"
+                    attribute="position" to="0.5 0.5 0" delay="0" dur="1000"
+                ></a-animation>
 
-        <a-entity
-          id="animated-model"
-          gltf-model="#animated-asset"
-          position="0 0.0 0"
-          scale="0.25 0.25 0.25"
-          animation-mixer="clip: CubeAction; autoplay: true; loop: false"
-          >
-          <!-- events:
-          event-set__enter="_event: mouseenter; material.color: yellowgreen; scale: 3 1 1"
-          event-set__leave="_event: mouseleave; material.color: skyblue; scale: 1 1 1"
-          -->
+                <a-animation
+                    begin="click"
+                    attribute="rotation" to="0 -90 0" delay="0" dur="1000"
+                ></a-animation>
+            </a-entity>
+        </a-marker>
 
-          <!-- more events:
-          <a-animation
-            begin="click"
-            attribute="rotation"
-            to="0 -90 0"
-            dur="500"
-            delay="0"
-          ></a-animation>
-          -->
+        <a-entity camera>
+            <a-cursor></a-cursor>
+        </a-entity>
 
-          <a-animation
-              begin="click"
-              attribute="position" to="0.5 0.5 0" delay="0" dur="1000"
-          ></a-animation>
-
-      </a-entity>
-
-    </a-marker>
-
-    <a-entity camera mouse-cursor>
-    </a-entity>
-
-  </a-scene>
+    </a-scene>
 </body>
-
-<script>
-  var textOutput = "16 :: 1.6.0";
-  document.getElementById("textOutput").innerHTML = textOutput;
-</script>
 
 </html>
