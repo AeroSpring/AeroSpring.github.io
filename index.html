@@ -34,8 +34,9 @@
   -->
 </head>
 
-<body class="a-body">
-  <a-scene class="fullscreen" canvas="" inspector="" keyboard-shortcuts="" screenshot="" vr-mode-ui="" auto-enter-vr="">
+<body style='margin : 0px; overflow: hidden;'>
+
+  <a-scene>
 
     <a-assets>
         <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
@@ -79,7 +80,7 @@
       </a-entity>
 
       <a-entity
-        text="value: Mark 9; color: #BBB"
+        text="value: Mark 10; color: #BBB"
         position="-0.9 0.2 -3"
         scale="1.5 1.5 1.5"
       ></a-entity>
@@ -95,7 +96,7 @@
 </body>
 
 <script>
-  var textOutput = "9";
+  var textOutput = "10";
   document.getElementById("textOutput").innerHTML = textOutput;
 </script>
 
