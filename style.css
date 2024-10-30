@@ -8,7 +8,7 @@ body, canvas {
   display: none;
   user-select: none;
 }    
-#add_icon, #switch_icon {
+#add_icon{
   position: absolute;
   left: 0;
   bottom: 10vh;
@@ -19,12 +19,23 @@ body, canvas {
   color: #0096db;
 }
 #switch_icon {
+  position: absolute;
   left: 5vh;
   bottom: 5vh;
-  width: 100%;
   text-align: left;
   font-size: 5vh;
   color: grey;
+}
+#save_icon {
+  position: absolute;
+  right: 5vh;
+  top: 5vh;
+  text-align: right;
+  font-size: 5vh;
+  color: grey;
+}
+input[type="file"] {
+  display: none;
 }
 #color_input {
   display: none;
@@ -99,4 +110,35 @@ body, canvas {
 }
 #physics_icon {
   color: grey;
+}
+#open-file-block {
+  position: absolute;
+  top: 35vh;
+  left: 0;
+  width: 100%;
+}
+#open-file-block span{
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+#open_file_icon {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 10vh;
+}
+.xr-button-overlay {
+  position: absolute;
+  top: 55vh;
+  left: 0vw;
+  width: 100%;
+  text-align: center;
+}
+.babylonVRicon{
+  height: 10vh !important;
+  /* background-image: url(icon.png); */
 }
