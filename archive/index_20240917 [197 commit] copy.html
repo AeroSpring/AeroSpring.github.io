@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <style>
+    .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .arjs-loader div {
+        text-align: center;
+        font-size: 1.25em;
+        color: white;
+    }
+    </style>
+
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    </head>
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://rawgit.com/jeromeetienne/AR.js/master/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    <script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
+
+    <!-- import events.js script 
+    <script src="https://rawgit.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-click-events/events.js"></script>
+    <script src="./events.js"></script>
+    -->
+    <script>
+        window.onload = function () {
+            AFRAME.registerComponent('markerhandler', {
+                init: function() {
+                    const animatedMarker = document.querySelector("#animated-marker");
+                    const aEntity = document.querySelector("#animated-model");
+
+                    animatedMarker.addEventListener('click', function(ev, target){
+
+                        alert('Message from script № 1');
+
+                        const intersectedElement = ev && ev.detail && ev.detail.intersectedEl;
+                        if (aEntity && intersectedElement === aEntity) {
+
+                            const position = aEntity.getAttribute('position');
+                            var arrayOfStrings = position.split(/\s/);
+                            Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
+                            aEntity.setAttribute('position', position);
+
+                            const animationMixer = aEntity.getAttribute('animation-mixer');
+                            Object.keys(animationMixer).forEach((key) => animationMixer[key] = "clip: ConeAction; loop: false");
+                            aEntity.setAttribute('animation-mixer', animationMixer);
+
+                        }
+                        alert('Clicked at: ', evt.detail.intersection.point);
+                        //console.log('Clicked at: ', evt.detail.intersection.point);
+                    });
+                }
+            });
+        };
+      </script>
+    
+    <body style="margin : 0px; overflow: hidden;">
+        <a-scene embedded arjs="trackingMethod: best; debugUIEnabled: false;">
+
+            <a-assets>
+                <a-asset-item id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset-item>
+            </a-assets>
+
+            <a-marker markerhandler emitevents="true" cursor="rayOrigin: mouse" id="animated-marker" type="pattern" url="/markers/pattern-qr-code.patt">
+                <!-- Plane to display the imafe -->
+                <!--
+                <a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
+                -->
+
+                <a-entity
+                    id="animated-model"
+                    position="0 0.5 0"
+                    rotation="0 0 0"
+                    scale="0.25 0.25 0.25"
+                    gltf-model="#animated-asset"
+                ></a-entity>
+            </a-marker>
+
+            <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
+            <a-entity camera></a-entity>
+
+        </a-scene>
+    </body>
+</html>
