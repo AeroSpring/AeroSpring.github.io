@@ -38,6 +38,12 @@
             <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
         </a-assets>
 
+        <a-entity
+          text="value: Mark 13; color: #BBB"
+          position="-0.9 0.2 -3"
+          scale="1.5 1.5 1.5"
+        ></a-entity>
+
         <a-marker
             emitevents="true"
             cursor="fuse: true; rayOrigin: mouse"
@@ -45,12 +51,6 @@
             preset='custom'
             type="pattern"
             url="/markers/pattern-qr-code.patt">
-
-            <a-entity
-              text="value: Mark 13; color: #BBB"
-              position="-0.9 0.2 -3"
-              scale="1.5 1.5 1.5"
-            ></a-entity>
 
             <a-entity
                 id="animated-model"
