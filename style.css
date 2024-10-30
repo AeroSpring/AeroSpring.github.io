@@ -8,7 +8,7 @@ body, canvas {
   display: none;
   user-select: none;
 }    
-#add_icon {
+#add_icon, #switch_icon {
   position: absolute;
   left: 0;
   bottom: 10vh;
@@ -17,6 +17,14 @@ body, canvas {
   font-size: 10vh;   
   opacity: 0.7;   
   color: #0096db;
+}
+#switch_icon {
+  left: 5vh;
+  bottom: 5vh;
+  width: 100%;
+  text-align: left;
+  font-size: 5vh;
+  color: grey;
 }
 #color_input {
   display: none;
@@ -88,4 +96,7 @@ body, canvas {
 }
 #gizmo-block span {
   font-size: 5vh;
+}
+#physics_icon {
+  color: grey;
 }
