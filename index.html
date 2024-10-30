@@ -17,6 +17,11 @@
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
     let scene = new BABYLON.Scene(engine);
+    // Создание среды по умолчанию (для вывода текстур 3D-модели)
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
     // Создание света
     let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
     light.intensity = 0.7;
@@ -29,6 +34,7 @@
       }
     });
 
+    /*
     // Создание куба
     let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
     box.material = new BABYLON.StandardMaterial('material', scene);
@@ -39,6 +45,7 @@
     // Степень непрозрачности
     box.hasVertexAlpha = true;
     box.visibility = 0.7;
+    */
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
     BABYLON.SceneLoader.ImportMesh(
@@ -47,7 +54,12 @@
       'Fan.gltf', 
       scene, 
       (meshArray) => {
-        //meshArray[0]
+        let fan = meshArray[0];
+        fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        fan.position = new BABYLON.Vector3(0, 1, 1);
+        shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
+        fan.receiveShadows = true; //принимаемая тень
+
       }
     );
 
