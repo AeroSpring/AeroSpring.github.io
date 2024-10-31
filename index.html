@@ -39,6 +39,10 @@
     let featuresManager = xr.baseExperience.featuresManager;
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
     // Отображение DOM Overlay, после перехода в xr-режим
+    BABYLON.WebXRState.IN_XR = true;
+    domOverlay.style.display = 'block';
+    /*
+    // Отображение DOM Overlay, после перехода в xr-режим
     xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
@@ -52,13 +56,14 @@
         default: break;
       }
     });
+    */
 
     /*
     // Подключение Gizmo-менедджера
     let gizmoManager = new BABYLON.GizmoManager(scene);
     */
 
-
+    
     // ПЕРЕМЕННЫЕ
     let activeElement = null;
 
@@ -88,17 +93,18 @@
 
 
     engine.runRenderLoop(() => {
+      /*
       if(activeElement) {
         activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
       }
+      */
       scene.render()
     });
 
 
     // Обработчики событий
     fan.addEventListener('click', (event) => {
-      activeElement = fan;
-      //fan.position = new BABYLON.Vector3(0, 1, 0.5);
+      fan.position = new BABYLON.Vector3(0, 1, 0.5);
     });
 
     /*
