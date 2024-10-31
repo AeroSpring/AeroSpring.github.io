@@ -102,14 +102,12 @@
     );
     
     sl.actionManager = new BABYLON.ActionManager(scene);
-    sl.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+    sl.actionManager.registerAction(new BABYLON.SetValueAction(
       BABYLON.ActionManager.OnPickTrigger, 
-      function (evt) {
-        const fan = evt.meshUnderPointer;
-        //move the fan upright
-        fan.position.x += 1;
-        fan.position.y += 1;
-    }));
+      sl, 
+      "scaling", 
+      new BABYLON.Vector3(0.5, 0.5, 0.5)
+    ));
 
 
     // ФУНКЦИИ
