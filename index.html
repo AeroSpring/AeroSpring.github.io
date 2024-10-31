@@ -10,7 +10,7 @@
     <canvas id="renderCanvas"></canvas>
     <script>
         const canvas = document.getElementById("renderCanvas");
-        const engine = new BABYLON.Engine(canvas, true);
+        const engine = new BABYLON.Engine(canvas);//, true);
 
         const createScene = function() {
             const scene = new BABYLON.Scene(engine);
@@ -48,7 +48,7 @@
             */
 
             //ЗАГРУЗКА 3D-МОДЕЛИ
-            BABYLON.SceneLoader.ImportMesh(
+            const propeller = BABYLON.SceneLoader.ImportMesh(
               null, 
               'assets/Fan/', 
               'Fan.gltf', 
@@ -61,14 +61,14 @@
                 fan.receiveShadows = true; //принимаемая тень
               }
             );
-            fan.actionManager = new BABYLON.ActionManager(scene);
-            fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+            propeller.actionManager = new BABYLON.ActionManager(scene);
+            propeller.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
               BABYLON.ActionManager.OnPickTrigger, 
               function (evt) {
-                const sourcefan = evt.meshUnderPointer;
+                const newpropeller = evt.meshUnderPointer;
                 //move the fan upright
-                fan.position.x += 0.5;
-                fan.position.y += 0.5;
+                newpropeller.position.x += 0.5;
+                newpropeller.position.y += 0.5;
             }));
 
             const ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 4, height: 4});
