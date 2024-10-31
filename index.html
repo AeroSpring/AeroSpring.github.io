@@ -117,17 +117,6 @@
       }
     );
     */
-    
-    model.meshes[0].actionManager = new BABYLON.ActionManager(scene);
-    model.meshes[0].actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
-        function (evt) {
-            model.meshes[0] = evt.meshUnderPointer;
-            model.meshes[0].position.x += 0.5;
-            model.meshes[0].position.y += 0.5;
-        }
-      )
-    );
 
 
     // ФУНКЦИИ
@@ -149,7 +138,20 @@
     });
 
 
-    // Обработчики событий
+    // ОБРАБОТЧИКИ СОБЫТИЙ
+    /*
+    model.meshes[0].actionManager = new BABYLON.ActionManager(scene);
+    model.meshes[0].actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+        function (evt) {
+            model.meshes[0] = evt.meshUnderPointer;
+            model.meshes[0].position.x += 0.5;
+            model.meshes[0].position.y += 0.5;
+        }
+      )
+    );
+    */
+
     /*
     fan.addEventListener('click', (event) => {
       fan.position = new BABYLON.Vector3(0, 1, 0.5);
