@@ -88,7 +88,7 @@
     //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/vintageDeskFan/", "vintageFan_animated.gltf", scene);
     //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/Fan/", "Fan.gltf", scene);
     const model = await BABYLON.appendSceneAsync("assets/Fan/Fan.gltf", scene);
-    model.meshes[0].parent = root;
+    //model.meshes[0].parent = root;
     model.meshes[0].scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
     model.meshes[0].position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
     //model.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
