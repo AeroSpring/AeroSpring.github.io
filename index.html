@@ -8,13 +8,17 @@
 </head>
 <body>
     <canvas id="renderCanvas"></canvas>
-    <script>
+    <script type="module">
         const canvas = document.getElementById("renderCanvas");
         const engine = new BABYLON.Engine(canvas);//, true);
 
         const createScene = function() {
-            const scene = new BABYLON.Scene(engine);
-            scene.clearColor = new BABYLON.Color3.Black;
+            let scene = new BABYLON.Scene(engine);
+            // Создание среды по умолчанию (для вывода текстур 3D-модели)
+            scene.createDefaultEnvironment({
+              createSkybox: false,
+              createGround: false
+            });
 
             const alpha =  Math.PI/4;
             const beta = Math.PI/3;
@@ -25,6 +29,14 @@
             camera.attachControl(canvas, true);
 
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+
+            // Подключение WebXR
+            scene.createDefaultXRExperienceAsync({
+              uiOptions: {
+                sessionMode: 'immersive-ar', 
+                referenceSpaceType: 'local-floor',
+              }
+            });
 
             /*
             const box = BABYLON.MeshBuilder.CreateBox("box", {});
@@ -48,7 +60,7 @@
             */
 
             //ЗАГРУЗКА 3D-МОДЕЛИ
-            BABYLON.SceneLoader.ImportMesh(
+            const propeller = BABYLON.SceneLoader.ImportMesh(
               null, 
               'assets/Fan/', 
               'Fan.gltf', 
@@ -61,8 +73,8 @@
                 fan.receiveShadows = true; //принимаемая тень
               }
             );
-            fan.actionManager = new BABYLON.ActionManager(scene);
-            fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+            propeller.actionManager = new BABYLON.ActionManager(scene);
+            propeller.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
               BABYLON.ActionManager.OnPickTrigger, 
               function (evt) {
                 const newpropeller = evt.meshUnderPointer;
