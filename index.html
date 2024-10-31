@@ -3,18 +3,17 @@
 </head>
 <body> 
   <canvas></canvas>
-  <!--
+  
   <div id="dom-overlay">
-    <div id="gizmo-block"></div>
+    <!-- <div id="gizmo-block"></div> -->
   </div>
-  -->
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script type="module">
     // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
-    //let domOverlay = window.document.querySelector('#dom-overlay');
+    let domOverlay = window.document.querySelector('#dom-overlay');
     // Создание движка
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
@@ -35,8 +34,8 @@
         referenceSpaceType: 'local-floor',
       }
     });
-    /*
-    let xrCamera = xr.baseExperience.camera;
+
+    //let xrCamera = xr.baseExperience.camera;
 
     // Подключение DOM Overlay
     let featuresManager = xr.baseExperience.featuresManager;
@@ -55,7 +54,6 @@
         default: break;
       }
     });
-    */
 
     /*
     // Подключение Gizmo-менедджера
@@ -64,7 +62,7 @@
 
     
     // ПЕРЕМЕННЫЕ
-    let activeElement = null;
+    //let activeElement = null;
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
     let fan = BABYLON.SceneLoader.ImportMesh(
@@ -86,8 +84,8 @@
       function (evt) {
         const fan = evt.meshUnderPointer;
         //move the fan upright
-        fan.position.x += 0.5;
-        fan.position.y += 0.5;
+        fan.position.x += 1;
+        fan.position.y += 1;
     }));
 
 
