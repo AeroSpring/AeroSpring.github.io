@@ -4,18 +4,17 @@
 <body> 
   <canvas></canvas>
   
-  <!--
   <div id="dom-overlay">
-     <div id="gizmo-block"></div>
+    <!-- <div id="gizmo-block"></div> -->
   </div>
-   -->
+  
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script type="module">
     // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
-    //let domOverlay = window.document.querySelector('#dom-overlay');
+    let domOverlay = window.document.querySelector('#dom-overlay');
     // Создание движка
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
@@ -39,7 +38,6 @@
 
     //let xrCamera = xr.baseExperience.camera;
 
-    /*
     // Подключение DOM Overlay
     let featuresManager = xr.baseExperience.featuresManager;
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
@@ -57,8 +55,7 @@
         default: break;
       }
     });
-    */
-
+    
     /*
     // Подключение Gizmo-менедджера
     let gizmoManager = new BABYLON.GizmoManager(scene);
