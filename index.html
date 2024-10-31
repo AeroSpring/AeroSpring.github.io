@@ -64,6 +64,26 @@
     // ПЕРЕМЕННЫЕ
     //let activeElement = null;
 
+    const box = BABYLON.MeshBuilder.CreateBox("box", {});
+    box.position.x = 0.5;
+    box.position.y = 1;
+
+    const boxMaterial = new BABYLON.StandardMaterial("material", scene);
+    boxMaterial.diffuseColor = BABYLON.Color3.Random();
+    box.material = boxMaterial;
+
+    box.actionManager = new BABYLON.ActionManager(scene);
+    box.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+        function (evt) {
+            const sourceBox = evt.meshUnderPointer;
+            sourceBox.position.x += 0.1;
+            sourceBox.position.y += 0.1;
+            boxMaterial.diffuseColor = BABYLON.Color3.Random();
+        }
+      )
+    );
+
     //ЗАГРУЗКА 3D-МОДЕЛИ
     let fan = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -79,8 +99,8 @@
       }
     );
     fan.actionManager = new BABYLON.ActionManager(scene);
-    fan.actionManager.registerAction(new BABYLON.SetValueAction(
-      BABYLON.ActionManager.OnPickTrigger,
+    fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+      BABYLON.ActionManager.OnPickTrigger, 
       function (evt) {
         let efan = evt.meshUnderPointer;
         //move the fan upright
