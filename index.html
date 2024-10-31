@@ -10,7 +10,7 @@
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script type="module">
-    // Извлечение тега canvas
+    // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
     // Создание движка
@@ -37,9 +37,9 @@
 
     // Подключение DOM Overlay
     let featuresManager = xr.baseExperience.featuresManager;
-    featuresManager.enableFeatures(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
-    // Отображение DOM Overlay после входа в XR-режим
-    xr.baseExperience.onStateChangedObservable.add((webXRState) => {
+    featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
+    // Отображение DOM Overlay, после перехода в xr-режим
+    xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
           domOverlay.style.display = 'block';
@@ -86,7 +86,20 @@
     */
 
 
+    engine.runRenderLoop(() => {
+      /*
+      if(activeElement) {
+        activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
+      }
+      */
+      scene.render()
+    });
+    
+
     // Обработчики событий
+    fan.addEventListener('click', (event) => {
+      fan.position = new BABYLON.Vector3(0, 2, 0.5);
+    });
 
     /*
     // Обработчики событий для gizmo
@@ -95,10 +108,5 @@
     });
     */
 
-    engine.runRenderLoop(() => {
-      if(activeElement) {
-        activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
-      }
-      scene.render()});
   </script>
 </body>
