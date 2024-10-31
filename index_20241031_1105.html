@@ -84,7 +84,7 @@
     fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPickTrigger, 
       function (evt) {
-        const sourcefan = evt.meshUnderPointer;
+        const fan = evt.meshUnderPointer;
         //move the fan upright
         fan.position.x += 0.5;
         fan.position.y += 0.5;
