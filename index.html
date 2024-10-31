@@ -79,8 +79,8 @@
       }
     );
     fan.actionManager = new BABYLON.ActionManager(scene);
-    fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-      BABYLON.ActionManager.OnPickTrigger, 
+    fan.actionManager.registerAction(new BABYLON.SetValueAction(
+      BABYLON.ActionManager.OnPickTrigger,
       function (evt) {
         let efan = evt.meshUnderPointer;
         //move the fan upright
