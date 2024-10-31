@@ -105,10 +105,10 @@
     sl.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPickTrigger, 
       function (evt) {
-        let efan = evt.meshUnderPointer;
+        let sl = evt.meshUnderPointer;
         //move the fan upright
-        efan.position.x += 1;
-        efan.position.y += 1;
+        sl.position.x += 1;
+        sl.position.y += 1;
     }));
 
 
