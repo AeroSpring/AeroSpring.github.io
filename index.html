@@ -100,8 +100,9 @@
         fan.receiveShadows = true; //принимаемая тень
       }
     );
-    st.actionManager = new BABYLON.ActionManager(scene);
-    st.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+    
+    sl.actionManager = new BABYLON.ActionManager(scene);
+    sl.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPickTrigger, 
       function (evt) {
         let efan = evt.meshUnderPointer;
