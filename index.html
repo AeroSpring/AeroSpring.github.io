@@ -11,6 +11,7 @@
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <script type="module">
     // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
@@ -85,7 +86,8 @@
 
     // load the mesh
     //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/vintageDeskFan/", "vintageFan_animated.gltf", scene);
-    const model = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/Fan/", "Fan.gltf", scene);
+    //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/Fan/", "Fan.gltf", scene);
+    const model = await BABYLON.appendSceneAsync("assets/Fan/Fan.gltf", scene);
     model.meshes[0].parent = root;
     model.meshes[0].scaling.scaleInPlace(0.1);
     model.meshes[0].position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
@@ -101,8 +103,9 @@
     //fanRunning.start(true);
 
 
-    /*
+    
     //ЗАГРУЗКА 3D-МОДЕЛИ
+    /*
     let sl = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/Fan/', 
