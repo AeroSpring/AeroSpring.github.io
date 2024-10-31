@@ -58,6 +58,10 @@
     let gizmoManager = new BABYLON.GizmoManager(scene);
     */
 
+
+    // ПЕРЕМЕННЫЕ
+    let activeElement = null;
+
     //ЗАГРУЗКА 3D-МОДЕЛИ
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -67,15 +71,12 @@
       (meshArray) => {
         let fan = meshArray[0];
         fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(0, 1, 1); //.Vector3(вправо, , от меня)
+        fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
         shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
         fan.receiveShadows = true; //принимаемая тень
       }
     );
     //activeElement = fan;
-
-    // ПЕРЕМЕННЫЕ
-    let activeElement = null;
 
     // ФУНКЦИИ
     /*
@@ -87,18 +88,17 @@
 
 
     engine.runRenderLoop(() => {
-      /*
       if(activeElement) {
         activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
       }
-      */
       scene.render()
     });
-    
+
 
     // Обработчики событий
     fan.addEventListener('click', (event) => {
-      fan.position = new BABYLON.Vector3(0, 2, 0.5);
+      activeElement = fan;
+      //fan.position = new BABYLON.Vector3(0, 1, 0.5);
     });
 
     /*
