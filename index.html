@@ -90,8 +90,8 @@
     model.meshes[0].scaling.scaleInPlace(0.1);
     model.meshes[0].position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
     model.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
-    shadowGenerator.addShadowCaster(model.meshes[0]); //отбрасываемая тень
-    model.meshes[0].receiveShadows = true; //принимаемая тень
+    //shadowGenerator.addShadowCaster(model.meshes[0]); //отбрасываемая тень
+    //model.meshes[0].receiveShadows = true; //принимаемая тень
 
     // load animations from glTF
     //const fanRunning = scene.getAnimationGroupByName("fanRunning");
