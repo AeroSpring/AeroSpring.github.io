@@ -85,27 +85,27 @@
     );
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    let fan = BABYLON.SceneLoader.ImportMesh(
+    BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/Fan/', 
       'Fan.gltf', 
       scene, 
       (meshArray) => {
-        let _fan = meshArray[0];
-        _fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        _fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
-        shadowGenerator.addShadowCaster(_fan); //отбрасываемая тень
-        _fan.receiveShadows = true; //принимаемая тень
+        let fan = meshArray[0];
+        fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
+        shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
+        fan.receiveShadows = true; //принимаемая тень
       }
     );
     fan.actionManager = new BABYLON.ActionManager(scene);
     fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPickTrigger, 
       function (evt) {
-        let efan = evt.meshUnderPointer;
+        fan = evt.meshUnderPointer;
         //move the fan upright
-        efan.position.x += 1;
-        efan.position.y += 1;
+        fan.position.x += 1;
+        fan.position.y += 1;
     }));
 
 
