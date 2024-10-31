@@ -4,12 +4,12 @@
 <body> 
   <canvas></canvas>
   <div id="dom-overlay">
-    <div id="gizmo-block"></div>
+    <!-- <div id="gizmo-block"></div> -->
   </div>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
-  <script>
+  <script type="module">
     // Извлечение тега canvas
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
@@ -27,27 +27,35 @@
     light.intensity = 0.7;
 
     // Подключение WebXR
-    scene.createDefaultXRExperienceAsync({
+    let xr = await scene.createDefaultXRExperienceAsync({
       uiOptions: {
         sessionMode: 'immersive-ar', 
         referenceSpaceType: 'local-floor',
       }
     });
+    let xrCamera = xr.baseExperience.camera;
 
-    // Подключение Gizmo-менедджера
-    let gizmoManager = new BABYLON.GizmoManager(scene);
+    // Подключение DOM Overlay
+    let featuresManager = xr.baseExperience.featuresManager;
+    featuresManager.enableFeatures(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
+    // Отображение DOM Overlay после входа в XR-режим
+    xr.baseExperience.onStateChangedObservable.add((webXRState) => {
+      switch(webXRState){
+        case BABYLON.WebXRState.IN_XR: {
+          domOverlay.style.display = 'block';
+          break;
+        }
+        case BABYLON.WebXRState.EXITING_XR: {
+          domOverlay.style.display = 'none';
+          break;
+        }
+        default: break;
+      }
+    });
 
     /*
-    // Создание куба
-    let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
-    box.material = new BABYLON.StandardMaterial('material', scene);
-    box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
-    // Позиционирование
-    box.position.y = 1;
-    box.position.z = 1;
-    // Степень непрозрачности
-    box.hasVertexAlpha = true;
-    box.visibility = 0.7;
+    // Подключение Gizmo-менедджера
+    let gizmoManager = new BABYLON.GizmoManager(scene);
     */
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
@@ -59,26 +67,38 @@
       (meshArray) => {
         let fan = meshArray[0];
         fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(0, 0, -1); //.Vector3(вправо, ,)
+        fan.position = new BABYLON.Vector3(0, 1, 1); //.Vector3(вправо, , от меня)
         shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
         fan.receiveShadows = true; //принимаемая тень
-
       }
     );
+    //activeElement = fan;
+
+    // ПЕРЕМЕННЫЕ
+    let activeElement = null;
 
     // ФУНКЦИИ
+    /*
     const closeGizmo = () => {
       gizmoManager._attachedMesh = null;
       gizmoBlock.style.display = 'none';
     }
+    */
 
 
     // Обработчики событий
+
+    /*
     // Обработчики событий для gizmo
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       gizmoBlock.style.display = 'block'; // 'none'
     });
+    */
 
-    engine.runRenderLoop(() => scene.render());
+    engine.runRenderLoop(() => {
+      if(activeElement) {
+        activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
+      }
+      scene.render()});
   </script>
 </body>
