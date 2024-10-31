@@ -1,18 +1,18 @@
-<head>
-  <link rel="stylesheet" href="style.css">
-</head>
 <body> 
   <canvas></canvas>
-  <div id="dom-overlay">
-    <div id="gizmo-block"></div>
-  </div>
+  <style>
+    body, canvas {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script>
     // Извлечение тега canvas
     let canvas = window.document.querySelector('canvas');
-    let domOverlay = window.document.querySelector('#dom-overlay');
     // Создание движка
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
@@ -33,9 +33,6 @@
         referenceSpaceType: 'local-floor',
       }
     });
-
-    // Подключение Gizmo-менедджера
-    let gizmoManager = new BABYLON.GizmoManager(scene);
 
     /*
     // Создание куба
@@ -59,25 +56,12 @@
       (meshArray) => {
         let fan = meshArray[0];
         fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(1, 0, 0);
+        fan.position = new BABYLON.Vector3(0, 0, 0);
         shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
         fan.receiveShadows = true; //принимаемая тень
 
       }
     );
-
-    // ФУНКЦИИ
-    const closeGizmo = () => {
-      gizmoManager._attachedMesh = null;
-      gizmoBlock.style.display = 'none';
-    }
-
-
-    // Обработчики событий
-    // Обработчики событий для gizmo
-    gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      gizmoBlock.style.display = 'block'; // 'none'
-    });
 
     engine.runRenderLoop(() => scene.render());
   </script>
