@@ -4,12 +4,6 @@
 <body> 
   <canvas></canvas>
   
-  <!--
-  <div id="dom-overlay">
-    <div id="gizmo-block"></div>
-  </div>
-  -->
-  
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
@@ -21,6 +15,29 @@ class Demo {
         // this root node will be transformed by the image tracking module
         const root = new BABYLON.TransformNode("root", scene);
         root.setEnabled(false);
+
+        const box = BABYLON.MeshBuilder.CreateBox("box", {});
+        box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        box.position.x = 0.5;
+        box.position.y = 1;
+
+        const boxMaterial = new BABYLON.StandardMaterial("material", scene);
+        boxMaterial.diffuseColor = BABYLON.Color3.Random();
+        box.material = boxMaterial;
+
+        box.actionManager = new BABYLON.ActionManager(scene);
+        box.actionManager.registerAction(
+          new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+            function (evt) {
+                const sourceBox = evt.meshUnderPointer;
+                sourceBox.position.x += 0.1;
+                sourceBox.position.y += 0.1;
+                boxMaterial.diffuseColor = BABYLON.Color3.Random();
+            }
+          )
+        );
+
+        /*
         // load the mesh
         const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/vintageDeskFan/", "vintageFan_animated.gltf", scene);
         model.meshes[0].parent = root;
@@ -32,6 +49,8 @@ class Demo {
         scene.stopAllAnimations();
         // run the fanRunning animation
         fanRunning.start(true);
+        */
+
         // initiate the xr experience helper
         const xr = await scene.createDefaultXRExperienceAsync(options);
         const featuresManager = xr.baseExperience.featuresManager;
@@ -55,6 +74,11 @@ class Demo {
 }
 class Playground {
     static async CreateScene(engine, canvas) {
+        // Извлечение тегов из разметки
+        let canvas = window.document.querySelector('canvas');
+        // Создание движка
+        let engine = new BABYLON.Engine(canvas);
+        // Создание сцены и присоеденение ее к движку
         const scene = new BABYLON.Scene(engine);
         await Demo.SetupXR(scene, {
             uiOptions: {
