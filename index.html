@@ -35,6 +35,29 @@
     const root = new BABYLON.TransformNode("root", scene);
     root.setEnabled(false);
 
+
+    const box = BABYLON.MeshBuilder.CreateBox("box", {});
+    box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+    box.position.x = 0.5;
+    box.position.y = 1;
+
+    const boxMaterial = new BABYLON.StandardMaterial("material", scene);
+    boxMaterial.diffuseColor = BABYLON.Color3.Random();
+    box.material = boxMaterial;
+
+    box.actionManager = new BABYLON.ActionManager(scene);
+    box.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+        function (evt) {
+            const sourceBox = evt.meshUnderPointer;
+            sourceBox.position.x += 0.1;
+            sourceBox.position.y += 0.1;
+            boxMaterial.diffuseColor = BABYLON.Color3.Random();
+        }
+      )
+    );
+
+
     // Подключение WebXR
     let xr = await scene.createDefaultXRExperienceAsync({
       uiOptions: {
@@ -83,27 +106,6 @@
 
     
     // ПЕРЕМЕННЫЕ
-
-    const box = BABYLON.MeshBuilder.CreateBox("box", {});
-    box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-    box.position.x = 0.5;
-    box.position.y = 1;
-
-    const boxMaterial = new BABYLON.StandardMaterial("material", scene);
-    boxMaterial.diffuseColor = BABYLON.Color3.Random();
-    box.material = boxMaterial;
-
-    box.actionManager = new BABYLON.ActionManager(scene);
-    box.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
-        function (evt) {
-            const sourceBox = evt.meshUnderPointer;
-            sourceBox.position.x += 0.1;
-            sourceBox.position.y += 0.1;
-            boxMaterial.diffuseColor = BABYLON.Color3.Random();
-        }
-      )
-    );
 
 
     /*
