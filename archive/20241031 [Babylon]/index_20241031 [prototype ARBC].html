@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html>
+<!-- 
+    Made by labris at https://babylonpress.org/resources/utilities/click-on-3d-model-opens-modal-window-with-specific-wordpress-post/
+-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Babylon.js HTML Modals</title>
+
+    <!-- Babylon.js -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/5.32.1/babylon.js"></script>
+    <!--
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    -->
+
+    <style>
+        html,
+        body {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .modal {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: scaleX(1.1) scaleY(1.1);
+            transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
+            font-family: sans-serif;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 1rem 1.5rem;
+            width: 60%;
+            height: 60%;
+            border-radius: 0.5rem;
+            z-index: 99000 !important;
+        }
+
+        .close-button {
+            float: right;
+            width: 1.5rem;
+            line-height: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 0.25rem;
+            background-color: lightgray;
+        }
+
+        .close-button:hover {
+            background-color: darkgray;
+        }
+
+        .show-modal {
+            opacity: 1;
+            visibility: visible;
+            transform: scaleX(1.0) scaleY(1.0);
+            transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+        }
+
+        @media only screen and (max-width: 50rem) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .modal-content {
+                width: calc(100% - 5rem);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!--
+    Button for debugging - you may delete it completely if you don't need it
+-->
+    <button class="trigger" style="margin: 4px;">Click here to trigger the modal without any relation to Babylon scene or click box or sphere below and see what will happen :)</button>
+    
+    <div class="modal">
+        <div class="modal-content">
+            <span class="close-button">×</span>
+            <div id="modal-iframe">
+                <p>Modal Dummy Text Dolor Ipsum Babylon!</p>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="renderCanvas"></canvas>
+
+    <script>
+        var modal = document.querySelector(".modal");
+        var trigger = document.querySelector(".trigger");
+        var closeButton = document.querySelector(".close-button");
+
+        function toggleModal() {
+            modal.classList.toggle("show-modal");
+
+        }
+
+        function windowOnClick(event) {
+            if (event.target === modal) {
+                toggleModal();
+            }
+        }
+
+        trigger.addEventListener("click", toggleModal);
+        closeButton.addEventListener("click", toggleModal);
+        window.addEventListener("click", windowOnClick);
+    </script>
+<!--
+    Actually there is no need here to have 2 script tags; it is done just to show that they can be 
+    A. separated; 
+    B. used as 2 independent external .js files
+-->
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+
+        var engine = null;
+        var scene = null;
+        var sceneToRender = null;
+        var createDefaultEngine = function() {
+            return new BABYLON.Engine(canvas, true, {
+                preserveDrawingBuffer: true,
+                stencil: true,
+                disableWebGL2Support: false
+            });
+        };
+        var createScene = function() {
+            var scene = new BABYLON.Scene(engine);
+
+            var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
+            camera.setTarget(BABYLON.Vector3.Zero());
+            camera.attachControl(canvas, true);
+
+            var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+
+            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter: 2, segments: 32}, scene);
+            sphere.position.y = 1;
+
+            var box = BABYLON.MeshBuilder.CreateBox("box", {size: 1}, scene);
+            box.position.x = -5
+            box.position.y = 1;
+
+            var ground = BABYLON.MeshBuilder.CreateGround("ground", {
+                width: 6,
+                height: 6
+            }, scene);
+
+            // Now let's create an Object with mesh as a key and some text content as its value
+            var meshContent = {
+                box: 'This is extremely nice BOX! <br/> <p style = "color:green">No problems with CSS styling.</p>',
+                sphere: 'This SPHERE is really wonderful! <br/><h3>HTML tags allowed :)</h3>'
+            }
+
+            // Checking onPointerUp event, see console
+            scene.onPointerUp = function(evt, pickResult) {
+                if (pickResult.hit) {
+                    console.log("pickResult.hit: " + pickResult.pickedMesh.name);
+                    if (meshContent[pickResult.pickedMesh.name]) {
+                        console.log("In the list"); // YES! Our mesh is in the list (ground is not there)
+                        
+                        toggleModal(); // If there was no modal before, it will be shown; it there was modal already, it will be invisible
+
+                        console.log("Mesh: " + pickResult.pickedMesh.name + "; Content: " + meshContent[pickResult.pickedMesh.name]);
+
+                        document.getElementById("modal-iframe").innerHTML = meshContent[pickResult.pickedMesh.name];
+                        // You can also use iframe here to display any content. All you need is to bind iframe src value with mesh in our meshContent list
+                        // and then change the code above to load the iframe src into the modal
+                    }
+                }
+            }
+
+            return scene;
+        };
+
+        // The engine part, don't touch if you don't know what to do :)
+
+        window.initFunction = async function() {
+
+            var asyncEngineCreation = async function() {
+                try {
+                    return createDefaultEngine();
+                } catch (e) {
+                    console.log("the available createEngine function failed. Creating the default engine instead");
+                    return createDefaultEngine();
+                }
+            }
+
+            window.engine = await asyncEngineCreation();
+            if (!engine) throw 'engine should not be null.';
+            window.scene = createScene();
+        };
+        initFunction().then(() => {
+            sceneToRender = scene
+            engine.runRenderLoop(function() {
+                if (sceneToRender && sceneToRender.activeCamera) {
+                    sceneToRender.render();
+                }
+            });
+        });
+
+        // Resize
+        window.addEventListener("resize", function() {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>
