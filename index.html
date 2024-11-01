@@ -73,11 +73,12 @@ class Demo {
     }
 }
 class Playground {
+    // Извлечение тегов из разметки
+    canvas = window.document.querySelector('canvas');
+    // Создание движка
+    engine = new BABYLON.Engine(canvas);
+
     static async CreateScene(engine, canvas) {
-        // Извлечение тегов из разметки
-        let canvas = window.document.querySelector('canvas');
-        // Создание движка
-        let engine = new BABYLON.Engine(canvas);
         // Создание сцены и присоеденение ее к движку
         const scene = new BABYLON.Scene(engine);
         await Demo.SetupXR(scene, {
