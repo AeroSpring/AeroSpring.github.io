@@ -25,6 +25,7 @@
     const root = new BABYLON.TransformNode("root", scene);
     root.setEnabled(false);
 
+
     const box = BABYLON.MeshBuilder.CreateBox("box", {});
     box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
     box.position.x = 0.5;
@@ -45,6 +46,7 @@
         }
       )
     );
+    
 
     /*
     // load the mesh
@@ -61,15 +63,13 @@
     */
 
     // initiate the xr experience helper
-    /*
     let xr = await scene.createDefaultXRExperienceAsync({
       uiOptions: {
         sessionMode: 'immersive-ar', 
         //referenceSpaceType: 'local-floor',
       }
     });
-    */
-    const xr = await scene.createDefaultXRExperienceAsync(options);
+    //const xr = await scene.createDefaultXRExperienceAsync(options);
     const featuresManager = xr.baseExperience.featuresManager;
     // initiate the image tracking feature
     const imageTracking = featuresManager.enableFeature(BABYLON.WebXRFeatureName.IMAGE_TRACKING, "latest", {
