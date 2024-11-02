@@ -1,0 +1,144 @@
+body, canvas {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+#dom-overlay {
+  display: none;
+  user-select: none;
+}    
+#add_icon{
+  position: absolute;
+  left: 0;
+  bottom: 10vh;
+  width: 100%;
+  text-align: center;
+  font-size: 10vh;   
+  opacity: 0.7;   
+  color: #0096db;
+}
+#switch_icon {
+  position: absolute;
+  left: 5vh;
+  bottom: 5vh;
+  text-align: left;
+  font-size: 5vh;
+  color: grey;
+}
+#save_icon {
+  position: absolute;
+  right: 5vh;
+  top: 5vh;
+  text-align: right;
+  font-size: 5vh;
+  color: grey;
+}
+input[type="file"] {
+  display: none;
+}
+#color_input {
+  display: none;
+  position: absolute;
+  bottom: 10vh;
+  left: 12vw;
+  width: 8vh;
+  height: 8vh;
+  outline: none;
+  padding: 0;
+  opacity: 0.7;
+  border-radius: 50%;
+}
+#color_input::-moz-color-swatch {
+  border-radius: 50%;
+  border-color: transparent;
+}
+
+#color_input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+  border-color: transparent;
+}
+
+#color_input::-webkit-color-swatch {
+  border-radius: 50%;
+  border-color: transparent;
+}   
+#distance_input {
+  -webkit-appearance: none;
+  width: 50vh;
+  height: 10vw;
+  position: absolute;
+  display: none;
+  bottom: 35vh;
+  left: 25vw;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  transform: rotate(-90deg);
+}
+#distance_input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10vw;
+  height: 15vw;
+  background: #0096db;
+  cursor: pointer;
+}
+#distance_input::-moz-range-thumb {
+  width: 10vw;
+  height: 15vw;
+  background: #0096db;
+  cursor: pointer;
+}
+
+#gizmo-block {
+  display: none;
+  position: absolute;
+  bottom: 25vh;
+  width: 100vw;
+  text-align: center;
+  font-size: 10vh;
+  height: 10vh;
+  color: #0096db;
+  opacity: 0.7;
+}
+#gizmo-block span {
+  font-size: 5vh;
+}
+#physics_icon {
+  color: grey;
+}
+#open-file-block {
+  position: absolute;
+  top: 35vh;
+  left: 0;
+  width: 100%;
+}
+#open-file-block span{
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+#open_file_icon {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 10vh;
+}
+.xr-button-overlay {
+  position: absolute;
+  top: 55vh;
+  left: 0vw;
+  width: 100%;
+  text-align: center;
+}
+.babylonVRicon{
+  height: 10vh !important;
+  /* background-image: url(icon.png); */
+}

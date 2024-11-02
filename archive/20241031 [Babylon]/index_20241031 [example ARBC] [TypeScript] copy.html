@@ -1,0 +1,69 @@
+<head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body> 
+    <canvas></canvas>
+    
+    <!--
+    <div id="dom-overlay">
+      <div id="gizmo-block"></div>
+    </div>
+    -->
+    
+  
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script type="module">
+  class Demo {
+      static async SetupXR(scene, options) {
+          scene.createDefaultEnvironment({ createGround: false, createSkybox: false });
+          // this root node will be transformed by the image tracking module
+          const root = new BABYLON.TransformNode("root", scene);
+          root.setEnabled(false);
+          // load the mesh
+          const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/vintageDeskFan/", "vintageFan_animated.gltf", scene);
+          model.meshes[0].parent = root;
+          model.meshes[0].scaling.scaleInPlace(0.005);
+          model.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+          // load animations from glTF
+          const fanRunning = scene.getAnimationGroupByName("fanRunning");
+          // Stop all animations to make sure the asset it ready
+          scene.stopAllAnimations();
+          // run the fanRunning animation
+          fanRunning.start(true);
+          // initiate the xr experience helper
+          const xr = await scene.createDefaultXRExperienceAsync(options);
+          const featuresManager = xr.baseExperience.featuresManager;
+          // initiate the image tracking feature
+          const imageTracking = featuresManager.enableFeature(BABYLON.WebXRFeatureName.IMAGE_TRACKING, "latest", {
+              images: [
+                  {
+                      src: "https://cdn.babylonjs.com/imageTracking.png",
+                      estimatedRealWorldWidth: 0.2
+                  },
+              ]
+          });
+          // this callback will be executed every time the image's position was updated
+          imageTracking.onTrackedImageUpdatedObservable.add((image) => {
+              // copy the updated transformation to the model
+              root.setPreTransformMatrix(image.transformationMatrix);
+              root.setEnabled(true);
+          });
+          return xr;
+      }
+  }
+  class Playground {
+      static async CreateScene(engine, canvas) {
+          const scene = new BABYLON.Scene(engine);
+          await Demo.SetupXR(scene, {
+              uiOptions: {
+                  sessionMode: "immersive-ar"
+              }
+          });
+          return scene;
+      }
+  }
+  
+    </script>
+  </body>
