@@ -1,6 +1,3 @@
-
-
-
 // Setup BabylonJS in the usual way
 const canvas = document.createElement('canvas');
 document.body.appendChild(canvas);
@@ -28,14 +25,15 @@ const imageTracker = new ZapparBabylon.ImageTrackerLoader().load(url);
 
 const trackerTransformNode = new ZapparBabylon.ImageAnchorTransformNode('tracker', camera, imageTracker, scene);
 
+
 // Add some content to the image tracker
-//const box = BABYLON.Mesh.CreateBox('box', 1, scene, false, BABYLON.Mesh.DOUBLESIDE)
-const box = BABYLON.MeshBuilder.CreateBox("box", {});
+const box = BABYLON.Mesh.CreateBox('box', 1, scene, false, BABYLON.Mesh.DOUBLESIDE)
+//const box = BABYLON.MeshBuilder.CreateBox("box", {});
 box.parent = trackerTransformNode;
 box.visibility = 0;
-box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-box.position.x = 0.5;
-box.position.y = 1;
+//box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+//box.position.x = 0.5;
+//box.position.y = 1;
 
 const boxMaterial = new BABYLON.StandardMaterial("material", scene);
 boxMaterial.diffuseColor = BABYLON.Color3.Random();
@@ -52,6 +50,7 @@ box.actionManager.registerAction(
     }
   )
 );
+
 
 imageTracker.onVisible.bind(() => {
   box.visibility = 1;
