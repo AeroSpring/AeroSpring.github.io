@@ -20,7 +20,8 @@ ZapparBabylon.permissionRequestUI().then((granted) => {
 });
 
 
-const url = new URL("./example-tracking-image.zpt", import.meta.url).href;
+//const url = new URL("./example-tracking-image.zpt", import.meta.url).href;    assets/Fan/
+const url = new URL("./assets/pictures/AutumnCity.zpt", import.meta.url).href;
 const imageTracker = new ZapparBabylon.ImageTrackerLoader().load(url);
 
 const trackerTransformNode = new ZapparBabylon.ImageAnchorTransformNode('tracker', camera, imageTracker, scene);
