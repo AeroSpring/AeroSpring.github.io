@@ -1,0 +1,349 @@
+<head>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
+</head>
+<body> 
+  <div id="open-file-block">
+    <label id="open_file_icon" for="file_input" class="material-icons-outlined">file_open</label>
+    <br>
+    <span id="file-input-info">Open file (.glb only)</span>
+    <input id="file_input" type="file">
+  </div>
+  <canvas></canvas>
+  <div id="dom-overlay">
+    <span id="add_icon" class="material-icons-outlined">add_circle</span>
+    <span id="switch_icon" class="material-icons-outlined">adjust</span>
+    <span id="save_icon" class="material-icons-outlined">save</span>
+    <input id="distance_input" type="range" min="0" max="2" value="0" step="any" />
+    <input id="color_input" type="color" value="#0096db" />
+    <div id="gizmo-block">
+      <span id="move_icon" class="material-icons-outlined">open_with</span>
+      <span id="scale_icon" class="material-icons-outlined">open_in_full</span>
+      <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
+      <span id="delete_icon" class="material-icons-outlined">delete</span>
+      <span id="physics_icon" class="material-icons-outlined">support</span> 
+      <span id="close_icon" class="material-icons-outlined">cancel</span> 
+    </div>
+  </div>
+
+  <script src="https://momentjs.com/downloads/moment.min.js"></script>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/ammo.js"></script>
+  <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+  <script src="https://preview.babylonjs.com/serializers/babylonjs.glTF2Serializer.min.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script type="module">
+    // Извлечение тегов из разметки
+    let canvas = window.document.querySelector('canvas');
+    let domOverlay = window.document.querySelector('#dom-overlay');
+    let addIcon = window.document.querySelector('#add_icon');
+    let distanceInput = window.document.querySelector('#distance_input');
+    let colorInput = window.document.querySelector('#color_input');
+    let gizmoBlock = window.document.querySelector('#gizmo-block');
+    let moveIcon = window.document.querySelector('#move_icon');
+    let scaleIcon = window.document.querySelector('#scale_icon');
+    let rotateIcon = window.document.querySelector('#rotate_icon');
+    let deleteIcon = window.document.querySelector('#delete_icon');
+    let physicsIcon = window.document.querySelector('#physics_icon');
+    let closeIcon = window.document.querySelector('#close_icon');
+    let switchIcon = window.document.querySelector('#switch_icon');
+    let saveIcon = window.document.querySelector('#save_icon');
+    let fileInput = window.document.querySelector('#file_input');
+    let fileInputInfo = window.document.querySelector('#file-input-info');
+    // Создание движка
+    let engine = new BABYLON.Engine(canvas);
+    // Создание сцены и присоеденение ее к движку
+    let scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color3(1, 1, 1);
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
+    // Подключение физики
+    await Ammo();
+    let physicsEngine = new BABYLON.AmmoJSPlugin();
+    scene.enablePhysics(
+      new BABYLON.Vector3(0, -9.81, 0),
+      physicsEngine
+    );
+    // Создание света
+    let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
+    light.intensity = 0.7;
+
+    // Подключение WebXR
+    let xr = await scene.createDefaultXRExperienceAsync({
+      uiOptions: {
+        sessionMode: 'immersive-ar', // 'immersive-vr'
+        referenceSpaceType: 'local-floor',
+      }
+    });
+    let xrCamera = xr.baseExperience.camera;
+    // Подключение DOM Overlay
+    let featuresManager = xr.baseExperience.featuresManager;
+    featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
+    // Отображение DOM Overlay, после перехода в xr-режим
+    xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
+      switch(webXRState){
+        case BABYLON.WebXRState.IN_XR: {
+          domOverlay.style.display = 'block';
+          break;
+        }
+        case BABYLON.WebXRState.EXITING_XR: {
+          domOverlay.style.display = 'none';
+          break;
+        }
+        default: break;
+      }
+    });
+
+    // Подключение Gizmo
+    let gizmoManager = new BABYLON.GizmoManager(scene);
+    gizmoManager.attachableMeshes = [];
+
+    // КОНСТАНТЫ
+    const CREATION_MODE = 'creation_mode';
+    const PLAYING_MODE = 'playing_mode';
+    // ПЕРЕМЕННЫЕ
+    let activeElement = null;
+    let distance = 0.3;
+    let selectedColor = null;
+    let editingElement = null;
+    let mode = CREATION_MODE;
+    // ФУНКЦИИ
+    const createObject = () => {
+      // Создание обьекта
+      let obj = null;
+      let objColor = null;
+      let objMass = 0;
+      switch(mode){
+        case CREATION_MODE: {
+          obj = new BABYLON.MeshBuilder.CreateBox('box', {
+            width: 0.1,
+            height: 0.1,
+            depth: 0.1
+          }, scene);          
+          objColor = new BABYLON.Color3(0, 0.58, 0.86);
+          gizmoManager.attachableMeshes.push(obj);
+          objMass = 0;
+          break;
+        }
+        case PLAYING_MODE: {
+          obj = new BABYLON.MeshBuilder.CreateSphere('sphere', {
+            diameter: 0.1
+          }, scene);           
+          objColor = new BABYLON.Color3(1, 0, 0);
+          objMass = 2;
+          physicsEngine.setGravity(new BABYLON.Vector3(0, 0, 0));
+          break;
+        }
+        default: break;
+      }
+      obj.material = new BABYLON.StandardMaterial('material', scene);
+      obj.material.emissiveColor = objColor;
+      // Позиционирование
+      obj.position = xrCamera.getFrontPosition(distance);
+      // Степень непрозрачности
+      obj.material.alpha = 0.7;
+      obj.physicsImposter = new BABYLON.PhysicsImpostor(
+        obj,
+        BABYLON.PhysicsImpostor.BoxImpostor,
+        {
+          mass: objMass,
+          friction: 10,
+          restitution: 0,
+        }
+      );
+      activeElement = obj;
+    }
+    const createBasePlane = () => {
+      // Создание куба
+      let obj = new BABYLON.MeshBuilder.CreateBox('basePlane', {
+        width: 10,
+        height: 0.1,
+        depth: 10
+      }, scene);
+      obj.material = new BABYLON.StandardMaterial('material', scene);
+      obj.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
+      // Степень непрозрачности
+      obj.hasVertexAlpha = true;
+      obj.visibility = 0;      
+      obj.physicsImposter = new BABYLON.PhysicsImpostor(
+        obj,
+        BABYLON.PhysicsImpostor.BoxImpostor,
+        {
+          mass: 0,
+          friction: 10,
+          restitution: 0,
+        }
+      );
+    }    
+    createBasePlane();
+    const getColor = (hexColor) => {
+      let red = parseInt(hexColor.substr(1, 2), 16);
+      let green = parseInt(hexColor.substr(3, 2), 16);
+      let blue = parseInt(hexColor.substr(5, 2), 16);
+      return new BABYLON.Color3(red/255, green/255, blue/255);
+    }
+    // Функции для Gizmo
+    const clearGizmoOptions = () => {
+      moveIcon.style.color = '#0096db';
+      scaleIcon.style.color = '#0096db';
+      rotateIcon.style.color = '#0096db';
+      gizmoManager.positionGizmoEnabled = false;
+      gizmoManager.boundingBoxGizmoEnabled = false;
+    }
+    const setBoundingBox = (option) => {
+      gizmoManager.boundingBoxGizmoEnabled = true;  
+      gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
+      gizmoManager.gizmos.boundingBoxGizmo.scaleBoxSize = 0;
+      switch(option){
+        case 'scale': gizmoManager.gizmos.boundingBoxGizmo.scaleBoxSize = 0.03; break;
+        case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
+        default: break;
+      }
+      gizmoManager.gizmos.boundingBoxGizmo.updateBoundingBox();        
+    }
+    const setGizmoOption = (option) => {
+      clearGizmoOptions();
+      switch(option) {
+        case 'move': {
+          moveIcon.style.color = 'white';
+          gizmoManager.positionGizmoEnabled = true;
+          break;
+        }
+        case 'scale': {
+          scaleIcon.style.color = 'white';
+          setBoundingBox(option);  
+          break;      
+        }
+        case 'rotate': {
+          rotateIcon.style.color = 'white';
+          setBoundingBox(option);     
+          break;      
+        }        
+        default: break;
+      }
+    }
+    const closeGizmo = (needDispose = false) => {
+      clearGizmoOptions();
+      gizmoManager._attachedMesh = null;
+      gizmoManager.enableAutoPicking = true;
+      gizmoBlock.style.display = 'none';
+      (needDispose)
+        ? editingElement.dispose()
+        : editingElement = null;
+    }
+
+    engine.runRenderLoop(() => {
+      if(activeElement) {
+        activeElement.position = xrCamera.getFrontPosition(distance);
+        if(selectedColor) activeElement.material.emissiveColor = selectedColor;
+      }
+      scene.render();
+    });
+
+    // Обработчики событий
+    addIcon.addEventListener('click', (event) => {
+      if(activeElement){
+        if(mode === PLAYING_MODE){
+          let ray = xrCamera.getForwardRay(2);
+          let direction = new BABYLON.Vector3(
+            ray.direction._x,
+            ray.direction._y,
+            ray.direction._z
+          );
+          activeElement.physicsImposter.setLinearVelocity(
+            direction.scale(10),
+            activeElement.getAbsolutePosition()
+          );
+          physicsEngine.setGravity(new BABYLON.Vector3(0, -9.81, 0));
+        }
+        activeElement = null;
+        event.target.innerText = 'add_circle';
+        distanceInput.style.display = 'none';
+        colorInput.style.display = 'none';
+      }else{
+        if(editingElement) closeGizmo();
+        event.target.innerText = 'check_circle';
+        distanceInput.style.display = 'block';
+        colorInput.style.display = 'block';
+        createObject();
+      }
+    });
+    distanceInput.addEventListener('input', (event) => {
+      distance = parseFloat(event.target.value) + 0.3;
+    });
+    colorInput.addEventListener('change', (event) => {
+      // event.target.value = HEX(#00ff00) => BABYLON.Color3(0, 1, 0)
+      selectedColor = getColor(event.target.value);
+    });
+    switchIcon.addEventListener('click', (event) => {
+      if(event.target.innerText === 'add_circle'){
+        event.target.innerText = 'adjust';
+        addIcon.innerText = 'add_circle';
+        addIcon.style.color = '#0096db';
+        colorInput.value = '#0096db';
+        mode = CREATION_MODE;
+      }else{
+        event.target.innerText = 'add_circle';
+        addIcon.innerText = 'adjust';
+        addIcon.style.color = 'red';
+        colorInput.value = '#ff0000';
+        mode = PLAYING_MODE;
+      }
+    });
+    saveIcon.addEventListener('click', (event) => {
+      let fileSaveTime = moment().format('MMMM Do YYYY, h-mm-ss');
+      let filename = `Ar_scene_${fileSaveTime}`;
+      let sceneForDownload = scene;
+      sceneForDownload.meshes.map(mesh => {
+        if(mesh.name === 'basePlane'
+        || mesh.name === 'teleportationTarget'
+        || mesh.name === 'laserPointer'
+        ) mesh.dispose();
+      });
+      BABYLON.GLTF2Export.GLBAsync(sceneForDownload, filename).then(glb => {
+        glb.downloadFiles();
+      })
+    });
+    fileInput.addEventListener('input', (event) => {
+      if(event.target.files && event.target.files[0]){
+        let reader = new FileReader();
+        reader.addEventListener('load', (e) => {
+          BABYLON.SceneLoader.Append('', e.target.result, scene, (loadedScene) => {
+            fileInputInfo.innerText = event.target.files[0].name;
+          });
+        });
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    });
+    // Обработчики для Gizmo
+    gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      if(!activeElement){
+        gizmoManager.enableAutoPicking = false;
+        editingElement = mesh;
+        gizmoBlock.style.display = 'block';
+        setGizmoOption('move');
+        (editingElement.physicsImposter.getParam('mass') > 0)
+          ? physicsIcon.style.color = '#0096db'
+          : physicsIcon.style.color = 'grey';
+      }else{
+        gizmoManager._attachedMesh = null;
+      }
+    });
+    moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
+    scaleIcon.addEventListener('click', (event) => setGizmoOption('scale'));
+    rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
+    deleteIcon.addEventListener('click', (event) => closeGizmo(true));
+    physicsIcon.addEventListener('click', (event) => {
+      if(editingElement.physicsImposter.getParam('mass') > 0){
+        editingElement.physicsImposter.setMass(0);
+        event.target.style.color = 'grey';
+      }else{
+        editingElement.physicsImposter.setMass(1);
+        event.target.style.color = '#0096db';        
+      }
+    })
+    closeIcon.addEventListener('click', (event) => closeGizmo());
+  </script>
+</body>

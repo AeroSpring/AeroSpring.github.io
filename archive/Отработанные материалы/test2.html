@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+<body style="margin: 0; overflow: hidden;">
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+	<a-scene embedded arjs>
+		<!-- Marker for tracking -->
+		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+			<!-- Plane to display the imafe -->
+			<a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
+			<!--
+			<a-entity
+				position="0 0 0"
+				scale="0.2 0.2 0.2"
+				gltf-model="obj/House/House.gltf"
+			></a-entity>
+			-->
+		</a-marker>
+		<!-- Camera to view the scene -->
+		<a-entity camera></a-entity>
+	</a-scene>
+</body>
+</html>

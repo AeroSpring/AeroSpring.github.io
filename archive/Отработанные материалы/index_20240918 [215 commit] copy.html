@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+    .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .arjs-loader div {
+        text-align: center;
+        font-size: 1.25em;
+        color: white;
+    }
+</style>
+
+<head>
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+
+<head>
+    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+    <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
+    <script>
+        AFRAME.registerComponent('cursor-animator', {
+            init: function () {
+                this.el.addEventListener('click', function (evt) {
+                    alert('click');
+
+                });
+            }
+        });
+
+        AFRAME.registerComponent('raycaster-autorefresh', {
+            init: function () {
+                var el = this.el;
+                this.el.addEventListener('model-loaded', function () {
+                    var cursorEl = el.querySelector('[raycaster]');
+                    cursorEl.components.raycaster.refreshObjects();
+                });
+            }
+        });
+    </script>
+</head>
+
+<body style='margin : 0px; overflow: hidden;'>
+    <a-scene embedded arjs='sourceType: webcam;' raycaster-autorefresh>
+        <a-assets>
+            <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
+        </a-assets>
+        <a-marker 
+
+            markerhandler 
+            emitevents="true" 
+            cursor="fuse: true; rayOrigin: mouse" 
+            id="animated-marker"
+            preset='custom' 
+            type="pattern"
+            url="/markers/pattern-qr-code.patt">
+
+            <a-entity 
+                id="rotate" 
+                gltf-model="#animated-asset" 
+                scale="0.25 0.25 0.25"
+                position="0 0.5 0" 
+                cursor-animator>
+
+                <a-animation 
+                    begin="click" 
+                    attribute="rotation" 
+                    to="0 360 0" 
+                    delay="0" 
+                    dur="1000"
+                ></a-animation>
+            </a-entity>
+
+        </a-marker>
+
+        <a-entity camera> <a-cursor></a-cursor> </a-entity>
+
+    </a-scene>
+</body>
+
+</html>

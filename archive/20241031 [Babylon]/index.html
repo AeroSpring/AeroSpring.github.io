@@ -1,0 +1,188 @@
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body> 
+  <canvas></canvas>
+  
+  <div id="dom-overlay">
+    <!-- <div id="gizmo-block"></div> -->
+  </div>
+  
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script type="module">
+    // Извлечение тегов из разметки
+    let canvas = window.document.querySelector('canvas');
+    //let domOverlay = window.document.querySelector('#dom-overlay');
+    // Создание движка
+    let engine = new BABYLON.Engine(canvas);
+    // Создание сцены и присоеденение ее к движку
+    let scene = new BABYLON.Scene(engine);
+    // Создание среды по умолчанию (для вывода текстур 3D-модели)
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
+    // Создание света
+    let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
+    light.intensity = 0.7;
+
+    // This root node will be transformed by the image tracking module
+    const root = new BABYLON.TransformNode("root", scene);
+    root.setEnabled(false);
+
+    // Подключение WebXR
+    let xr = await scene.createDefaultXRExperienceAsync({
+      uiOptions: {
+        sessionMode: 'immersive-ar', 
+        //referenceSpaceType: 'local-floor',
+      }
+    });
+    let featuresManager = xr.baseExperience.featuresManager;
+
+    // Initiate the image tracking feature
+    const imageTracking = featuresManager.enableFeature(BABYLON.WebXRFeatureName.IMAGE_TRACKING,
+      "latest", {
+        images: [
+          {
+            src: "https://cdn.babylonjs.com/imageTracking.png",
+            estimatedRealWorldWidth: 0.2
+          },
+        ]
+      }); // as BABYLON.WebXRImageTracking;
+
+      // This callback will be executed every time the image's position was updated
+      imageTracking.onTrackedImageUpdatedObservable.add((image) => {
+          // copy the updated transformation to the model
+          root.setPreTransformMatrix(image.transformationMatrix);
+          root.setEnabled(true);
+      });
+
+      
+
+    featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
+    // Отображение DOM Overlay, после перехода в xr-режим
+    xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
+      switch(webXRState){
+        case BABYLON.WebXRState.IN_XR: {
+          domOverlay.style.display = 'block';
+          break;
+        }
+        case BABYLON.WebXRState.EXITING_XR: {
+          domOverlay.style.display = 'none';
+          break;
+        }
+        default: break;
+      }
+    });
+    
+
+    
+    // ПЕРЕМЕННЫЕ
+
+    const box = BABYLON.MeshBuilder.CreateBox("box", {});
+    box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+    box.position.x = 0.5;
+    box.position.y = 1;
+
+    const boxMaterial = new BABYLON.StandardMaterial("material", scene);
+    boxMaterial.diffuseColor = BABYLON.Color3.Random();
+    box.material = boxMaterial;
+
+    box.actionManager = new BABYLON.ActionManager(scene);
+    box.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+        function (evt) {
+            const sourceBox = evt.meshUnderPointer;
+            sourceBox.position.x += 0.1;
+            sourceBox.position.y += 0.1;
+            boxMaterial.diffuseColor = BABYLON.Color3.Random();
+        }
+      )
+    );
+
+
+    /*
+    // load the mesh
+    //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "https://assets.babylonjs.com/meshes/vintageDeskFan/", "vintageFan_animated.gltf", scene);
+    //const model = await BABYLON.SceneLoader.ImportMeshAsync("", "assets/Fan/", "Fan.gltf", scene);
+    const model = await BABYLON.appendSceneAsync("assets/Fan/Fan.gltf", scene);
+    //model.meshes[0].parent = root;
+    model.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+    model.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
+    //model.meshes[0].rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+    //shadowGenerator.addShadowCaster(model.meshes[0]); //отбрасываемая тень
+    //model.meshes[0].receiveShadows = true; //принимаемая тень
+
+    // load animations from glTF
+    //const fanRunning = scene.getAnimationGroupByName("fanRunning");
+    // Stop all animations to make sure the asset it ready
+    //scene.stopAllAnimations();
+    // run the fanRunning animation
+    //fanRunning.start(true);
+    */
+
+
+    
+    //ЗАГРУЗКА 3D-МОДЕЛИ
+    /*
+    let sl = BABYLON.SceneLoader.ImportMesh(
+      null, 
+      'assets/Fan/', 
+      'Fan.gltf', 
+      scene, 
+      (meshArray) => {
+        let fan = meshArray[0];
+        fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
+        shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
+        fan.receiveShadows = true; //принимаемая тень
+      }
+    );
+    */
+
+
+    // ФУНКЦИИ
+
+
+    engine.runRenderLoop(() => {
+      /*
+      if(activeElement) {
+        activeElement.position = new BABYLON.Vector3(0, 2, 0.5);
+      }
+      */
+      scene.render()
+    });
+
+
+    // ОБРАБОТЧИКИ СОБЫТИЙ
+    /*
+    model.meshes[0].actionManager = new BABYLON.ActionManager(scene);
+    model.meshes[0].actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+        function (evt) {
+            model.meshes[0] = evt.meshUnderPointer;
+            model.meshes[0].position.x += 0.5;
+            model.meshes[0].position.y += 0.5;
+        }
+      )
+    );
+    */
+
+    /*
+    fan.addEventListener('click', (event) => {
+      fan.position = new BABYLON.Vector3(0, 1, 0.5);
+    });
+    */
+
+    /*
+    // Обработчики событий для gizmo
+    gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      gizmoBlock.style.display = 'block'; // 'none'
+    });
+    */
+
+  </script>
+</body>

@@ -1,0 +1,68 @@
+<body> 
+  <canvas></canvas>
+  <style>
+    body, canvas {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
+  <script>
+    // Извлечение тега canvas
+    let canvas = window.document.querySelector('canvas');
+    // Создание движка
+    let engine = new BABYLON.Engine(canvas);
+    // Создание сцены и присоеденение ее к движку
+    let scene = new BABYLON.Scene(engine);
+    // Создание среды по умолчанию (для вывода текстур 3D-модели)
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
+    // Создание света
+    let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
+    light.intensity = 0.7;
+
+    // Подключение WebXR
+    scene.createDefaultXRExperienceAsync({
+      uiOptions: {
+        sessionMode: 'immersive-ar', 
+        referenceSpaceType: 'local-floor',
+      }
+    });
+
+    /*
+    // Создание куба
+    let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
+    box.material = new BABYLON.StandardMaterial('material', scene);
+    box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
+    // Позиционирование
+    box.position.y = 1;
+    box.position.z = 1;
+    // Степень непрозрачности
+    box.hasVertexAlpha = true;
+    box.visibility = 0.7;
+    */
+
+    //ЗАГРУЗКА 3D-МОДЕЛИ
+    BABYLON.SceneLoader.ImportMesh(
+      null, 
+      'assets/Fan/', 
+      'Fan.gltf', 
+      scene, 
+      (meshArray) => {
+        let fan = meshArray[0];
+        fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        fan.position = new BABYLON.Vector3(0, 0, 0);
+        shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
+        fan.receiveShadows = true; //принимаемая тень
+
+      }
+    );
+
+    engine.runRenderLoop(() => scene.render());
+  </script>
+</body>

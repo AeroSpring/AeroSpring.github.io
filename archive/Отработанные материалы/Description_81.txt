@@ -1,0 +1,3 @@
+81: myQR > 
+index.html : anivate my3d-model (Fan.gltf/.glb) by myOR, inner & outer animation Fan is resolved.
+test1.html : myPicture as BCard by myQR.

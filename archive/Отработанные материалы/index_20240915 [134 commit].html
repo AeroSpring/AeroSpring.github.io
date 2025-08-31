@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+<body style="margin : 0px; overflow: hidden;">
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+	<script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
+	<a-scene embedded arjs>
+    <a-assets>
+      <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.glb"></a-asset-item>
+    </a-assets>
+    <a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+			<!-- Plane to display the imafe -->
+			<a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
+      
+			<!-- ToRight ToUp ToDown
+      position="0 0 0"
+			-->
+      <a-entity
+        position="0 0.5 0"
+        rotation="0 0 0"
+				scale="0.25 0.25 0.25"
+				gltf-model="#animaModel"
+        animation-mixer="clip: ConeAction; autoplay: true; loop: true"
+      ></a-entity>
+      <a-entity
+        position="1 0.5 0"
+        rotation="0 0 0"
+				scale="0.25 0.25 0.25"
+				gltf-model="#animaModel"
+        animation-mixer="clip: CubeAction; autoplay: true; loop: true"
+      ></a-entity>
+      <a-sound
+        src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav"
+        autoplay="true"
+        position="-3 1 -4">
+      </a-sound>
+    </a-marker>
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
+</html>
+
+<!--
+20240915 commit 134
+Сканирование ссылки и построение по одному QR-коду - паттерну.
+Вывел своё изображение как основание и 2 анимированные 3D-модели со смещением.
+ -->

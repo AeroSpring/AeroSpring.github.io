@@ -1,0 +1,110 @@
+
+!<-- 69 index.html -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+<body style="margin : 0px; overflow: hidden;">
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+	<script src="https://cdn.8thwall.com/web/aframe/aframe-extras-7.2.0.min.js"></script>
+//	<script src="js/aframe-extras.js"></script>
+
+	<a-scene embedded arjs>
+
+        <a-assets>
+            <a-asset-item id="animaModel" src="./assets/Interactive/Interactive.gltf"></a-asset-item>
+        </a-assets>
+				gltf-model="#animaModel"
+
+		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+			<a-entity
+				position="0 0 0"
+                rotation="0 0 0"
+				scale="0.25 0.25 0.25"
+
+				gltf-model="obj/Interactive/Interactive.gltf"
+				gltf-model="obj/Fan/Fan.gltf"
+				gltf-model="obj/Fan/Fan.glb"
+
+				animation-mixer="clip: *; autoplay: true; loop: true"
+                animation-mixer="clip: Old_fan.004_propeller_0Action; autoplay: true; loop: true"
+
+                animation__rotate = "property: rotation; dur: 8000; easing: linear; dir: normal; from:0 0 0; to: 0 360 0; loop: true;"
+            ></a-entity>
+            <a-sound 
+                src="https://cdn.aframe.io/basic-guide/audio/backgroundnoise.wav" 
+                autoplay="true" 
+                position="-3 1 -4">
+            </a-sound>
+		</a-marker>
+		<a-entity camera></a-entity>
+	</a-scene>
+</body>
+</html>
+
+
+
+
+!<-- test1.html -->
+
+<!DOCTYPE html>
+<html lang="ru">
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+<body style="margin: 0; overflow: hidden;">
+	<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+	<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+	<a-scene embedded arjs>
+		<!-- Marker for tracking -->
+		<a-marker type="pattern" url="/markers/pattern-qr-code.patt">
+			<!-- Plane to display the imafe -->
+			<a-plane id="imagePlane" position="0 0 0" rotation="-90 0 0" width="4" height="2.09" material="shader: flat; scale: 2 2 2; src:capture.jpg"></a-plane>
+			<!--
+			<a-entity
+				position="0 0 0"
+				scale="0.2 0.2 0.2"
+				gltf-model="obj/House/House.gltf"
+			></a-entity>
+			-->
+		</a-marker>
+		<!-- Camera to view the scene -->
+		<a-entity camera></a-entity>
+	</a-scene>
+</body>
+</html>
