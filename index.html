@@ -5,6 +5,47 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/three.js/build/ar-threex-location-only.js'></script>
     <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
+    
+    <!-- import events.js script
+    <script src="./events.js"></script>
+    -->
+    <script>
+        AFRAME.registerComponent('cursor-animator', {
+            init: function () {
+                const animatedMarker = document.querySelector("#animated-marker");
+                const aEntity = document.querySelector("#animated-model");
+
+                this.el.addEventListener('click', function (evt) {
+
+
+                    //console.log('fuse: true; rayOrigin: mouse');
+
+
+                    //alert('fuse: true; rayOrigin: mouse');
+
+                    //const position = aEntity.getAttribute('position');
+                    //var arrayOfStrings = position.split(/\s/);
+                    //Object.keys(position).forEach((key) => position[key] = "0 0 " + (Number(arrayOfStrings[2]) + 0.5));
+                    //aEntity.setAttribute('position', position);
+
+                    const animationMixer = aEntity.getAttribute('animation-mixer');
+                    aEntity.setAttribute('animation-mixer', "clip: ConeAction; autoplay: true; loop: false");
+
+                });
+            }
+        });
+
+        AFRAME.registerComponent('raycaster-autorefresh', {
+            init: function () {
+                var el = this.el;
+                this.el.addEventListener('model-loaded', function () {
+                    var cursorEl = el.querySelector('[raycaster]');
+                    cursorEl.components.raycaster.refreshObjects();
+                });
+            }
+        });
+    </script>
+
 </head>
 <body>
     <body style='margin : 0px; overflow: hidden;'>
@@ -14,8 +55,26 @@
             <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
         </a-assets>
 
+        <a-entity
+            id="animated-model"
+            gltf-model="#animated-asset"
+            gps-new-entity-place="latitude: 44.989337; longitude: 41.160899"
+            scale="1.25 1.25 1.25"
+            animation-mixer="clip: CubeAction; autoplay: true; loop: false"
+            cursor-animator>
+
+            <a-animation
+                begin="click"
+                attribute="position" to="0.5 0.5 0" delay="0" dur="1000"
+            ></a-animation>
+
+            <a-animation
+                begin="click"
+                attribute="rotation" to="0 -90 0" delay="0" dur="1000"
+            ></a-animation>
+        </a-entity>
+
         <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
-        <a-box color="red" gps-new-entity-place="latitude: 44.989337; longitude: 41.160899" depth="30" height="30" width="30"></a-box>
 
     </a-scene>
 </body>
