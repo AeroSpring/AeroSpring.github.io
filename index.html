@@ -3,10 +3,17 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
 </head>
 <body> 
+  <div id="open-file-block">
+    <label id="open_file_icon" for="file_input" class="material-icons-outlined">file_open</label>
+    <br>
+    <span id="file-input-info">Open file (.glb only)</span>
+    <input id="file_input" type="file">
+  </div>
   <canvas></canvas>
   <div id="dom-overlay">
     <span id="add_icon" class="material-icons-outlined">add_circle</span>
     <span id="switch_icon" class="material-icons-outlined">adjust</span>
+    <span id="save_icon" class="material-icons-outlined">save</span>
     <input id="distance_input" type="range" min="0" max="2" value="0" step="any" />
     <input id="color_input" type="color" value="#0096db" />
     <div id="gizmo-block">
@@ -14,13 +21,17 @@
       <span id="scale_icon" class="material-icons-outlined">open_in_full</span>
       <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
       <span id="delete_icon" class="material-icons-outlined">delete</span>
-      <span id="physics_icon" class="material-icons-outlined">support</span>
+      <span id="physics_icon" class="material-icons-outlined">support</span> 
       <span id="close_icon" class="material-icons-outlined">cancel</span> 
     </div>
   </div>
 
+  <script src="https://momentjs.com/downloads/moment.min.js"></script>
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/ammo.js"></script>
+  <script src="https://preview.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
+  <script src="https://preview.babylonjs.com/serializers/babylonjs.glTF2Serializer.min.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <script type="module">
     // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
@@ -36,10 +47,18 @@
     let physicsIcon = window.document.querySelector('#physics_icon');
     let closeIcon = window.document.querySelector('#close_icon');
     let switchIcon = window.document.querySelector('#switch_icon');
+    let saveIcon = window.document.querySelector('#save_icon');
+    let fileInput = window.document.querySelector('#file_input');
+    let fileInputInfo = window.document.querySelector('#file-input-info');
     // Создание движка
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
     let scene = new BABYLON.Scene(engine);
+    scene.clearColor = new BABYLON.Color3(1, 1, 1);
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
     // Подключение физики
     await Ammo();
     let physicsEngine = new BABYLON.AmmoJSPlugin();
@@ -124,8 +143,7 @@
       // Позиционирование
       obj.position = xrCamera.getFrontPosition(distance);
       // Степень непрозрачности
-      obj.hasVertexAlpha = true;
-      obj.visibility = 0.7;      
+      obj.material.alpha = 0.7;
       obj.physicsImposter = new BABYLON.PhysicsImpostor(
         obj,
         BABYLON.PhysicsImpostor.BoxImpostor,
@@ -139,7 +157,7 @@
     }
     const createBasePlane = () => {
       // Создание куба
-      let obj = new BABYLON.MeshBuilder.CreateBox('box', {
+      let obj = new BABYLON.MeshBuilder.CreateBox('basePlane', {
         width: 10,
         height: 0.1,
         depth: 10
@@ -272,6 +290,31 @@
         addIcon.style.color = 'red';
         colorInput.value = '#ff0000';
         mode = PLAYING_MODE;
+      }
+    });
+    saveIcon.addEventListener('click', (event) => {
+      let fileSaveTime = moment().format('MMMM Do YYYY, h-mm-ss');
+      let filename = `Ar_scene_${fileSaveTime}`;
+      let sceneForDownload = scene;
+      sceneForDownload.meshes.map(mesh => {
+        if(mesh.name === 'basePlane'
+        || mesh.name === 'teleportationTarget'
+        || mesh.name === 'laserPointer'
+        ) mesh.dispose();
+      });
+      BABYLON.GLTF2Export.GLBAsync(sceneForDownload, filename).then(glb => {
+        glb.downloadFiles();
+      })
+    });
+    fileInput.addEventListener('input', (event) => {
+      if(event.target.files && event.target.files[0]){
+        let reader = new FileReader();
+        reader.addEventListener('load', (e) => {
+          BABYLON.SceneLoader.Append('', e.target.result, scene, (loadedScene) => {
+            fileInputInfo.innerText = event.target.files[0].name;
+          });
+        });
+        reader.readAsDataURL(event.target.files[0]);
       }
     });
     // Обработчики для Gizmo
