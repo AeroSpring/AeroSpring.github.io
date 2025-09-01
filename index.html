@@ -51,19 +51,6 @@
     <body style='margin : 0px; overflow: hidden;'>
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
 
-        <a-assets>
-            <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
-        </a-assets>
-
-        <a-entity
-            id="animated-model"
-            gltf-model="#animated-asset"
-            gps-new-entity-place="latitude: 44.989337; longitude: 41.160899"
-            scale="0.05 0.5 0.5"
-            animation-mixer="clip: CubeAction; autoplay: true; loop: false"
-            cursor-animator>
-        </a-entity>
-
         <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
         <a-box color="red" gps-new-entity-place="latitude: 44.989337; longitude: 41.160899" depth="30" height="30" width="30"></a-box>
 
