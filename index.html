@@ -155,6 +155,7 @@
       );
       activeElement = obj;
     }
+
     const createBasePlane = () => {
       // Создание куба
       let obj = new BABYLON.MeshBuilder.CreateBox('basePlane', {
@@ -176,7 +177,8 @@
           restitution: 0,
         }
       );
-    }    
+    }
+
     createBasePlane();
     const getColor = (hexColor) => {
       let red = parseInt(hexColor.substr(1, 2), 16);
@@ -184,6 +186,7 @@
       let blue = parseInt(hexColor.substr(5, 2), 16);
       return new BABYLON.Color3(red/255, green/255, blue/255);
     }
+
     // Функции для Gizmo
     const clearGizmoOptions = () => {
       moveIcon.style.color = '#0096db';
@@ -242,6 +245,8 @@
       scene.render();
     });
 
+
+
     // Обработчики событий
     addIcon.addEventListener('click', (event) => {
       if(activeElement){
@@ -270,13 +275,16 @@
         createObject();
       }
     });
+
     distanceInput.addEventListener('input', (event) => {
       distance = parseFloat(event.target.value) + 0.3;
     });
+
     colorInput.addEventListener('change', (event) => {
       // event.target.value = HEX(#00ff00) => BABYLON.Color3(0, 1, 0)
       selectedColor = getColor(event.target.value);
     });
+
     switchIcon.addEventListener('click', (event) => {
       if(event.target.innerText === 'add_circle'){
         event.target.innerText = 'adjust';
@@ -292,6 +300,7 @@
         mode = PLAYING_MODE;
       }
     });
+
     saveIcon.addEventListener('click', (event) => {
       let fileSaveTime = moment().format('MMMM Do YYYY, h-mm-ss');
       let filename = `Ar_scene_${fileSaveTime}`;
@@ -306,6 +315,7 @@
         glb.downloadFiles();
       })
     });
+
     fileInput.addEventListener('input', (event) => {
       if(event.target.files && event.target.files[0]){
         let reader = new FileReader();
@@ -315,8 +325,11 @@
           });
         });
         reader.readAsDataURL(event.target.files[0]);
+        reader.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        reader.position = new BABYLON.Vector3(0, 0, 1);
       }
     });
+
     // Обработчики для Gizmo
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       if(!activeElement){
@@ -345,5 +358,6 @@
       }
     })
     closeIcon.addEventListener('click', (event) => closeGizmo());
+
   </script>
 </body>

@@ -315,6 +315,9 @@
           });
         });
         reader.readAsDataURL(event.target.files[0]);
+        reader.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        reader.position = new BABYLON.Vector3(0, 0, 1);
+
       }
     });
     // Обработчики для Gizmo
