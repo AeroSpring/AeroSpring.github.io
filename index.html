@@ -3,18 +3,18 @@
 </head>
 <body> 
   <canvas></canvas>
-  
+  <!--
   <div id="dom-overlay">
-    <!-- <div id="gizmo-block"></div> -->
+    <div id="gizmo-block"></div>
   </div>
-  
+  -->
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
   <script type="module">
     // Извлечение тегов из разметки
     let canvas = window.document.querySelector('canvas');
-    let domOverlay = window.document.querySelector('#dom-overlay');
+    //let domOverlay = window.document.querySelector('#dom-overlay');
     // Создание движка
     let engine = new BABYLON.Engine(canvas);
     // Создание сцены и присоеденение ее к движку
@@ -35,8 +35,8 @@
         referenceSpaceType: 'local-floor',
       }
     });
-
-    //let xrCamera = xr.baseExperience.camera;
+    /*
+    let xrCamera = xr.baseExperience.camera;
 
     // Подключение DOM Overlay
     let featuresManager = xr.baseExperience.featuresManager;
@@ -55,7 +55,8 @@
         default: break;
       }
     });
-    
+    */
+
     /*
     // Подключение Gizmo-менедджера
     let gizmoManager = new BABYLON.GizmoManager(scene);
@@ -63,51 +64,31 @@
 
     
     // ПЕРЕМЕННЫЕ
-    //let activeElement = null;
-
-    const box = BABYLON.MeshBuilder.CreateBox("box", {});
-    box.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-    box.position.x = 0.5;
-    box.position.y = 1;
-
-    const boxMaterial = new BABYLON.StandardMaterial("material", scene);
-    boxMaterial.diffuseColor = BABYLON.Color3.Random();
-    box.material = boxMaterial;
-
-    box.actionManager = new BABYLON.ActionManager(scene);
-    box.actionManager.registerAction(
-      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
-        function (evt) {
-            const sourceBox = evt.meshUnderPointer;
-            sourceBox.position.x += 0.1;
-            sourceBox.position.y += 0.1;
-            boxMaterial.diffuseColor = BABYLON.Color3.Random();
-        }
-      )
-    );
+    let activeElement = null;
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    let sl = BABYLON.SceneLoader.ImportMesh(
+    let fan = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/Fan/', 
       'Fan.gltf', 
       scene, 
       (meshArray) => {
-        let fan = meshArray[0];
-        fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
-        shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
-        fan.receiveShadows = true; //принимаемая тень
+        let _fan = meshArray[0];
+        _fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        _fan.position = new BABYLON.Vector3(0, 0, 1); //.Vector3(вправо, вверх, от меня)
+        shadowGenerator.addShadowCaster(_fan); //отбрасываемая тень
+        _fan.receiveShadows = true; //принимаемая тень
       }
     );
-    
-    sl.actionManager = new BABYLON.ActionManager(scene);
-    sl.actionManager.registerAction(new BABYLON.SetValueAction(
+    fan.actionManager = new BABYLON.ActionManager(scene);
+    fan.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       BABYLON.ActionManager.OnPickTrigger, 
-      sl.mesh, 
-      "scaling", 
-      new BABYLON.Vector3(0.5, 0.5, 0.5)
-    ));
+      function (evt) {
+        const fan = evt.meshUnderPointer;
+        //move the fan upright
+        fan.position.x += 0.5;
+        fan.position.y += 0.5;
+    }));
 
 
     // ФУНКЦИИ
