@@ -7,6 +7,7 @@
     <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
 
     <script src="https://rawgit.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
+    <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
     
     <!-- import events.js script
     <script src="./events.js"></script>
@@ -64,16 +65,6 @@
             scale="0.05 0.5 0.5"
             animation-mixer="clip: CubeAction; autoplay: true; loop: false"
             cursor-animator>
-
-            <a-animation
-                begin="click"
-                attribute="position" to="0.5 0.5 0" delay="0" dur="1000"
-            ></a-animation>
-
-            <a-animation
-                begin="click"
-                attribute="rotation" to="0 -90 0" delay="0" dur="1000"
-            ></a-animation>
         </a-entity>
 
         <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
