@@ -111,6 +111,7 @@
       gizmoManager.positionGizmoEnabled = false;
       gizmoManager.boundingBoxGizmoEnabled = false;
     }
+    
     const setBoundingBox = (option) => {
       gizmoManager.boundingBoxGizmoEnabled = true;  
       gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
@@ -122,6 +123,7 @@
       }
       gizmoManager.gizmos.boundingBoxGizmo.updateBoundingBox();        
     }
+
     const setGizmoOption = (option) => {
       clearGizmoOptions();
       switch(option) {
