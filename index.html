@@ -149,12 +149,11 @@
       if(event.target.files && event.target.files[0]){
         let reader = new FileReader();
         reader.addEventListener('load', (e) => {
-          BABYLON.SceneLoader.Append('', e.target.result, scene, (loadedScene) => {
-            let obj = event.target.files[0]
+          let obj = BABYLON.SceneLoader.Append('', e.target.result, scene, (loadedScene) => {
             fileInputInfo.innerText = event.target.files[0].name;
-            obj.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-            obj.position = new BABYLON.Vector3(0, 0, 1);
           });
+          obj.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+          obj.position = new BABYLON.Vector3(0, 0, 1);
         });
         //reader.readAsDataURL(event.target.files[0]);
         reader.readAsDataURL(obj);
