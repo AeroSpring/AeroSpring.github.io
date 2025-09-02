@@ -14,7 +14,6 @@
     <div id="gizmo-block">
       <span id="move_icon" class="material-icons-outlined">open_with</span>
       <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
-      <span id="delete_icon" class="material-icons-outlined">delete</span>
       <span id="close_icon" class="material-icons-outlined">cancel</span> 
     </div>
   </div>
@@ -29,7 +28,6 @@
     let gizmoBlock = window.document.querySelector('#gizmo-block');
     let moveIcon = window.document.querySelector('#move_icon');
     let rotateIcon = window.document.querySelector('#rotate_icon');
-    let deleteIcon = window.document.querySelector('#delete_icon');
     let closeIcon = window.document.querySelector('#close_icon');
     let fileInput = window.document.querySelector('#file_input');
     let fileInputInfo = window.document.querySelector('#file-input-info');
@@ -156,10 +154,9 @@
             fileInputInfo.innerText = event.target.files[0].name;
           });
         });
-        reader.readAsDataURL(event.target.files[0]);
-        reader.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        reader.position = new BABYLON.Vector3(0, 0, 1);
-        // activeElement = reader;
+        obj = reader.readAsDataURL(event.target.files[0]);
+        obj.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        obj.position = new BABYLON.Vector3(0, 0, 1);
       }
     });
 
@@ -176,7 +173,6 @@
     });
     moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
     rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
-    deleteIcon.addEventListener('click', (event) => closeGizmo(true));
     closeIcon.addEventListener('click', (event) => closeGizmo());
 
   </script>
