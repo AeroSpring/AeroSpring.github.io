@@ -115,7 +115,8 @@
         }
         case 'rotate': {
           rotateIcon.style.color = 'white';
-          setBoundingBox(option);
+          gizmoManager.rotationGizmoEnabled = true;
+          //setBoundingBox(option);
           break;      
         }        
         default: break;
