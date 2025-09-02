@@ -99,6 +99,7 @@
       gizmoManager.boundingBoxGizmoEnabled = true;  
       gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
       switch(option){
+        case 'move': gizmoManager.gizmos.boundingBoxGizmo.moveBoxSize = 0.03; break;
         case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
         default: break;
       }
