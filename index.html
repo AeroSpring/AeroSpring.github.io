@@ -96,10 +96,10 @@
     }
 
     const setBoundingBox = (option) => {
-      gizmoManager.boundingBoxGizmoEnabled = true;
+      gizmoManager.boundingBoxGizmoEnabled = true;  
       gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
       switch(option){
-        case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.001; break;
+        case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
         default: break;
       }
       gizmoManager.gizmos.boundingBoxGizmo.updateBoundingBox();        
