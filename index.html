@@ -97,10 +97,8 @@
 
     const setBoundingBox = (option) => {
       gizmoManager.boundingBoxGizmoEnabled = true;
-      gizmoManager.gizmos.boundingBoxGizmo.moveBoxSize = 0;
       gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
       switch(option){
-        case 'move': gizmoManager.gizmos.boundingBoxGizmo.moveBoxSize = 0.03; break;
         case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
         default: break;
       }
@@ -163,8 +161,6 @@
       if(!activeElement){
         gizmoManager.enableAutoPicking = false;
         editingElement = mesh;
-        editingElement.scaling = new BABYLON.Vector3(0.01, 0.01, 0.01);
-        editingElement.position = new BABYLON.Vector3(0, 0, 1);
         gizmoBlock.style.display = 'block';
         setGizmoOption('move');
       }else{
