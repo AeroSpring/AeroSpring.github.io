@@ -39,7 +39,6 @@
     
     // Создание сцены и присоеденение ее к движку
     let scene = new BABYLON.Scene(engine);
-    // scene.clearColor = new BABYLON.Color3(1, 1, 1);
     scene.createDefaultEnvironment({
       createSkybox: false,
       createGround: false
@@ -160,7 +159,7 @@
         reader.readAsDataURL(event.target.files[0]);
         reader.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         reader.position = new BABYLON.Vector3(0, 0, 1);
-        activeElement = reader;
+        // activeElement = reader;
       }
     });
 
