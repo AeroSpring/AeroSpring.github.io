@@ -92,12 +92,11 @@
       moveIcon.style.color = '#0096db';
       rotateIcon.style.color = '#0096db';
       gizmoManager.positionGizmoEnabled = false;
-      gizmoManager.rotationGizmoEnabled = false;
-      //gizmoManager.boundingBoxGizmoEnabled = false;
+      gizmoManager.boundingBoxGizmoEnabled = false;
     }
 
     const setBoundingBox = (option) => {
-      gizmoManager.boundingBoxGizmoEnabled = true;  
+      gizmoManager.boundingBoxGizmoEnabled = false; //true;
       gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
       switch(option){
         case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
@@ -116,8 +115,7 @@
         }
         case 'rotate': {
           rotateIcon.style.color = 'white';
-          gizmoManager.rotationGizmoEnabled = true;
-          //setBoundingBox(option);
+          setBoundingBox(option);
           break;      
         }        
         default: break;
