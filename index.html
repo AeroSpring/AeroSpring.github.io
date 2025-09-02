@@ -115,7 +115,7 @@
         }
         case 'rotate': {
           rotateIcon.style.color = 'white';
-          //setBoundingBox(option);     
+          setBoundingBox(option);
           break;      
         }        
         default: break;
@@ -161,7 +161,7 @@
       if(!activeElement){
         gizmoManager.enableAutoPicking = false;
         editingElement = mesh;
-        gizmoBlock.style.display = 'block';
+        //gizmoBlock.style.display = 'block';
         setGizmoOption('move');
       }else{
         gizmoManager._attachedMesh = null;
