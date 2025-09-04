@@ -66,9 +66,6 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-        drone.addEventListener('click', (event) => {
-          drone.dispose();
-        }
       }
     );
 
@@ -84,9 +81,6 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
-        steampunk.addEventListener('click', (event) => {
-          steampunk.dispose();
-        }
       }
     );
 
