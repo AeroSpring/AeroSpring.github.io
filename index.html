@@ -56,7 +56,7 @@
       (meshArray) => {
         let fan = meshArray[0];
         fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(0, 0, 1);
+        fan.position = new BABYLON.Vector3(-1, 0, 1);
         shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
         fan.receiveShadows = true; //принимаемая тень
 
@@ -71,7 +71,7 @@
       (meshArray) => {
         let fan = meshArray[0];
         fan.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        fan.position = new BABYLON.Vector3(0, 0, 1);
+        fan.position = new BABYLON.Vector3(1, 0, 1);
         shadowGenerator.addShadowCaster(fan); //отбрасываемая тень
         fan.receiveShadows = true; //принимаемая тень
 
