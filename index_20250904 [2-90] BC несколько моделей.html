@@ -79,36 +79,6 @@
       }
     );
 
-
-
     engine.runRenderLoop(() => scene.render());
-
-
-    
-    // Обработчики событий
-    drone.addEventListener('click', (event) => {
-      if(activeElement){
-        activeElement = null;
-        event.target.innerText = '[drone] был активным';
-        drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-      }else{
-        event.target.innerText = '[drone] TEXT_2';
-        drone.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
-      }
-    });
-
-    steampunk.addEventListener('click', (event) => {
-      if(activeElement){
-        activeElement = null;
-        event.target.innerText = '[steampunk] был активным';
-        steampunk.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-      }else{
-        event.target.innerText = '[steampunk] TEXT_2';
-        steampunk.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
-      }
-    });
-
-
-
   </script>
 </body>
