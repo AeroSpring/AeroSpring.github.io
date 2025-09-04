@@ -102,6 +102,7 @@
                   BABYLON.ActionManager.OnPickTrigger, // Тип события: клик по мешу
                   () => {
                       alert("Вы жмакнули по drone"); // Действие при клике
+                      droneMesh.dispose()
                   }
               )
           );
@@ -131,6 +132,7 @@
                   BABYLON.ActionManager.OnPickTrigger, // Тип события: клик по мешу
                   () => {
                       alert("Вы жмакнули по steampunk"); // Действие при клике
+                      steampunkMesh.dispose()
                   }
               )
           );
