@@ -94,6 +94,21 @@
     
     // Обработчики событий
     drone.addEventListener('click', (event) => {
+      const droneMesh = scene.getMeshByName("drone");
+      if (droneMesh) {
+          droneMesh.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
+          droneMesh.actionManager.registerAction(
+              new BABYLON.ExecuteCodeAction(
+                  BABYLON.ActionManager.OnPickTrigger, // Тип события: клик по мешу
+                  () => {
+                      alert("Вы жмакнули по drone"); // Действие при клике
+                  }
+              )
+          );
+      } else {
+          console.log("Меш с именем 'drone' не найден.");
+      }
+      /*
       if(activeElement){
         activeElement = null;
         event.target.innerText = '[drone] был активным';
@@ -104,9 +119,25 @@
         //event.target.innerText = '[drone] стал активным';
         //drone.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
       }
+      */
     });
 
     steampunk.addEventListener('click', (event) => {
+      const steampunkMesh = scene.getMeshByName("steampunk");
+      if (steampunkMesh) {
+          steampunkMesh.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
+          steampunkMesh.actionManager.registerAction(
+              new BABYLON.ExecuteCodeAction(
+                  BABYLON.ActionManager.OnPickTrigger, // Тип события: клик по мешу
+                  () => {
+                      alert("Вы жмакнули по steampunk"); // Действие при клике
+                  }
+              )
+          );
+      } else {
+          console.log("Меш с именем 'steampunk' не найден.");
+      }
+      /*
       if(activeElement){
         activeElement = null;
         event.target.innerText = '[steampunk] был активным';
@@ -119,6 +150,7 @@
         ////steampunk.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
         //steampunk.rotation = new BABYLON.Vector3(0, -90, 0);
       }
+      */
     });
 
     
