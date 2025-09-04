@@ -56,7 +56,7 @@
       (meshArray) => {
         let drone = meshArray[0];
         drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        drone.position = new BABYLON.Vector3(-1, 1, 3);
+        drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
 
@@ -70,8 +70,9 @@
       scene, 
       (meshArray) => {
         let steampunk = meshArray[0];
-        steampunk.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+        steampunk.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
         steampunk.position = new BABYLON.Vector3(1, 1, 1);
+        steampunk.rotation = new BABYLON.Vector3(-90, 0, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
 
