@@ -99,9 +99,10 @@
         event.target.innerText = '[drone] был активным';
         drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
       }else{
-        activeElement = drone;
-        event.target.innerText = '[drone] стал активным';
-        drone.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
+        drone.dispose()
+        //activeElement = drone;
+        //event.target.innerText = '[drone] стал активным';
+        //drone.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
       }
     });
 
@@ -112,40 +113,16 @@
         //steampunk.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
       }else{
-        activeElement = steampunk;
-        event.target.innerText = '[steampunk] стал активным';
-        //steampunk.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
-        steampunk.rotation = new BABYLON.Vector3(0, -90, 0);
+        steampunk.dispose()
+        //activeElement = steampunk;
+        //event.target.innerText = '[steampunk] стал активным';
+        ////steampunk.scaling = new BABYLON.Vector3(0.7, 0.7, 0.7);
+        //steampunk.rotation = new BABYLON.Vector3(0, -90, 0);
       }
     });
 
     
-    scene.onPointerObservable.add((pointerInfo) => {
-      switch (pointerInfo.type) {
-        case BABYLON.PointerEventTypes.POINTERDOWN:
-          console.log("POINTER DOWN");
-          break;
-        case BABYLON.PointerEventTypes.POINTERUP:
-          console.log("POINTER UP");
-          break;
-        case BABYLON.PointerEventTypes.POINTERMOVE:
-          console.log("POINTER MOVE");
-          break;
-        case BABYLON.PointerEventTypes.POINTERWHEEL:
-          console.log("POINTER WHEEL");
-          break;
-        case BABYLON.PointerEventTypes.POINTERPICK:
-          console.log("POINTER PICK");
-          break;
-        case BABYLON.PointerEventTypes.POINTERTAP:
-          console.log("POINTER TAP");
-          break;
-        case BABYLON.PointerEventTypes.POINTERDOUBLETAP:
-          console.log("POINTER DOUBLE-TAP");
-          break;
-      }
-    });
-
+    
 
 
 
