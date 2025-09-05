@@ -68,11 +68,10 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-        drone.isPickable = true;
       }
     );
-    if(drone){
-      alert('drone added');
+    if (!drone.actionManager) {
+      drone.actionManager = new BABYLON.ActionManager(scene);
     }
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
@@ -87,11 +86,10 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
-        steampunk.isPickable = true;
       }
     );
-    if(steampunk){
-      alert('steampunk added');
+    if (!steampunk.actionManager) {
+      steampunk.actionManager = new BABYLON.ActionManager(scene);
     }
 
 
@@ -113,45 +111,44 @@
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
-          box.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+          box.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0);
           //box.dispose();
           // Вы можете использовать объект event для получения дополнительной информации
           console.log("Событие:", event);
         }
       )
     );
-
+    
+    /*
     drone.addEventListener('click', (event) => {
       alert('drone clicked');
       //drone.isVisible = false;
       drone.dispose();
       //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
     });
-        /*
-    drone.actionManager = new BABYLON.ActionManager(scene);
+    */
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
-        BABYLON.ActionManager.OnPickTrigger, function () {
-          //drone.isVisible = false;
-          drone.dispose();
-          //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+        BABYLON.ActionManager.OnPickTrigger, 
+        function(event) {
+          drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+          //drone.dispose();
+          // Вы можете использовать объект event для получения дополнительной информации
+          console.log("Событие:", event);
         }
       )
     );
-    */
     
-    steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
-        {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
-        function () {
-          alert('steampunk clicked');
-          //steampunk.isVisible = false;
-          //alert("Вы жмакнули по steampunk"); // Действие при клике
+        BABYLON.ActionManager.OnPickTrigger, 
+        function(event) {
+          //steampunk.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
           steampunk.dispose();
-          //steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-        },
-      ),
+          // Вы можете использовать объект event для получения дополнительной информации
+          console.log("Событие:", event);
+        }
+      )
     );
     
     
