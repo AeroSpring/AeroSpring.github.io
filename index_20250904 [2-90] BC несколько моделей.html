@@ -36,12 +36,7 @@
 
 
 
-    // ПЕРЕМЕННЫЕ
-    let activeElement = null;
-
-
-
-    //ЗАГРУЗКА 3D-МОДЕЛЕЙ
+    //ЗАГРУЗКА 3D-МОДЕЛИ
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -53,11 +48,9 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-        //alert("создан drone");
+
       }
     );
-
-    
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -71,6 +64,7 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
+
       }
     );
 
@@ -91,22 +85,21 @@
         }
       )
     );
-
-
-
+    
+    
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
         function () {
-          steampunk.isVisible = false;
+          //steampunk.isVisible = false;
           //alert("Вы жмакнули по steampunk"); // Действие при клике
           //steampunk.dispose();
-          //steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+          steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         },
       ),
     );
-
+    
     
 
   </script>
