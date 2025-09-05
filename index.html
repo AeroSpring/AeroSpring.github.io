@@ -75,19 +75,18 @@
 
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
-    /*
     drone.actionManager = new BABYLON.ActionManager(scene);
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, function () {
-          //drone.isVisible = false;
-          drone.dispose();
+          drone.isVisible = false;
+          //drone.dispose();
           //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
         }
       )
     );
-    */
-    /*
+    
+    
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -95,12 +94,11 @@
         function () {
           //steampunk.isVisible = false;
           //alert("Вы жмакнули по steampunk"); // Действие при клике
-          steampunk.dispose();
-          //steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+          //steampunk.dispose();
+          steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         },
       ),
     );
-    */
     
     
 
