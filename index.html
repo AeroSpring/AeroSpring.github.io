@@ -89,7 +89,10 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
-    steampunk.actionManager = new BABYLON.ActionManager(scene);
+    steampunk = scene.getMeshByName("steampunkMesh");
+    if (steampunk) {
+      steampunk.actionManager = new BABYLON.ActionManager(scene);
+    }
 
 
 
