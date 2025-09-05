@@ -57,33 +57,24 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    let drone = BABYLON.SceneLoader.ImportMesh(
+    let droneMesh = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
       scene, 
       (meshArray) => {
-        let drone = meshArray[0];
-        drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        drone.position = new BABYLON.Vector3(-1, 1, 4);
-        shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
-        drone.receiveShadows = true; //принимаемая тень
-        drone.actionManager = new BABYLON.ActionManager(scene);
-
-        drone.actionManager.registerAction(
-          new BABYLON.ExecuteCodeAction(
-            BABYLON.ActionManager.OnPickTrigger, 
-            function(event) {
-              //drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-              drone.dispose();
-              // Вы можете использовать объект event для получения дополнительной информации
-              console.log("Событие:", event);
-            }
-          )
-        );
-
+        let droneMesh = meshArray[0];
+        droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+        droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
+        shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
+        droneMesh.receiveShadows = true; //принимаемая тень
+        droneMesh.actionManager = new BABYLON.ActionManager(scene);
       }
     );
+    const drone = scene.getMeshByName("drone");
+    if (drone) {
+      drone.actionManager = new BABYLON.ActionManager(scene);
+    }
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -120,19 +111,17 @@
       )
     );
     
-    /*
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
-          drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-          //drone.dispose();
+          //drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+          drone.dispose();
           // Вы можете использовать объект event для получения дополнительной информации
           console.log("Событие:", event);
         }
       )
     );
-    */
     
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
