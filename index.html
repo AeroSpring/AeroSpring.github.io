@@ -84,10 +84,6 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
-        //alert("создан steampunk");
-        //steampunk.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
-        //  alert('sphere clicked');
-        //}));
       }
     );
 
@@ -103,7 +99,7 @@
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, function () {
           //drone.dispose();
-          drone.scaling = new BABYLON.Vector3(1.1, 1.1, 1.1);
+          drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
         }
       )
     );
@@ -115,8 +111,9 @@
       new BABYLON.ExecuteCodeAction(
         {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
         function () {
-          alert("Вы жмакнули по steampunk"); // Действие при клике
-          steampunk.dispose();
+          //alert("Вы жмакнули по steampunk"); // Действие при клике
+          //steampunk.dispose();
+          steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
         },
       ),
     );
