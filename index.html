@@ -92,16 +92,20 @@
     );
 
 
+
+    engine.runRenderLoop(() => scene.render());
+
+
     
     // Обработчики событий
     drone.actionManager = new BABYLON.ActionManager(scene);
-    drone.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
+    drone.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
       drone.dispose();
       alert('drone clicked');
     }));
 
 
-    
+
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -112,10 +116,6 @@
         },
       ),
     );
-
-
-
-    engine.runRenderLoop(() => scene.render());
 
     
 
