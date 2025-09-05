@@ -34,16 +34,20 @@
       }
     });
 
+    /*
+    // Создание куба
+    let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
+    box.material = new BABYLON.StandardMaterial('material', scene);
+    box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
+    // Позиционирование
+    box.position.y = 1;
+    box.position.z = 1;
+    // Степень непрозрачности
+    box.hasVertexAlpha = true;
+    box.visibility = 0.7;
+    */
 
-
-    // ПЕРЕМЕННЫЕ
-    let activeElement = null;
-    let drone;
-    let steampunk;
-
-
-
-    //ЗАГРУЗКА 3D-МОДЕЛЕЙ
+    //ЗАГРУЗКА 3D-МОДЕЛИ
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -55,10 +59,9 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
+
       }
     );
-
-    
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -72,10 +75,9 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
+
       }
     );
-
-
 
     engine.runRenderLoop(() => scene.render());
 
