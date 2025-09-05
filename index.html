@@ -1,12 +1,9 @@
-<body> 
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
   <canvas></canvas>
-  <style>
-    body, canvas {
-      margin: 0;
-      width: 100vw;
-      height: 100vh;
-    }
-  </style>
+  <div id="dom-overlay"></div>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
@@ -99,8 +96,8 @@
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
     drone.addEventListener('input', (event) => {
-      drone.isVisible = false;
-      //drone.dispose();
+      //drone.isVisible = false;
+      drone.dispose();
       //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
     });
 
