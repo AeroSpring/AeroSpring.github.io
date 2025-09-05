@@ -99,10 +99,14 @@
     
     // Обработчики событий
     drone.actionManager = new BABYLON.ActionManager(scene);
-    drone.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-      drone.dispose();
-      alert('drone clicked');
-    }));
+    drone.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnPickTrigger, function () {
+          //drone.dispose();
+          drone.scaling = new BABYLON.Vector3(1.1, 1.1, 1.1);
+        }
+      )
+    );
 
 
 
