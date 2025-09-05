@@ -81,15 +81,15 @@
       'steampunk.glb', 
       scene, 
       (meshArray) => {
-        let steampunk = meshArray[0];
-        steampunk.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
-        steampunk.position = new BABYLON.Vector3(1, 1, 1);
-        steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
-        shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
-        steampunk.receiveShadows = true; //принимаемая тень
-        steampunk.actionManager = new BABYLON.ActionManager(scene);
+        let steampunkMesh = meshArray[0];
+        steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
+        steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
+        steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
+        shadowGenerator.addShadowCaster(steampunkMesh); //отбрасываемая тень
+        steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    steampunk.actionManager = new BABYLON.ActionManager(scene);
 
 
 
