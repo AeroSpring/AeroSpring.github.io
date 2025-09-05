@@ -107,7 +107,21 @@
       )
     );
     
-    drone.actionManager.registerAction(
+    const droneMesh = scene.getMeshByName("drone");
+    if (droneMesh) {
+      drone.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(
+          BABYLON.ActionManager.OnPickTrigger, 
+          function(event) {
+            droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+            droneMesh.dispose();
+            // Вы можете использовать объект event для получения дополнительной информации
+            console.log("Событие:", event);
+          }
+        )
+      );
+    }
+    /*drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
@@ -117,7 +131,7 @@
           console.log("Событие:", event);
         }
       )
-    );
+    );*/
     
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
