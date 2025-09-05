@@ -68,7 +68,6 @@
         droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
         droneMesh.receiveShadows = true; //принимаемая тень
-        droneMesh.actionManager = new BABYLON.ActionManager(scene);
       }
     );
     let drone = scene.getMeshByName("droneMesh");
