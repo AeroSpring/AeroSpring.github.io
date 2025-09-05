@@ -40,7 +40,7 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    let drone = BABYLON.SceneLoader.ImportMesh(
+    var drone = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
@@ -81,12 +81,10 @@
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
     drone.addEventListener('click', (event) => {
-      if(event.target.files && event.target.files[0]){
-        alert('drone clicked');
-        //drone.isVisible = false;
-        drone.dispose();
-        //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
-      }
+      alert('drone clicked');
+      //drone.isVisible = false;
+      drone.dispose();
+      //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
     });
     
     /*
