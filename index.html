@@ -41,20 +41,7 @@
 
 
 
-    /*
-    // Создание куба
-    let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
-    box.material = new BABYLON.StandardMaterial('material', scene);
-    box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
-    // Позиционирование
-    box.position.y = 1;
-    box.position.z = 1;
-    // Степень непрозрачности
-    box.hasVertexAlpha = true;
-    box.visibility = 0.7;
-    */
-
-    //ЗАГРУЗКА 3D-МОДЕЛИ
+    //ЗАГРУЗКА 3D-МОДЕЛЕЙ
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -93,13 +80,14 @@
 
 
     
-    // Обработчики событий
+    // ОБРАБОТЧИКИ СОБЫТИЙ
     drone.actionManager = new BABYLON.ActionManager(scene);
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, function () {
+          drone.isVisible = false;
           //drone.dispose();
-          drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+          //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
         }
       )
     );
@@ -111,6 +99,7 @@
       new BABYLON.ExecuteCodeAction(
         {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
         function () {
+          steampunk.isVisible = false;
           //alert("Вы жмакнули по steampunk"); // Действие при клике
           //steampunk.dispose();
           steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);

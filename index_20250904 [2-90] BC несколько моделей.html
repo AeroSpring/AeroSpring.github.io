@@ -34,20 +34,14 @@
       }
     });
 
-    /*
-    // Создание куба
-    let box = new BABYLON.Mesh.CreateBox('box', 0.1, scene);
-    box.material = new BABYLON.StandardMaterial('material', scene);
-    box.material.emissiveColor = new BABYLON.Color3(0, 0.58, 0.86);
-    // Позиционирование
-    box.position.y = 1;
-    box.position.z = 1;
-    // Степень непрозрачности
-    box.hasVertexAlpha = true;
-    box.visibility = 0.7;
-    */
 
-    //ЗАГРУЗКА 3D-МОДЕЛИ
+
+    // ПЕРЕМЕННЫЕ
+    let activeElement = null;
+
+
+
+    //ЗАГРУЗКА 3D-МОДЕЛЕЙ
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -59,9 +53,11 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-
+        //alert("создан drone");
       }
     );
+
+    
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -75,10 +71,43 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
-
       }
     );
 
+
+
     engine.runRenderLoop(() => scene.render());
+
+
+    
+    // ОБРАБОТЧИКИ СОБЫТИЙ
+    drone.actionManager = new BABYLON.ActionManager(scene);
+    drone.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnPickTrigger, function () {
+          drone.isVisible = false;
+          //drone.dispose();
+          //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+        }
+      )
+    );
+
+
+
+    steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
+    steampunk.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
+        function () {
+          steampunk.isVisible = false;
+          //alert("Вы жмакнули по steampunk"); // Действие при клике
+          //steampunk.dispose();
+          steampunk.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+        },
+      ),
+    );
+
+    
+
   </script>
 </body>
