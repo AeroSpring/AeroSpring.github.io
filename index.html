@@ -1,22 +1,18 @@
-<head>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
-</head>
 <body>
-  <div id="open-file-block">
-    <label id="open_file_icon" for="file_input" class="material-icons-outlined">file_open</label>
-    <br>
-    <span id="file-input-info">Open file (.glb only)</span>
-    <input id="file_input" type="file">
-  </div>
   <canvas></canvas>
-  <div id="dom-overlay">
-    <div id="gizmo-block">
-      <span id="move_icon" class="material-icons-outlined">open_with</span>
-      <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
-      <span id="close_icon" class="material-icons-outlined">cancel</span> 
-    </div>
+  <style>
+    body, canvas {
+      margin: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+    #dom-overlay {
+      display: none;
+      user-select: none;
+    }    
+  </style>
 
+  <div id="dom-overlay">
   </div>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -26,12 +22,6 @@
     // ИЗВЛЕЧЕНИЕ ТЕГОВ ИЗ РАЗМЕТКИ
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
-    let gizmoBlock = window.document.querySelector('#gizmo-block');
-    let moveIcon = window.document.querySelector('#move_icon');
-    let rotateIcon = window.document.querySelector('#rotate_icon');
-    let closeIcon = window.document.querySelector('#close_icon');
-    let fileInput = window.document.querySelector('#file_input');
-    let fileInputInfo = window.document.querySelector('#file-input-info');
 
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
@@ -61,7 +51,8 @@
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
     // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
     xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
-      //domOverlay.style.display = 'block';
+      domOverlay.style.display = 'block';
+      /*
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
           domOverlay.style.display = 'block';
@@ -73,6 +64,7 @@
         }
         default: break;
       }
+      */
     });
 
 
