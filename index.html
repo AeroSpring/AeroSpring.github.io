@@ -9,7 +9,18 @@
     #dom-overlay {
       display: none;
       user-select: none;
-    }    
+    }
+    .xr-button-overlay {
+      position: absolute;
+      top: 55vh;
+      left: 0vw;
+      width: 100%;
+      text-align: center;
+    }
+    .babylonVRicon{
+      height: 10vh !important;
+      /* background-image: url(icon.png); */
+    }
   </style>
 
   <div id="dom-overlay">
@@ -51,8 +62,7 @@
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
     // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
     xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
-      domOverlay.style.display = 'block';
-      /*
+      //domOverlay.style.display = 'block';
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
           domOverlay.style.display = 'block';
@@ -64,7 +74,6 @@
         }
         default: break;
       }
-      */
     });
 
 
