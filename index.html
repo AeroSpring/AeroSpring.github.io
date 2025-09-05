@@ -126,7 +126,21 @@
       */
     });
 
+
+
     steampunk.addEventListener('click', (event) => {
+      steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
+      steampunk.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(
+          {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
+          function () {
+            alert("Вы жмакнули по steampunk"); // Действие при клике
+            steampunk.dispose();
+          }
+        )
+      );
+
+      /*
       const steampunkMesh = scene.getMeshByName("steampunk");
       if (steampunkMesh) {
           steampunkMesh.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
@@ -142,6 +156,8 @@
       } else {
           console.log("Меш с именем 'steampunk' не найден.");
       }
+      */
+
       /*
       if(activeElement){
         activeElement = null;
