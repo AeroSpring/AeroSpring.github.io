@@ -40,7 +40,7 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    var drone = BABYLON.SceneLoader.ImportMesh(
+    let drone = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
@@ -54,6 +54,7 @@
         drone.isPickable = true;
       }
     );
+    alert('drone added');
 
     var steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -70,6 +71,7 @@
         steampunk.isPickable = true;
       }
     );
+    alert('steampunk added');
 
 
 
@@ -80,6 +82,7 @@
     // ОБРАБОТЧИКИ СОБЫТИЙ
     drone.addEventListener('click', (event) => {
       if(event.target.files && event.target.files[0]){
+        alert('drone clicked');
         //drone.isVisible = false;
         drone.dispose();
         //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
@@ -104,6 +107,7 @@
       new BABYLON.ExecuteCodeAction(
         {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
         function () {
+          alert('steampunk clicked');
           //steampunk.isVisible = false;
           //alert("Вы жмакнули по steampunk"); // Действие при клике
           steampunk.dispose();
