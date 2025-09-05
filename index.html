@@ -74,8 +74,8 @@
           new BABYLON.ExecuteCodeAction(
             BABYLON.ActionManager.OnPickTrigger, 
             function(event) {
-              drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-              //drone.dispose();
+              //drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+              drone.dispose();
               // Вы можете использовать объект event для получения дополнительной информации
               console.log("Событие:", event);
             }
