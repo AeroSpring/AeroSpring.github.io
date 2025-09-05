@@ -54,7 +54,9 @@
         drone.isPickable = true;
       }
     );
-    alert('drone added');
+    if(drone){
+      alert('drone added');
+    }
 
     var steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -72,10 +74,6 @@
       }
     );
     alert('steampunk added');
-
-
-
-    engine.runRenderLoop(() => scene.render());
 
 
     
@@ -113,6 +111,10 @@
         },
       ),
     );
+
+
+
+    engine.runRenderLoop(() => scene.render());
     
     
 
