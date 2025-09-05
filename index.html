@@ -78,6 +78,15 @@
 
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
+    drone.addEventListener('click', (event) => {
+      if(event.target.files && event.target.files[0]){
+        //drone.isVisible = false;
+        drone.dispose();
+        //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+      }
+    });
+    
+    /*
     drone.actionManager = new BABYLON.ActionManager(scene);
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -88,7 +97,8 @@
         }
       )
     );
-        
+    */
+    
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
