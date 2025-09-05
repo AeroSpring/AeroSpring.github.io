@@ -57,20 +57,23 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    let drone = BABYLON.SceneLoader.ImportMesh(
+    BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
       scene, 
       (meshArray) => {
-        let drone = meshArray[0];
-        drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        drone.position = new BABYLON.Vector3(-1, 1, 4);
-        shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
-        drone.receiveShadows = true; //принимаемая тень
-        drone.actionManager = new BABYLON.ActionManager(scene);
+        let droneMesh = meshArray[0];
+        droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+        droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
+        shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
+        droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    let drone = scene.getMeshByName("droneMesh");
+    if (drone) {
+      drone.actionManager = new BABYLON.ActionManager(scene);
+    }
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -78,15 +81,18 @@
       'steampunk.glb', 
       scene, 
       (meshArray) => {
-        let steampunk = meshArray[0];
-        steampunk.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
-        steampunk.position = new BABYLON.Vector3(1, 1, 1);
-        steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
-        shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
-        steampunk.receiveShadows = true; //принимаемая тень
-        steampunk.actionManager = new BABYLON.ActionManager(scene);
+        let steampunkMesh = meshArray[0];
+        steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
+        steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
+        steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
+        shadowGenerator.addShadowCaster(steampunkMesh); //отбрасываемая тень
+        steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    //steampunk = scene.getMeshByName("steampunkMesh");
+    if (steampunk) {
+      steampunk.actionManager = new BABYLON.ActionManager(scene);
+    }
 
 
 
@@ -99,7 +105,7 @@
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
-          //box.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0);
+          box.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0);
           box.dispose();
           // Вы можете использовать объект event для получения дополнительной информации
           console.log("Событие:", event);
@@ -107,31 +113,17 @@
       )
     );
     
-    const droneMesh = scene.getMeshByName("drone");
-    if (droneMesh) {
-      drone.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(
-          BABYLON.ActionManager.OnPickTrigger, 
-          function(event) {
-            droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-            droneMesh.dispose();
-            // Вы можете использовать объект event для получения дополнительной информации
-            console.log("Событие:", event);
-          }
-        )
-      );
-    }
-    /*drone.actionManager.registerAction(
+    drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
-          drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-          //drone.dispose();
+          //drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+          drone.dispose();
           // Вы можете использовать объект event для получения дополнительной информации
           console.log("Событие:", event);
         }
       )
-    );*/
+    );
     
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
