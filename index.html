@@ -73,7 +73,13 @@
         steampunk.isPickable = true;
       }
     );
-    alert('steampunk added');
+    if(steampunk){
+      alert('steampunk added');
+    }
+
+
+
+    engine.runRenderLoop(() => scene.render());
 
 
     
@@ -111,10 +117,6 @@
         },
       ),
     );
-
-
-
-    engine.runRenderLoop(() => scene.render());
     
     
 
