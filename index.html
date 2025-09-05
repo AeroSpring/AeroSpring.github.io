@@ -49,7 +49,10 @@
     // Степень непрозрачности
     box.hasVertexAlpha = true;
     //box.visibility = 0.7;
-    box.isPickable = true;
+    //box.isPickable = true;
+    if (!box.actionManager) {
+      box.actionManager = new BABYLON.ActionManager(scene);
+    }
 
 
 
@@ -98,12 +101,25 @@
 
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
+    /*
     box.addEventListener('click', (event) => {
       alert('box clicked');
       //box.isVisible = false;
       box.dispose();
       //box.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
     });
+    */
+    box.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        BABYLON.ActionManager.OnPickTrigger, 
+        function(event) {
+          box.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
+          //box.dispose();
+          // Вы можете использовать объект event для получения дополнительной информации
+          console.log("Событие:", event);
+        }
+      )
+    );
 
     drone.addEventListener('click', (event) => {
       alert('drone clicked');
@@ -111,8 +127,7 @@
       drone.dispose();
       //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
     });
-    
-    /*
+        /*
     drone.actionManager = new BABYLON.ActionManager(scene);
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
