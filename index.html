@@ -71,7 +71,7 @@
         droneMesh.actionManager = new BABYLON.ActionManager(scene);
       }
     );
-    const drone = scene.getMeshByName("droneMesh");
+    let drone = scene.getMeshByName("droneMesh");
     if (drone) {
       drone.actionManager = new BABYLON.ActionManager(scene);
     }
