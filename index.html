@@ -67,6 +67,7 @@
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
         //alert("создан drone");
+        drone.actionManager = new BABYLON.ActionManager(scene);
         drone.actionManager.registerAction(new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickUpTrigger, function () {
           drone.dispose();
           alert('drone clicked');
