@@ -70,9 +70,10 @@
         drone.receiveShadows = true; //принимаемая тень
       }
     );
-    if (!drone.actionManager) {
+    /*if (!drone.actionManager) {
       drone.actionManager = new BABYLON.ActionManager(scene);
-    }
+    }*/
+    drone.actionManager = new BABYLON.ActionManager(scene);
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -88,9 +89,10 @@
         steampunk.receiveShadows = true; //принимаемая тень
       }
     );
-    if (!steampunk.actionManager) {
+    /*if (!steampunk.actionManager) {
       steampunk.actionManager = new BABYLON.ActionManager(scene);
-    }
+    }*/
+    steampunk.actionManager = new BABYLON.ActionManager(scene);
 
 
 
@@ -99,14 +101,6 @@
 
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
-    /*
-    box.addEventListener('click', (event) => {
-      alert('box clicked');
-      //box.isVisible = false;
-      box.dispose();
-      //box.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
-    });
-    */
     box.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
@@ -119,14 +113,6 @@
       )
     );
     
-    /*
-    drone.addEventListener('click', (event) => {
-      alert('drone clicked');
-      //drone.isVisible = false;
-      drone.dispose();
-      //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
-    });
-    */
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
