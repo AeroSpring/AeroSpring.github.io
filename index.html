@@ -92,10 +92,6 @@
     );
 
 
-
-    engine.runRenderLoop(() => scene.render());
-
-
     
     // Обработчики событий
     drone.actionManager = new BABYLON.ActionManager(scene);
@@ -106,19 +102,20 @@
 
 
     
-    const steampunk = scene.getMeshByName("steampunk");
-    if (steampunk) {
-      steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
-      steampunk.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(
-          {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
-          function () {
-            alert("Вы жмакнули по steampunk"); // Действие при клике
-            steampunk.dispose();
-          },
-        ),
-      );
-    }
+    steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
+    steampunk.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(
+        {trigger: BABYLON.ActionManager.OnPickTrigger}, // Тип события: клик по мешу
+        function () {
+          alert("Вы жмакнули по steampunk"); // Действие при клике
+          steampunk.dispose();
+        },
+      ),
+    );
+
+
+
+    engine.runRenderLoop(() => scene.render());
 
     
 
