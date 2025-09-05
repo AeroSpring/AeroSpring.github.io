@@ -92,6 +92,7 @@
     
     // Обработчики событий
     drone.addEventListener('click', (event) => {
+      /*
       const droneMesh = scene.getMeshByName("drone");
       if (droneMesh) {
           droneMesh.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
@@ -107,6 +108,8 @@
       } else {
           console.log("Меш с именем 'drone' не найден.");
       }
+      */
+      drone.dispose();
       /*
       if(activeElement){
         activeElement = null;
