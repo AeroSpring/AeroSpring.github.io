@@ -68,12 +68,9 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
+        drone.actionManager = new BABYLON.ActionManager(scene);
       }
     );
-    /*if (!drone.actionManager) {
-      drone.actionManager = new BABYLON.ActionManager(scene);
-    }*/
-    //drone.actionManager = new BABYLON.ActionManager(scene);
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -87,12 +84,9 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
+        steampunk.actionManager = new BABYLON.ActionManager(scene);
       }
     );
-    /*if (!steampunk.actionManager) {
-      steampunk.actionManager = new BABYLON.ActionManager(scene);
-    }*/
-    //steampunk.actionManager = new BABYLON.ActionManager(scene);
 
 
 
@@ -105,15 +99,29 @@
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
-          box.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0);
-          //box.dispose();
+          //box.scaling = new BABYLON.Vector3(2.0, 2.0, 2.0);
+          box.dispose();
           // Вы можете использовать объект event для получения дополнительной информации
           console.log("Событие:", event);
         }
       )
     );
-    /*
-    drone.actionManager.registerAction(
+    
+    const droneMesh = scene.getMeshByName("drone");
+    if (droneMesh) {
+      drone.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(
+          BABYLON.ActionManager.OnPickTrigger, 
+          function(event) {
+            droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+            droneMesh.dispose();
+            // Вы можете использовать объект event для получения дополнительной информации
+            console.log("Событие:", event);
+          }
+        )
+      );
+    }
+    /*drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
         BABYLON.ActionManager.OnPickTrigger, 
         function(event) {
@@ -123,7 +131,7 @@
           console.log("Событие:", event);
         }
       )
-    );
+    );*/
     
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -136,7 +144,7 @@
         }
       )
     );
-    */
+    
     
 
   </script>
