@@ -1,4 +1,4 @@
-<body>
+<body> 
   <canvas></canvas>
   <style>
     body, canvas {
@@ -6,25 +6,7 @@
       width: 100vw;
       height: 100vh;
     }
-    #dom-overlay {
-      display: none;
-      user-select: none;
-    }
-    .xr-button-overlay {
-      position: absolute;
-      top: 55vh;
-      left: 0vw;
-      width: 100%;
-      text-align: center;
-    }
-    .babylonVRicon{
-      height: 10vh !important;
-      /* background-image: url(icon.png); */
-    }
   </style>
-
-  <div id="dom-overlay">
-  </div>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
@@ -32,52 +14,29 @@
 
     // ИЗВЛЕЧЕНИЕ ТЕГОВ ИЗ РАЗМЕТКИ
     let canvas = window.document.querySelector('canvas');
-    let domOverlay = window.document.querySelector('#dom-overlay');
-
+   
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
-
+  
     // СОЗДАНИЕ СЦЕНЫ И ПРИСОЕДИНЕНИЕ ЕЁ К ДВИЖКУ
     let scene = new BABYLON.Scene(engine);
     scene.createDefaultEnvironment({
       createSkybox: false,
       createGround: false
     });
-
+ 
     // СОЗДАНИЕ СВЕТА
     let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
     light.intensity = 0.7;
 
     // ПОДКЛЮЧЕНИЕ WEBXR
-    let xr = await scene.createDefaultXRExperienceAsync({
+    scene.createDefaultXRExperienceAsync({
       uiOptions: {
-        sessionMode: 'immersive-ar',
+        sessionMode: 'immersive-ar', 
         referenceSpaceType: 'local-floor',
       }
     });
-    let xrCamera = xr.baseExperience.camera;
 
-    // ПОДКЛЮЧЕНИЕ DOM OVERLAY
-    let featuresManager = xr.baseExperience.featuresManager;
-    featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
-    // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
-    domOverlay.style.display = 'block';
-    /*
-    xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
-      switch(webXRState){
-        case BABYLON.WebXRState.IN_XR: {
-          domOverlay.style.display = 'block';
-          break;
-        }
-        case BABYLON.WebXRState.EXITING_XR: {
-          domOverlay.style.display = 'none';
-          break;
-        }
-        default: break;
-      }
-    });
-    */
-   
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
@@ -92,7 +51,7 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-
+        drone.isPickable = true;
       }
     );
 
@@ -108,7 +67,7 @@
         steampunk.rotation = new BABYLON.Vector3(0, 90, 0);
         shadowGenerator.addShadowCaster(steampunk); //отбрасываемая тень
         steampunk.receiveShadows = true; //принимаемая тень
-
+        steampunk.isPickable = true;
       }
     );
 
@@ -119,14 +78,6 @@
 
     
     // ОБРАБОТЧИКИ СОБЫТИЙ
-    drone.addEventListener('input', (event) => {
-      //drone.isVisible = false;
-      drone.dispose();
-      //drone.scaling = new BABYLON.Vector3(0.75, 0.75, 0.75);
-    });
-
-
-    /*
     drone.actionManager = new BABYLON.ActionManager(scene);
     drone.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -137,9 +88,8 @@
         }
       )
     );
-    */
-
-    /*
+    
+    
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
@@ -152,7 +102,6 @@
         },
       ),
     );
-    */
     
     
 
