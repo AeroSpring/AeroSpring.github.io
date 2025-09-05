@@ -61,8 +61,9 @@
     let featuresManager = xr.baseExperience.featuresManager;
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
     // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
+    domOverlay.style.display = 'block';
+    /*
     xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
-      //domOverlay.style.display = 'block';
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
           domOverlay.style.display = 'block';
@@ -75,7 +76,8 @@
         default: break;
       }
     });
-
+    */
+   
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
