@@ -3,7 +3,14 @@
 </head>
 <body>
   <canvas></canvas>
-  <div id="dom-overlay"></div>
+  <div id="dom-overlay">
+    <div id="gizmo-block">
+      <span id="move_icon" class="material-icons-outlined">open_with</span>
+      <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
+      <span id="close_icon" class="material-icons-outlined">cancel</span> 
+    </div>
+
+  </div>
 
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.js"></script>
@@ -41,6 +48,8 @@
     featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
     // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
     xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
+      domOverlay.style.display = 'block';
+      /*
       switch(webXRState){
         case BABYLON.WebXRState.IN_XR: {
           domOverlay.style.display = 'block';
@@ -52,6 +61,7 @@
         }
         default: break;
       }
+      */
     });
 
 
