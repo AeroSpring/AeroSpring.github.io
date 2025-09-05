@@ -40,7 +40,7 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    BABYLON.SceneLoader.ImportMesh(
+    drone = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
@@ -55,7 +55,7 @@
       }
     );
 
-    BABYLON.SceneLoader.ImportMesh(
+    steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/steampunk/', 
       'steampunk.glb', 
@@ -88,8 +88,7 @@
         }
       )
     );
-    
-    
+        
     steampunk.actionManager = new BABYLON.ActionManager(scene); // Создаем ActionManager для меша
     steampunk.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(
