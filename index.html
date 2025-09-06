@@ -76,7 +76,7 @@
       drone.actionManager = new BABYLON.ActionManager(scene);
     }
     */
-    BABYLON.SceneLoader.Append(
+    let drone = BABYLON.SceneLoader.Append(
       'assets/drone/', 
       'drone.glb', 
       scene,
@@ -85,6 +85,11 @@
         // newScene is the appended scene object
       }
     );
+    drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    drone.position = new BABYLON.Vector3(-1, 1, 4);
+    shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
+    drone.receiveShadows = true; //принимаемая тень
+    drone.actionManager = new BABYLON.ActionManager(scene);
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
