@@ -57,21 +57,19 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    BABYLON.SceneLoader.ImportMesh(
+    let drone = BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
       'drone.glb', 
       scene, 
-      (meshArray) => {
-        let drone = meshArray[0];
-        drone.material = new BABYLON.StandardMaterial('material', scene);
-        drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        drone.position = new BABYLON.Vector3(-1, 1, 4);
-        shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
-        drone.receiveShadows = true; //принимаемая тень
-        drone.actionManager = new BABYLON.ActionManager(scene);
-      }
+      (meshArray) => {}
     );
+    drone.material = new BABYLON.StandardMaterial('material', scene);
+    drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    drone.position = new BABYLON.Vector3(-1, 1, 4);
+    shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
+    drone.receiveShadows = true; //принимаемая тень
+    drone.actionManager = new BABYLON.ActionManager(scene);
     /*
     BABYLON.SceneLoader.ImportMesh(
       null, 
