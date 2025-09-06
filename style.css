@@ -9,15 +9,6 @@ body, canvas {
   user-select: none;
 }    
 
-#switch_icon {
-  position: absolute;
-  left: 5vh;
-  bottom: 5vh;
-  text-align: left;
-  font-size: 5vh;
-  color: grey;
-}
-
 #gizmo-block {
   display: none;
   position: absolute;

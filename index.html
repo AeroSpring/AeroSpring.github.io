@@ -75,7 +75,7 @@
 
     // ПОДКЛЮЧЕНИЕ GIZMO
     let gizmoManager = new BABYLON.GizmoManager(scene);
-    // gizmoManager.attachableMeshes = [];
+    gizmoManager.attachableMeshes = [];
 
 
 
@@ -180,6 +180,8 @@
 
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      mesh.dispose();
+      /*
       if(!activeElement){
         gizmoManager.enableAutoPicking = false;
         editingElement = mesh;
@@ -188,7 +190,9 @@
       }else{
         gizmoManager._attachedMesh = null;
       }
+      */
     });
+
     moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
     rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
     closeIcon.addEventListener('click', (event) => closeGizmo());
