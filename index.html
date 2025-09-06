@@ -57,6 +57,7 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
+    /*
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -74,6 +75,16 @@
     if (drone) {
       drone.actionManager = new BABYLON.ActionManager(scene);
     }
+    */
+    BABYLON.SceneLoader.Append(
+      'assets/drone/', 
+      'drone.glb', 
+      scene,
+      function (newScene) {
+        // Callback function after the scene is appended
+        // newScene is the appended scene object
+      }
+    );
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
