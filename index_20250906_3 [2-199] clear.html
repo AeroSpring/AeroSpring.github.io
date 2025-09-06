@@ -16,6 +16,9 @@
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
     let gizmoBlock = window.document.querySelector('#gizmo-block');
+    //let moveIcon = window.document.querySelector('#move_icon');
+    //let rotateIcon = window.document.querySelector('#rotate_icon');
+    //let closeIcon = window.document.querySelector('#close_icon');
     
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
@@ -53,6 +56,8 @@
     // ФУНКЦИИ
     // ФУНКЦИИ ДЛЯ GIZMO
     const clearGizmoOptions = () => {
+      //moveIcon.style.color = '#0096db';
+      //rotateIcon.style.color = '#0096db';
       gizmoManager.positionGizmoEnabled = false;
       gizmoManager.boundingBoxGizmoEnabled = false;
     }
@@ -61,7 +66,6 @@
       clearGizmoOptions(true);
       switch(option) {
         case 'dispose': {
-          window.location = 'https://okru.ru/userpubl/aerospring';
           closeGizmo(true)
           break;
         }

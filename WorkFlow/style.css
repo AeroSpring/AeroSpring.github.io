@@ -1,0 +1,25 @@
+body, canvas {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+#dom-overlay {
+  display: none;
+  user-select: none;
+}    
+
+#gizmo-block {
+  display: none;
+  position: absolute;
+  bottom: 25vh;
+  width: 100vw;
+  text-align: center;
+  font-size: 10vh;
+  height: 10vh;
+  color: #0096db;
+  opacity: 0.7;
+}
+#gizmo-block span {
+  font-size: 5vh;
+}
