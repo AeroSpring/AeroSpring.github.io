@@ -51,6 +51,30 @@
 
 
     // ФУНКЦИИ
+
+    // ФУНКЦИИ АНИМАЦИИ
+    // СОЗДАНИЕ АНИМАЦИИ ВРАЩЕНИЯ
+    const animationRotate = new BABYLON.Animation(
+      "rotationAnimation",
+      "rotation.y", // анимируемое свойство
+      30, // скорость анимации (кадров в секунду)
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
+    );
+
+    // СОЗДАНЕИ КАДРОВ АНИМАЦИИ
+    const keys = [];
+    keys.push({
+      frame: 0,
+      value: 0
+    });
+    keys.push({
+      frame: 60,
+      value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
+    });
+    animationBox.setKeys(keys);
+
+
+
     // ФУНКЦИИ ДЛЯ GIZMO
     const clearGizmoOptions = () => {
       gizmoManager.positionGizmoEnabled = false;
@@ -60,7 +84,7 @@
     const setGizmoOption = (option, _marker = '') => {
       clearGizmoOptions(true);
       switch(option) {
-        case 'dispose': {
+        case 'animation': {
           switch(_marker) {
             case 'drone': {
               //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
@@ -77,12 +101,11 @@
               document.location.href = 'https://okru.ru/userpubl/aerospring';
             }
           }
-          closeGizmo(true)
+          closeGizmo()
           break;
         }
-        case 'move': {
-          moveIcon.style.color = 'white';
-          gizmoManager.positionGizmoEnabled = true;
+        case 'dispose': {
+          closeGizmo(true)
           break;
         }
         default: break;
@@ -144,11 +167,13 @@
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
+      editingElement.animations = [animationRotate];
+      scene.beginAnimation(editingElement, 0, 60, true); // Воспроизведение анимации
       //gizmoBlock.style.display = 'block';
       
       const marker = scene.getMeshByName(mesh.name);
-      alert(marker.name);
-      setGizmoOption('dispose', marker.name);
+      //alert(marker.name);
+      setGizmoOption('animation', marker.name);
 
       /*
       if(!activeElement){

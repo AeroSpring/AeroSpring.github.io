@@ -57,18 +57,26 @@
       gizmoManager.boundingBoxGizmoEnabled = false;
     }
 
-    const setGizmoOption = (option, _link = '') => {
+    const setGizmoOption = (option, _marker = '') => {
       clearGizmoOptions(true);
       switch(option) {
         case 'dispose': {
-          if (_link = '') {
-            window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-            //document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-          }else{
-            window.location = 'https://okru.ru/avtoremont/predlagau/877886';
-            //document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+          switch(_marker) {
+            case 'drone': {
+              //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              break;
+            }
+            case 'steampunk': {
+              //window.location = 'https://okru.ru/avtoremont/predlagau/877886';
+              document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+              break;
+            }
+            default: {
+              //window.location = 'https://okru.ru/userpubl/aerospring';
+              document.location.href = 'https://okru.ru/userpubl/aerospring';
+            }
           }
-          //window.location = 'https://okru.ru/userpubl/aerospring';
           closeGizmo(true)
           break;
         }
@@ -101,6 +109,7 @@
       scene, 
       (meshArray) => {
         let droneMesh = meshArray[0];
+        droneMesh.name = 'drone'
         droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
         droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
@@ -115,6 +124,7 @@
       scene, 
       (meshArray) => {
         let steampunkMesh = meshArray[0];
+        steampunkMesh.name = 'steampunk'
         steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
         steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
         steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
@@ -136,9 +146,9 @@
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
       
-      //alert(mesh.name);
-      //const linkName = scene.getMeshByName(mesh.name);
-      setGizmoOption('dispose');
+      const marker = scene.getMeshByName(mesh.name);
+      alert(marker.name);
+      setGizmoOption('dispose', marker.name);
 
       /*
       if(!activeElement){
