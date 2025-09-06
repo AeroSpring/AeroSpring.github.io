@@ -88,9 +88,10 @@
         drone.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
         drone.receiveShadows = true; //принимаемая тень
-        drone.actionManager = new BABYLON.ActionManager(scene);
+        //drone.actionManager = new BABYLON.ActionManager(scene);
       }
     );
+    drone.actionManager = new BABYLON.ActionManager(scene);
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
