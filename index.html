@@ -69,7 +69,7 @@
     });
     keysPosition.push({
       frame: 60,
-      value: 0.5
+      value: -0.5
     });
     keysPosition.push({
       frame: 0,
@@ -191,8 +191,10 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       editingElement.animations = [animationPosition];
+      scene.beginAnimation(editingElement, 0, 6, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
-      scene.beginAnimation(editingElement, 0, 6); // , true); циклическое воспроизведение анимации
+      //scene.beginAnimation(editingElement, 0, 6); // , true); // циклическое воспроизведение анимации
+      
       //gizmoBlock.style.display = 'block';
       
       const marker = scene.getMeshByName(mesh.name);
