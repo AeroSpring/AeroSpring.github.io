@@ -57,7 +57,6 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
-    /*
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -75,7 +74,7 @@
     if (drone) {
       drone.actionManager = new BABYLON.ActionManager(scene);
     }
-    */
+    /*
     let drone = BABYLON.SceneLoader.Append(
       'assets/drone/', 
       'drone.glb', 
@@ -91,6 +90,7 @@
     shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
     drone.receiveShadows = true; //принимаемая тень
     //drone.actionManager = new BABYLON.ActionManager(scene);
+    */
 
     let steampunk = BABYLON.SceneLoader.ImportMesh(
       null, 
