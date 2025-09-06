@@ -68,11 +68,11 @@
       value: 1.0
     });
     keysPosition.push({
-      frame: 60,
+      frame: 120,
       value: 1.5
     });
     keysPosition.push({
-      frame: 120,
+      frame: 240,
       value: 1.0
     });
     animationPosition.setKeys(keysPosition);
@@ -212,7 +212,7 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       editingElement.animations = [animationPosition];
-      scene.beginAnimation(editingElement, 0, 6); //, true); //циклическое воспроизведение анимации
+      scene.beginAnimation(editingElement, 0, 6, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
       //scene.beginAnimation(editingElement, 0, 6); // , true); // циклическое воспроизведение анимации
       
