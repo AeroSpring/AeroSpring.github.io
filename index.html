@@ -39,6 +39,7 @@
 
 
 
+    /*
     var duplicate = function(container, offset, delay) {
         let entries = container.instantiateModelsToScene();
 
@@ -52,7 +53,8 @@
             }
         }, delay);
     }
-
+    */
+   
 
 
     // Создание куба
@@ -73,6 +75,7 @@
 
 
     //ЗАГРУЗКА 3D-МОДЕЛИ
+    /*
     BABYLON.loadAssetContainerAsync("https://models.babylonjs.com/alien.glb", scene).then(function (container) {
       container.addAllToScene();
       duplicate(container, 1.0, 1500);
@@ -80,6 +83,7 @@
       //scene.createDefaultCamera(true, true, true);
       //scene.createDefaultEnvironment();
     });
+    */
 
     /*
     BABYLON.SceneLoader.ImportMesh(
@@ -117,6 +121,22 @@
     drone.receiveShadows = true; //принимаемая тень
     //drone.actionManager = new BABYLON.ActionManager(scene);
     */
+    let drone = BABYLON.SceneLoader.Append(
+      'assets/drone/', 
+      'drone.glb', 
+      scene,
+      function (newScene) {
+        newScene.addAllToScene();
+        // Callback function after the scene is appended
+        // newScene is the appended scene object
+        //let drone = newScene[0];
+      }
+    );
+    drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    drone.position = new BABYLON.Vector3(-1, 1, 4);
+    shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
+    drone.receiveShadows = true; //принимаемая тень
+    drone.actionManager = new BABYLON.ActionManager(scene);
 
     /*
     let steampunk = BABYLON.SceneLoader.ImportMesh(
