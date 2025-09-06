@@ -57,20 +57,27 @@
       gizmoManager.boundingBoxGizmoEnabled = false;
     }
 
-    const setGizmoOption = (option, _link = '') => {
+    const setGizmoOption = (option, _marker = '') => {
       clearGizmoOptions(true);
       switch(option) {
         case 'dispose': {
-          if (_link = '') {
-            window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-            //document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-          }else{
-            window.location = 'https://okru.ru/avtoremont/predlagau/877886';
-            //document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+          switch(_marker) {
+            case 'drone': {
+              //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              break;
+            }
+            case 'steampunk': {
+              //window.location = 'https://okru.ru/avtoremont/predlagau/877886';
+              document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+              break;
+            }
+            default: {
+              //window.location = 'https://okru.ru/userpubl/aerospring';
+              document.location.href = 'https://okru.ru/userpubl/aerospring';
+            }
           }
-          //window.location = 'https://okru.ru/userpubl/aerospring';
           closeGizmo(true)
-          //alert(_link);
           break;
         }
         case 'move': {
@@ -117,6 +124,7 @@
       scene, 
       (meshArray) => {
         let steampunkMesh = meshArray[0];
+        steampunkMesh.name = 'steampunk'
         steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
         steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
         steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
@@ -138,9 +146,9 @@
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
       
-      const linkName = scene.getMeshByName(mesh.name);
-      alert(linkName);
-      setGizmoOption('dispose', mesh.name);
+      const marker = scene.getMeshByName(mesh.name);
+      alert(marker.Name);
+      setGizmoOption('dispose', marker.Name);
 
       /*
       if(!activeElement){
