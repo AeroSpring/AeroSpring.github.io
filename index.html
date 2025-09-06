@@ -106,7 +106,7 @@
     }
 
     const setGizmoOption = (option) => {
-      clearGizmoOptions();
+      clearGizmoOptions(true);
       switch(option) {
         case 'move': {
           moveIcon.style.color = 'white';
@@ -181,15 +181,13 @@
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       if(!activeElement){
-        //gizmoManager.enableAutoPicking = false;
-        gizmoManager.enableAutoPicking = true;
+        gizmoManager.enableAutoPicking = false;
         editingElement = mesh;
         gizmoBlock.style.display = 'block';
-        //setGizmoOption('move');
+        setGizmoOption('move');
+      }else{
+        gizmoManager._attachedMesh = null;
       }
-      //}else{
-      //  gizmoManager._attachedMesh = null;
-      //}
     });
 
     moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
