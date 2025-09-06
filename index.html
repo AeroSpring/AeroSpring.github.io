@@ -71,6 +71,10 @@
       frame: 60,
       value: 0.5
     });
+    keysPosition.push({
+      frame: 0,
+      value: 0
+    });
     animationPosition.setKeys(keysPosition);
     
     // СОЗДАНИЕ АНИМАЦИИ ВРАЩЕНИЯ
@@ -186,9 +190,9 @@
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
-      //editingElement.animations = [animationPosition];
-      editingElement.animations = [animationRotate];
-      scene.beginAnimation(editingElement, 0, 3); // , true); циклическое воспроизведение анимации
+      editingElement.animations = [animationPosition];
+      //editingElement.animations = [animationRotate];
+      scene.beginAnimation(editingElement, 0, 6); // , true); циклическое воспроизведение анимации
       //gizmoBlock.style.display = 'block';
       
       const marker = scene.getMeshByName(mesh.name);
