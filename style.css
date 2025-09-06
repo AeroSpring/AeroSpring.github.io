@@ -32,15 +32,3 @@ body, canvas {
 #gizmo-block span {
   font-size: 5vh;
 }
-
-.xr-button-overlay {
-  position: absolute;
-  top: 55vh;
-  left: 0vw;
-  width: 100%;
-  text-align: center;
-}
-.babylonVRicon{
-  height: 10vh !important;
-  /* background-image: url(icon.png); */
-}
