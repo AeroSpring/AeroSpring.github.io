@@ -63,10 +63,13 @@
       scene,
       (loadedScene) => {}
     );
-    drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-    drone.position = new BABYLON.Vector3(-1, 1, 4);
-    shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
-    drone.receiveShadows = true; //принимаемая тень
+    if (drone) {
+      drone.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+      drone.position = new BABYLON.Vector3(-1, 1, 4);
+      shadowGenerator.addShadowCaster(drone); //отбрасываемая тень
+      drone.receiveShadows = true; //принимаемая тень
+      drone.actionManager = new BABYLON.ActionManager(scene);
+    }
     /*
     BABYLON.SceneLoader.ImportMesh(
       null, 
