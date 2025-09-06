@@ -1,10 +1,14 @@
 <head>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
 </head>
 <body>
   <canvas></canvas>
   <div id="dom-overlay">
     <div id="gizmo-block">
+      <span id="move_icon" class="material-icons-outlined">open_with</span>
+      <span id="rotate_icon" class="material-icons-outlined">autorenew</span>
+      <span id="close_icon" class="material-icons-outlined">cancel</span> 
     </div>
   </div>
 
@@ -16,9 +20,9 @@
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
     let gizmoBlock = window.document.querySelector('#gizmo-block');
-    //let moveIcon = window.document.querySelector('#move_icon');
-    //let rotateIcon = window.document.querySelector('#rotate_icon');
-    //let closeIcon = window.document.querySelector('#close_icon');
+    let moveIcon = window.document.querySelector('#move_icon');
+    let rotateIcon = window.document.querySelector('#rotate_icon');
+    let closeIcon = window.document.querySelector('#close_icon');
     
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
@@ -41,14 +45,42 @@
         referenceSpaceType: 'local-floor',
       }
     });
-    
+    /*
+    let xr = await scene.createDefaultXRExperienceAsync({
+      uiOptions: {
+        sessionMode: 'immersive-ar',
+        referenceSpaceType: 'local-floor',
+      }
+    });
+    let xrCamera = xr.baseExperience.camera;
+
+    // ПОДКЛЮЧЕНИЕ DOM OVERLAY
+    let featuresManager = xr.baseExperience.featuresManager;
+    featuresManager.enableFeature(BABYLON.WebXRDomOverlay, 'latest', {element: '#dom-overlay'}, undefined, false);
+    // ОТОБРАЖЕНИЕ DOM OVERLAY, ПОСЛЕ ПЕРЕХОДА В XR-РЕЖИМ
+    xr.baseExperience.onStateChangedObservable.add((webXRState)=>{
+      switch(webXRState){
+        case BABYLON.WebXRState.IN_XR: {
+          domOverlay.style.display = 'block';
+          break;
+        }
+        case BABYLON.WebXRState.EXITING_XR: {
+          domOverlay.style.display = 'none';
+          break;
+        }
+        default: break;
+      }
+    });
+    */
+
     // ПОДКЛЮЧЕНИЕ GIZMO
     let gizmoManager = new BABYLON.GizmoManager(scene);
+    //gizmoManager.attachableMeshes = [];
 
 
 
     // ПЕРЕМЕННЫЕ
-    //let activeElement = null;
+    let activeElement = null;
     let editingElement = null;
 
 
@@ -56,10 +88,20 @@
     // ФУНКЦИИ
     // ФУНКЦИИ ДЛЯ GIZMO
     const clearGizmoOptions = () => {
-      //moveIcon.style.color = '#0096db';
-      //rotateIcon.style.color = '#0096db';
+      moveIcon.style.color = '#0096db';
+      rotateIcon.style.color = '#0096db';
       gizmoManager.positionGizmoEnabled = false;
       gizmoManager.boundingBoxGizmoEnabled = false;
+    }
+
+    const setBoundingBox = (option) => {
+      gizmoManager.boundingBoxGizmoEnabled = true;
+      gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0;
+      switch(option){
+        case 'rotate': gizmoManager.gizmos.boundingBoxGizmo.rotationSphereSize = 0.03; break;
+        default: break;
+      }
+      gizmoManager.gizmos.boundingBoxGizmo.updateBoundingBox();        
     }
 
     const setGizmoOption = (option) => {
@@ -74,6 +116,11 @@
           gizmoManager.positionGizmoEnabled = true;
           break;
         }
+        case 'rotate': {
+          rotateIcon.style.color = 'white';
+          setBoundingBox(option);
+          break;      
+        }        
         default: break;
       }
     }
@@ -123,17 +170,26 @@
 
 
     engine.runRenderLoop(() => scene.render());
+    /*
+    engine.runRenderLoop(() => {
+      if(activeElement) {
+        activeElement.position = xrCamera.getFrontPosition(distance);
+      }
+      scene.render();
+    });
+    */
 
 
 
     // ОБРАБОТЧИКИ СОБЫТИЙ
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      //gizmoManager.enableAutoPicking = false;
+      gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
-      //gizmoBlock.style.display = 'block';
+      gizmoBlock.style.display = 'block';
       setGizmoOption('dispose');
 
+      //gizmoManager._attachedMesh = null;
       /*
       if(!activeElement){
         gizmoManager.enableAutoPicking = false;
@@ -147,6 +203,8 @@
     });
 
     //moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
+    //rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
+    //closeIcon.addEventListener('click', (event) => closeGizmo());
 
   </script>
 </body>
