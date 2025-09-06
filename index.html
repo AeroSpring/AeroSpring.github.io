@@ -212,10 +212,10 @@
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
-      editingElement.animations = [animationPosition];
-      scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
-      //editingElement.animations = [animationRotate];
-      //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
+      //editingElement.animations = [animationPosition];
+      //scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
+      editingElement.animations = [animationRotate];
+      scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
       
       //gizmoBlock.style.display = 'block';
       
