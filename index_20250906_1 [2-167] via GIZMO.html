@@ -2,7 +2,13 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
 </head>
-<body>
+<body> 
+  <div id="open-file-block">
+    <label id="open_file_icon" for="file_input" class="material-icons-outlined">file_open</label>
+    <br>
+    <span id="file-input-info">Open file (.glb only)</span>
+    <input id="file_input" type="file">
+  </div>
   <canvas></canvas>
   <div id="dom-overlay">
     <div id="gizmo-block">
@@ -23,8 +29,8 @@
     let moveIcon = window.document.querySelector('#move_icon');
     let rotateIcon = window.document.querySelector('#rotate_icon');
     let closeIcon = window.document.querySelector('#close_icon');
-    //let fileInput = window.document.querySelector('#file_input');
-    //let fileInputInfo = window.document.querySelector('#file-input-info');
+    let fileInput = window.document.querySelector('#file_input');
+    let fileInputInfo = window.document.querySelector('#file-input-info');
     
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
@@ -41,13 +47,6 @@
     light.intensity = 0.7;
 
     // ПОДКЛЮЧЕНИЕ WEBXR
-    scene.createDefaultXRExperienceAsync({
-      uiOptions: {
-        sessionMode: 'immersive-ar', 
-        referenceSpaceType: 'local-floor',
-      }
-    });
-    /*
     let xr = await scene.createDefaultXRExperienceAsync({
       uiOptions: {
         sessionMode: 'immersive-ar',
@@ -73,7 +72,6 @@
         default: break;
       }
     });
-    */
 
     // ПОДКЛЮЧЕНИЕ GIZMO
     let gizmoManager = new BABYLON.GizmoManager(scene);
@@ -136,19 +134,28 @@
 
 
 
-    engine.runRenderLoop(() => scene.render());
-    /*
     engine.runRenderLoop(() => {
       if(activeElement) {
         activeElement.position = xrCamera.getFrontPosition(distance);
       }
       scene.render();
     });
-    */
 
 
 
     // ОБРАБОТЧИКИ СОБЫТИЙ
+    fileInput.addEventListener('input', (event) => {
+      if(event.target.files && event.target.files[0]){
+        let reader = new FileReader();
+        reader.addEventListener('load', (e) => {
+          BABYLON.SceneLoader.Append('', e.target.result, scene, (loadedScene) => {
+            fileInputInfo.innerText = event.target.files[0].name;
+          });
+        });
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    });
+
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
