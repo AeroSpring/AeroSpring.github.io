@@ -57,12 +57,16 @@
       gizmoManager.boundingBoxGizmoEnabled = false;
     }
 
-    const setGizmoOption = (option) => {
+    const setGizmoOption = (option, _link = '') => {
       clearGizmoOptions(true);
       switch(option) {
         case 'dispose': {
+          if (linkName) {
+            document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+          }else{
+            document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+          }
           //window.location = 'https://okru.ru/userpubl/aerospring';
-          document.location.href = 'https://okru.ru/userpubl/aerospring';
           closeGizmo(true)
           break;
         }
@@ -129,7 +133,8 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
-      setGizmoOption('dispose');
+      const linkName = scene.getMeshByName(mesh);
+      setGizmoOption('dispose', linkName);
 
       /*
       if(!activeElement){
