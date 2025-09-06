@@ -65,15 +65,15 @@
     const keysPosition = [];
     keysPosition.push({
       frame: 0,
-      value: 0
+      value: 1.0
     });
     keysPosition.push({
       frame: 60,
-      value: 0.5
+      value: 1.5
     });
     keysPosition.push({
       frame: 120,
-      value: 0
+      value: 1.0
     });
     animationPosition.setKeys(keysPosition);
     
@@ -95,6 +95,27 @@
       value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
     });
     animationRotate.setKeys(keysRotate);
+
+    /*
+    // СОЗДАНИЕ АНИМАЦИИ МАСШТАБИРОВАНИЯ
+    const animationScale = new BABYLON.Animation(
+      "scaleAnimation",
+      "scale", // анимируемое свойство
+      30, // скорость анимации (кадров в секунду)
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
+    );
+    // СОЗДАНИЕ КАДРОВ АНИМАЦИИ МАСШТАБИРОВАНИЯ
+    const keysScale = [];
+    keysScale.push({
+      frame: 0,
+      value: 1.0
+    });
+    keysScale.push({
+      frame: 60,
+      value: 0
+    });
+    animationScale.setKeys(keysScale);
+    */
 
 
 
@@ -191,7 +212,7 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       editingElement.animations = [animationPosition];
-      scene.beginAnimation(editingElement, 0, 6, true); //циклическое воспроизведение анимации
+      scene.beginAnimation(editingElement, 0, 6); //, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
       //scene.beginAnimation(editingElement, 0, 6); // , true); // циклическое воспроизведение анимации
       
