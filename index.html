@@ -71,7 +71,7 @@
       frame: 60,
       value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
     });
-    animationBox.setKeys(keys);
+    animationRotate.setKeys(keys);
 
 
 
@@ -82,7 +82,7 @@
     }
 
     const setGizmoOption = (option, _marker = '') => {
-      clearGizmoOptions(true);
+      clearGizmoOptions();
       switch(option) {
         case 'animation': {
           switch(_marker) {
