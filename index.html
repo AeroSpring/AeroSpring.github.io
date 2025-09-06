@@ -61,7 +61,7 @@
       clearGizmoOptions(true);
       switch(option) {
         case 'dispose': {
-          if (linkName) {
+          if (linkName = '') {
             document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
           }else{
             document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
@@ -133,7 +133,7 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
-      const linkName = scene.getMeshByName(mesh);
+      const linkName = scene.getMeshByName(mesh.name);
       setGizmoOption('dispose', linkName);
 
       /*
