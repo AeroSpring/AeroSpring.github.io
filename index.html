@@ -180,17 +180,16 @@
 
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      mesh.dispose();
-      /*
       if(!activeElement){
-        gizmoManager.enableAutoPicking = false;
+        //gizmoManager.enableAutoPicking = false;
+        gizmoManager.enableAutoPicking = true;
         editingElement = mesh;
         gizmoBlock.style.display = 'block';
-        setGizmoOption('move');
-      }else{
-        gizmoManager._attachedMesh = null;
+        //setGizmoOption('move');
       }
-      */
+      //}else{
+      //  gizmoManager._attachedMesh = null;
+      //}
     });
 
     moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
