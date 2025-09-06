@@ -135,8 +135,10 @@
       //gizmoManager.enableAutoPicking = false;
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
-      const linkName = scene.getMeshByName(mesh.name);
-      setGizmoOption('dispose', linkName);
+      
+      alert(mesh);
+      //const linkName = scene.getMeshByName(mesh.name);
+      setGizmoOption('dispose');
 
       /*
       if(!activeElement){
