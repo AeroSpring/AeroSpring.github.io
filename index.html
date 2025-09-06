@@ -92,7 +92,7 @@
       value: 0
     });
     keysRotate.push({
-      frame: 60,
+      frame: frameRate,
       value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
     });
     animationRotate.setKeys(keysRotate);
@@ -215,7 +215,7 @@
       editingElement.animations = [animationPosition];
       scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
-      //scene.beginAnimation(editingElement, 0, 6); // , true); // циклическое воспроизведение анимации
+      //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
       
       //gizmoBlock.style.display = 'block';
       
