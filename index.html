@@ -107,6 +107,10 @@
     const setGizmoOption = (option) => {
       clearGizmoOptions(true);
       switch(option) {
+        case 'dispose': {
+          closeGizmo(true)
+          break;
+        }
         case 'move': {
           moveIcon.style.color = 'white';
           gizmoManager.positionGizmoEnabled = true;
@@ -180,10 +184,10 @@
     // ОБРАБОТЧИКИ СОБЫТИЙ
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      gizmoManager.enableAutoPicking = true;
-      //editingElement = mesh;
-      //gizmoBlock.style.display = 'block';
-      //setGizmoOption('move');
+      gizmoManager.enableAutoPicking = false;
+      editingElement = mesh;
+      gizmoBlock.style.display = 'block';
+      setGizmoOption('dispose');
 
       //gizmoManager._attachedMesh = null;
       /*
