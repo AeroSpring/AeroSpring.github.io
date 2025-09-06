@@ -70,7 +70,7 @@
           }
           //window.location = 'https://okru.ru/userpubl/aerospring';
           closeGizmo(true)
-          alert(_link);
+          //alert(_link);
           break;
         }
         case 'move': {
@@ -138,8 +138,8 @@
       editingElement = mesh;
       //gizmoBlock.style.display = 'block';
       
-      //alert(mesh.name);
-      //const linkName = scene.getMeshByName(mesh.name);
+      const linkName = scene.getMeshByName(mesh.name);
+      alert(linkName);
       setGizmoOption('dispose', mesh.name);
 
       /*
