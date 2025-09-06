@@ -75,7 +75,7 @@
 
     // ПОДКЛЮЧЕНИЕ GIZMO
     let gizmoManager = new BABYLON.GizmoManager(scene);
-    gizmoManager.attachableMeshes = [];
+    //gizmoManager.attachableMeshes = [];
 
 
 
@@ -86,7 +86,6 @@
 
 
     // ФУНКЦИИ
-
     // ФУНКЦИИ ДЛЯ GIZMO
     const clearGizmoOptions = () => {
       moveIcon.style.color = '#0096db';
@@ -134,19 +133,7 @@
 
 
 
-    engine.runRenderLoop(() => scene.render());
-    /*
-    engine.runRenderLoop(() => {
-      if(activeElement) {
-        activeElement.position = xrCamera.getFrontPosition(distance);
-      }
-      scene.render();
-    });
-    */
-
-
-
-    // ОБРАБОТЧИКИ СОБЫТИЙ
+    // ДОБАВЛЕНИЕ МОДЕЛЕЙ
     BABYLON.SceneLoader.ImportMesh(
       null, 
       'assets/drone/', 
@@ -178,6 +165,19 @@
 
 
 
+    engine.runRenderLoop(() => scene.render());
+    /*
+    engine.runRenderLoop(() => {
+      if(activeElement) {
+        activeElement.position = xrCamera.getFrontPosition(distance);
+      }
+      scene.render();
+    });
+    */
+
+
+
+    // ОБРАБОТЧИКИ СОБЫТИЙ
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       if(!activeElement){
@@ -190,9 +190,9 @@
       }
     });
 
-    moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
-    rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
-    closeIcon.addEventListener('click', (event) => closeGizmo());
+    //moveIcon.addEventListener('click', (event) => setGizmoOption('move'));
+    //rotateIcon.addEventListener('click', (event) => setGizmoOption('rotate'));
+    //closeIcon.addEventListener('click', (event) => closeGizmo());
 
   </script>
 </body>
