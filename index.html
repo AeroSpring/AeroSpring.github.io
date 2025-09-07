@@ -173,12 +173,12 @@
     var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
     var textureContext = texture_drone.getContext();
     //Add text to dynamic texture
-    var font = "bold 60px Arial";
-    texture_drone.drawText("Drone", 200, 150, font, "black", "white", true, true);
+    var font = "normal 24px Arial";
+    texture_drone.drawText("Drone", 20, 15, font, "black", "white", true, true);
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
     plane_drone.material.diffuseTexture = texture_drone;
-    plane_drone.position = new BABYLON.Vector3(-2.0, 1.5, 3.5);
-    plane_drone.rotation = new BABYLON.Vector3(0, 0, 0);
+    plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
+    plane_drone.rotation = new BABYLON.Vector3(0, 0, 90);
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
