@@ -191,7 +191,7 @@
       }
     );
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
-    var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {size: 1}, scene);
+    var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
     var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
     var textureContext_steampunk = texture_steampunk.getContext();
     //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
