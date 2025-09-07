@@ -178,7 +178,7 @@
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
     plane_drone.material.diffuseTexture = texture_drone;
     plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
-    plane_drone.rotation = new BABYLON.Vector3(0, 0, (Math.PI/2));
+    plane_drone.rotation = new BABYLON.Vector3(0, 0, 0);
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
