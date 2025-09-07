@@ -213,21 +213,24 @@
 
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
+      const marker = scene.getMeshByName(mesh.name);
+      //alert(marker.name);
+
       editingElement = mesh;
 
       /*
       // ПЛАШКА ПО НАЖАТИЮ
-      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
-      var texture_ = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-      var textureContext = texture_.getContext();
+      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {width:1.5, height:1}, scene);
+      var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
       //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
       var font = "normal 24px Arial";
-      texture_.drawText("Drone", 30, 30, font, "black", "white", true, true);
+      texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
       plane.material = new BABYLON.StandardMaterial("mat", scene);
       plane.material.diffuseTexture = texture_;
       //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
       plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
-      plane.rotation = new BABYLON.Vector3(0, 0, 0);
+      plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
       plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
       */
 
@@ -236,10 +239,8 @@
       scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
       //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
-      
-      // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ
-      const marker = scene.getMeshByName(mesh.name);
-      //alert(marker.name);
+
+      // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ. ВЫБРАТЬ ЧТО-ТО ОДНО:
       //setGizmoOption('dispose');
       setGizmoOption('animation', marker.name);
       //setGizmoOption('');
