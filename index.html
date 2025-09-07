@@ -162,11 +162,12 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
-    //plane_drone.position = model.position.add(new BABYLON.Vector3(-1.5, 1.25, 3.75)); // Пример позиционирования относительно модели
     plane_drone.position = new BABYLON.Vector3(-1.5, 1.25, 3.75);
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -183,11 +184,12 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
     plane_steampunk.material = new BABYLON.StandardMaterial("mat", scene);
-    //plane_steampunk.position = model.position.add(new BABYLON.Vector3(0.5, 1.25, 0.75)); // Пример позиционирования относительно модели
     plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
     plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
 
 
@@ -200,6 +202,11 @@
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
       editingElement = mesh;
+
+      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
+      plane.material = new BABYLON.StandardMaterial("mat", scene);
+      plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Пример позиционирования относительно модели
+      plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
       // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
       editingElement.animations = [animationPosition];
