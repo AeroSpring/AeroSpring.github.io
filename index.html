@@ -162,6 +162,7 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
     var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
@@ -173,6 +174,7 @@
     plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
     plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -189,6 +191,7 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
     var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
@@ -200,6 +203,7 @@
     plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
     plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
 
 
@@ -217,20 +221,22 @@
 
       editingElement = mesh;
 
-      /*
       // ПЛАШКА ПО НАЖАТИЮ
-      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {width:1.5, height:1}, scene);
-      var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
-      //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
-      var font = "normal 24px Arial";
-      texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
-      plane.material = new BABYLON.StandardMaterial("mat", scene);
-      plane.material.diffuseTexture = texture_;
-      //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
-      plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
-      plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
-      plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
-      */
+      if (!plane) {
+        var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {width:1.5, height:1}, scene);
+        var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
+        //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
+        var font = "normal 24px Arial";
+        texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
+        plane.material = new BABYLON.StandardMaterial("mat", scene);
+        plane.material.diffuseTexture = texture_;
+        //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
+        plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
+        plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+        plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+      }else{
+        plane.dispose();
+      }
       
       // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
       editingElement.animations = [animationPosition];
