@@ -163,7 +163,7 @@
       }
     );
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
-    var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {size: 2}, scene);
+    var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {size: 0.5}, scene);
     /*
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
     plane_drone.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
@@ -178,7 +178,7 @@
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
     plane_drone.material.diffuseTexture = texture_drone;
     plane_drone.position = new BABYLON.Vector3(-2.0, 1.5, 3.5);
-    plane_drone.rotation = new BABYLON.Vector3(0, 0, 90);
+    plane_drone.rotation = new BABYLON.Vector3(0, 0, 0);
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
