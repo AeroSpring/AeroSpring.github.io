@@ -205,7 +205,7 @@
       // ПЛАШКА ПО НАЖАТИЮ
       var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
       plane.material = new BABYLON.StandardMaterial("mat", scene);
-      plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование относительно модели
+      plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
       plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
       */
 
