@@ -162,6 +162,9 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    var plane_drone = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
+    plane_drone.position = model.position.add(new BABYLON.Vector3(-1.5, 1.25, 3.75)); // Пример позиционирования относительно модели
+    plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -178,6 +181,9 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
+    plane_steampunk.position = model.position.add(new BABYLON.Vector3(0.5, 1.25, 0.75)); // Пример позиционирования относительно модели
+    plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
 
 
