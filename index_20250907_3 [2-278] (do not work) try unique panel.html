@@ -45,6 +45,7 @@
 
 
     // ПЕРЕМЕННЫЕ
+    let meshName = '';
     let editingElement = null;
     const frameRate = 20; // скорость анимации (кадров в секунду)
 
@@ -155,13 +156,14 @@
       scene, 
       (meshArray) => {
         let droneMesh = meshArray[0];
-        droneMesh.name = 'drone'
+        droneMesh.name = 'Drone'
         droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
         droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
         shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
     var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
@@ -173,6 +175,7 @@
     plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
     plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -181,7 +184,7 @@
       scene, 
       (meshArray) => {
         let steampunkMesh = meshArray[0];
-        steampunkMesh.name = 'steampunk'
+        steampunkMesh.name = 'Steampunk'
         steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
         steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
         steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
@@ -189,6 +192,7 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
     var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
@@ -200,6 +204,7 @@
     plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
     plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
 
 
@@ -215,18 +220,40 @@
       const marker = scene.getMeshByName(mesh.name);
       //alert(marker.name);
 
-      editingElement = mesh;
+      if(marker.name != meshName){
+        let deletePlane = scene.getMeshByName((meshName + "_plane"));
+        if (!deletePlane) {
+          deletePlane.dispose();
+          meshName = '';
+        }
 
+        meshName = marker.name;
+        editingElement = mesh;
+
+        // ПЛАШКА ПО НАЖАТИЮ
+        var plane = BABYLON.MeshBuilder.CreatePlane((marker.name + "_plane"), {width:1.5, height:1}, scene);
+        var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
+        //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
+        var font = "normal 24px Arial";
+        texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
+        plane.material = new BABYLON.StandardMaterial("mat", scene);
+        plane.material.diffuseTexture = texture_;
+        //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
+        plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
+        plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+        plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+      }
+      
       // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
       editingElement.animations = [animationPosition];
       scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
       //editingElement.animations = [animationRotate];
       //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
-
+      
       // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ. ВЫБРАТЬ ЧТО-ТО ОДНО:
       //setGizmoOption('dispose');
-      setGizmoOption('animation', marker.name);
-      //setGizmoOption('');
+      //setGizmoOption('animation', marker.name);
+      setGizmoOption('');
     });
 
   </script>
