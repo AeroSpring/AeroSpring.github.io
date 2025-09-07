@@ -162,10 +162,10 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
     var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-    //var textureContext_drone = texture_drone.getContext();
     //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
     var font = "normal 24px Arial";
     texture_drone.drawText("Drone", 30, 30, font, "black", "white", true, true);
@@ -174,6 +174,7 @@
     plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
     plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
@@ -190,10 +191,10 @@
         steampunkMesh.receiveShadows = true; //принимаемая тень
       }
     );
+    /*
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
     var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
-    //var textureContext_steampunk = texture_steampunk.getContext();
     //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
     var font = "normal 24px Arial";
     texture_steampunk.drawText("Steampunk", 30, 30, font, "black", "white", true, true);
@@ -202,6 +203,7 @@
     plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
     plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
 
 
 
@@ -213,24 +215,26 @@
 
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
+      const marker = scene.getMeshByName(mesh.name);
+      //alert(marker.name);
+
       editingElement = mesh;
 
-      /*
       // ПЛАШКА ПО НАЖАТИЮ
-      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {size: 1}, scene);
-      var texture_ = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-      var textureContext = texture_.getContext();
+      var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {width:1.5, height:1}, scene);
+      var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
       //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
       var font = "normal 24px Arial";
-      texture_.drawText("Drone", 30, 30, font, "black", "white", true, true);
+      texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
       plane.material = new BABYLON.StandardMaterial("mat", scene);
       plane.material.diffuseTexture = texture_;
       //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
       plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
       plane.rotation = new BABYLON.Vector3(0, 0, 0);
       plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
-      */
 
+      
       // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
       editingElement.animations = [animationPosition];
       scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
@@ -238,11 +242,10 @@
       //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
       
       // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ
-      const marker = scene.getMeshByName(mesh.name);
-      //alert(marker.name);
+      // ВЫБРАТЬ ЧТО-ТО ОДНО
       //setGizmoOption('dispose');
-      setGizmoOption('animation', marker.name);
-      //setGizmoOption('');
+      //setGizmoOption('animation', marker.name);
+      setGizmoOption('');
     });
 
   </script>
