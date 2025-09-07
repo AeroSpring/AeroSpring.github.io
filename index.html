@@ -231,7 +231,7 @@
       plane.material.diffuseTexture = texture_;
       //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
       plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
-      plane.rotation = new BABYLON.Vector3(0, 0, 0);
+      plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
       plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
       
