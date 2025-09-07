@@ -165,7 +165,7 @@
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
     var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-    var textureContext = texture_drone.getContext();
+    var textureContext_drone = texture_drone.getContext();
     //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
     var font = "normal 24px Arial";
     texture_drone.drawText("Drone", 30, 30, font, "black", "white", true, true);
@@ -192,8 +192,8 @@
     );
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {size: 1}, scene);
-    var texture_steampunk = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-    var textureContext = texture_steampunk.getContext();
+    var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
+    var textureContext_steampunk = texture_steampunk.getContext();
     //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
     var font = "normal 24px Arial";
     texture_steampunk.drawText("Steampunk", 30, 30, font, "black", "white", true, true);
