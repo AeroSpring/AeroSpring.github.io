@@ -45,6 +45,7 @@
 
 
     // ПЕРЕМЕННЫЕ
+    let meshName = '';
     let editingElement = null;
     const frameRate = 20; // скорость анимации (кадров в секунду)
 
@@ -215,15 +216,22 @@
 
     // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
     gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      if(!editingElement){
-        // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
-        const marker = scene.getMeshByName(mesh.name);
-        //alert(marker.name);
+      // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
+      const marker = scene.getMeshByName(mesh.name);
+      //alert(marker.name);
 
+      if(marker.name != meshName){
+        let deletePlane = scene.getMeshByName((meshName + "_plane"));
+        if (!deletePlane) {
+          deletePlane.dispose();
+          meshName = '';
+        }
+
+        meshName = marker.name;
         editingElement = mesh;
 
         // ПЛАШКА ПО НАЖАТИЮ
-        var plane = BABYLON.MeshBuilder.CreatePlane("infoPlane", {width:1.5, height:1}, scene);
+        var plane = BABYLON.MeshBuilder.CreatePlane((marker.name + "_plane"), {width:1.5, height:1}, scene);
         var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
         //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
         var font = "normal 24px Arial";
@@ -234,10 +242,6 @@
         plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
         plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
         plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
-      }else{
-        editingElement = null;
-        plane.dispose();
-        //gizmoManager._attachedMesh = null;
       }
       
       // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
