@@ -166,7 +166,7 @@
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
     plane_drone.material.diffuseTexture = new BABYLON.Texture('pictures/textures/tBots.png', scene);
-    plane_drone.position = new BABYLON.Vector3(-1.5, 1.25, 4.25);
+    plane_drone.position = new BABYLON.Vector3(-1.75, 1.25, 4.5);
     plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
@@ -187,12 +187,8 @@
     );
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
-    var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
-    //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
-    var font = "normal 24px Arial";
-    texture_steampunk.drawText("Steampunk", 30, 30, font, "black", "white", true, true);
     plane_steampunk.material = new BABYLON.StandardMaterial("mat", scene);
-    plane_steampunk.material.diffuseTexture = texture_steampunk;
+    plane_steampunk.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
     plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
     plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
     plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
