@@ -1,0 +1,260 @@
+<head>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas></canvas>
+  <div id="dom-overlay">
+    <div id="gizmo-block">
+    </div>
+  </div>
+
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+  <script type="module">
+    
+    // ИЗВЛЕЧЕНИЕ ТЕГОВ ИЗ РАЗМЕТКИ
+    let canvas = window.document.querySelector('canvas');
+    let domOverlay = window.document.querySelector('#dom-overlay');
+    let gizmoBlock = window.document.querySelector('#gizmo-block');
+    
+    // СОЗДАНИЕ ДВИЖКА
+    let engine = new BABYLON.Engine(canvas);
+    
+    // СОЗДАНИЕ СЦЕНЫ И ПРИСОЕДИНЕНИЕ ЕЁ К ДВИЖКУ
+    let scene = new BABYLON.Scene(engine);
+    scene.createDefaultEnvironment({
+      createSkybox: false,
+      createGround: false
+    });
+    
+    // СОЗДАНИЕ СВЕТА
+    let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
+    light.intensity = 0.7;
+
+    // ПОДКЛЮЧЕНИЕ WEBXR
+    scene.createDefaultXRExperienceAsync({
+      uiOptions: {
+        sessionMode: 'immersive-ar', 
+        referenceSpaceType: 'local-floor',
+      }
+    });
+    
+    // ПОДКЛЮЧЕНИЕ GIZMO
+    let gizmoManager = new BABYLON.GizmoManager(scene);
+
+
+
+    // ПЕРЕМЕННЫЕ
+    let meshName = '';
+    let editingElement = null;
+    const frameRate = 20; // скорость анимации (кадров в секунду)
+
+
+
+    // ФУНКЦИИ
+
+    // ФУНКЦИИ АНИМАЦИИ
+
+    // СОЗДАНИЕ АНИМАЦИИ ПЕРЕМЕЩЕНИЯ
+    const animationPosition = new BABYLON.Animation(
+      "positionAnimation",
+      "position.y", // анимируемое свойство
+      frameRate, // скорость анимации (кадров в секунду)
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
+    );
+    // СОЗДАНИЕ КАДРОВ АНИМАЦИИ ПЕРЕМЕЩЕНИЯ
+    const keysPosition = [];
+    keysPosition.push({
+      frame: 0,
+      value: 1.0
+    });
+    keysPosition.push({
+      frame: frameRate,
+      value: 1.5
+    });
+    keysPosition.push({
+      frame: 2 * frameRate,
+      value: 1.0
+    });
+    animationPosition.setKeys(keysPosition);
+    
+    // СОЗДАНИЕ АНИМАЦИИ ВРАЩЕНИЯ
+    const animationRotate = new BABYLON.Animation(
+      "rotationAnimation",
+      "rotation.y", // анимируемое свойство
+      30, // скорость анимации (кадров в секунду)
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
+    );
+    // СОЗДАНИЕ КАДРОВ АНИМАЦИИ ВРАЩЕНИЯ
+    const keysRotate = [];
+    keysRotate.push({
+      frame: 0,
+      value: 0
+    });
+    keysRotate.push({
+      frame: frameRate,
+      value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
+    });
+    animationRotate.setKeys(keysRotate);
+
+
+
+    // ФУНКЦИИ ДЛЯ GIZMO
+    const clearGizmoOptions = () => {
+      gizmoManager.positionGizmoEnabled = false;
+      gizmoManager.boundingBoxGizmoEnabled = false;
+    }
+
+    const setGizmoOption = (option, _marker = '') => {
+      clearGizmoOptions();
+      switch(option) {
+        case 'animation': {
+          switch(_marker) {
+            case 'drone': {
+              //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+              break;
+            }
+            case 'steampunk': {
+              //window.location = 'https://okru.ru/avtoremont/predlagau/877886';
+              document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
+              break;
+            }
+            default: {
+              //window.location = 'https://okru.ru/userpubl/aerospring';
+              document.location.href = 'https://okru.ru/userpubl/aerospring';
+            }
+          }
+          closeGizmo()
+          break;
+        }
+        case 'dispose': {
+          closeGizmo(true)
+          break;
+        }
+        default: break;
+      }
+    }
+
+    const closeGizmo = (needDispose = false) => {
+      clearGizmoOptions();
+      gizmoManager._attachedMesh = null;
+      gizmoManager.enableAutoPicking = true;
+      gizmoBlock.style.display = 'none';
+      (needDispose)
+        ? editingElement.dispose()
+        : editingElement = null;
+    }
+
+
+
+    // ДОБАВЛЕНИЕ МОДЕЛЕЙ
+    BABYLON.SceneLoader.ImportMesh(
+      null, 
+      'assets/drone/', 
+      'drone.glb', 
+      scene, 
+      (meshArray) => {
+        let droneMesh = meshArray[0];
+        droneMesh.name = 'Drone'
+        droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+        droneMesh.position = new BABYLON.Vector3(-1, 1, 4);
+        shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
+        droneMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+    /*
+    // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
+    var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
+    var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
+    //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
+    var font = "normal 24px Arial";
+    texture_drone.drawText("Drone", 30, 30, font, "black", "white", true, true);
+    plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
+    plane_drone.material.diffuseTexture = texture_drone;
+    plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
+    plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+    plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
+
+    BABYLON.SceneLoader.ImportMesh(
+      null, 
+      'assets/steampunk/', 
+      'steampunk.glb', 
+      scene, 
+      (meshArray) => {
+        let steampunkMesh = meshArray[0];
+        steampunkMesh.name = 'Steampunk'
+        steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
+        steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
+        steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
+        shadowGenerator.addShadowCaster(steampunkMesh); //отбрасываемая тень
+        steampunkMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+    /*
+    // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
+    var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
+    var texture_steampunk = new BABYLON.DynamicTexture("steampunk_dynamic_texture", {width:512, height:256}, scene);
+    //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
+    var font = "normal 24px Arial";
+    texture_steampunk.drawText("Steampunk", 30, 30, font, "black", "white", true, true);
+    plane_steampunk.material = new BABYLON.StandardMaterial("mat", scene);
+    plane_steampunk.material.diffuseTexture = texture_steampunk;
+    plane_steampunk.position = new BABYLON.Vector3(0.5, 1.25, 0.75);
+    plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+    plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+    */
+
+
+
+    engine.runRenderLoop(() => scene.render());
+
+
+
+    // ОБРАБОТЧИКИ СОБЫТИЙ
+
+    // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
+    gizmoManager.onAttachedToMeshObservable.add((mesh) => {
+      // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
+      const marker = scene.getMeshByName(mesh.name);
+      //alert(marker.name);
+
+      if(marker.name != meshName){
+        let deletePlane = scene.getMeshByName((meshName + "_plane"));
+        if (!deletePlane) {
+          deletePlane.dispose();
+          meshName = '';
+        }
+
+        meshName = marker.name;
+        editingElement = mesh;
+
+        // ПЛАШКА ПО НАЖАТИЮ
+        var plane = BABYLON.MeshBuilder.CreatePlane((marker.name + "_plane"), {width:1.5, height:1}, scene);
+        var texture_ = new BABYLON.DynamicTexture("dynamic_texture", {width:512, height:256}, scene);
+        //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
+        var font = "normal 24px Arial";
+        texture_.drawText(marker.name, 30, 30, font, "black", "white", true, true);
+        plane.material = new BABYLON.StandardMaterial("mat", scene);
+        plane.material.diffuseTexture = texture_;
+        //plane.material.diffuseTexture = new BABYLON.Texture('pictures/textures/light_grey.png', scene);
+        plane.position = editingElement.position.add(new BABYLON.Vector3(-0.5, 0.25, -0.25)); // Позиционирование ОТНОСИТЕЛЬНО МОДЕЛИ
+        plane.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+        plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
+      }
+      
+      // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
+      editingElement.animations = [animationPosition];
+      scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
+      //editingElement.animations = [animationRotate];
+      //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
+      
+      // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ. ВЫБРАТЬ ЧТО-ТО ОДНО:
+      //setGizmoOption('dispose');
+      //setGizmoOption('animation', marker.name);
+      setGizmoOption('');
+    });
+
+  </script>
+</body>
