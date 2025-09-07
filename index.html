@@ -164,16 +164,9 @@
     );
     // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
     var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
-    var texture_drone = new BABYLON.DynamicTexture("drone_dynamic_texture", {width:512, height:256}, scene);
-    //ДОБАВЛЕНИЕ ТЕКСТА НА ДИНАМИЧЕСКУЮ ТЕКСТУРУ
-    var font = "normal 24px Arial";
-    text_drone = 'Написание telegram-ботов любой сложности.';
-    texture_drone.drawText(text_drone, 30, 30, font, "black", "white", true, true);
-    //texture_drone.drawText("Drone", 30, 30, font, "black", "white", true, true);
     plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
-    plane_drone.material.diffuseTexture = texture_drone;
-    plane_drone.position = new BABYLON.Vector3(-1.75, 1.75, 4.5);
-    plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
+    plane_drone.material.diffuseTexture = new BABYLON.Texture('pictures/textures/tBots.png', scene);
+    plane_drone.position = new BABYLON.Vector3(-1.5, 1.25, 3.75);
     plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
