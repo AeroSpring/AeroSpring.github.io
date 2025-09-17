@@ -176,15 +176,12 @@
         model1CMesh.rotation = new BABYLON.Vector3(0, 0, 0);
         model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
         model1CMesh.receiveShadows = true; //принимаемая тень
-        a1 = model1CMesh.animationGroups[0];
-        a1.play();
-        a1.loopAnimation = true
-        a2 = model1CMesh.animationGroups[1];
-        a2.play();
-        a2.loopAnimation = true
-        a3 = model1CMesh.animationGroups[2];
-        a3.play();
-        a3.loopAnimation = true
+        model1CMesh.animationGroups[0].play();
+        model1CMesh.animationGroups[0].loopAnimation = true
+        model1CMesh.animationGroups[1].play();
+        model1CMesh.animationGroups[1].loopAnimation = true
+        model1CMesh.animationGroups[2].play();
+        model1CMesh.animationGroups[2].loopAnimation = true
       }
     );
 
