@@ -172,18 +172,31 @@
         let model1CMesh = meshArray[0];
         model1CMesh.name = 'model1C'
         model1CMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
-        model1CMesh.position = new BABYLON.Vector3(1, 0, 1);
+        model1CMesh.position = new BABYLON.Vector3(1.5, 0, 1.5);
         model1CMesh.rotation = new BABYLON.Vector3(0, 0, 0);
         model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
         model1CMesh.receiveShadows = true; //принимаемая тень
-//        model1CMesh.animationGroups[0].play();
-//        model1CMesh.animationGroups[0].loopAnimation = true
+        /*
+        model1CMesh.getAnimationGroupByName("TextAction_001").play();
+        model1CMesh.getAnimationGroupByName("TextAction_001").loopAnimation = true
         model1CMesh.getAnimationGroupByName("TextAction_002").play();
         model1CMesh.getAnimationGroupByName("TextAction_002").loopAnimation = true
         model1CMesh.getAnimationGroupByName("TextAction_003").play();
         model1CMesh.getAnimationGroupByName("TextAction_003").loopAnimation = true
+        */
       }
     );
+    let animaPack = scene.getMeshByName(("model1C"));
+    if (animaPack) {
+      animaPack.getAnimationGroupByName("TextAction_001").play();
+      animaPack.getAnimationGroupByName("TextAction_001").loopAnimation = true
+      animaPack.getAnimationGroupByName("TextAction_002").play();
+      animaPack.getAnimationGroupByName("TextAction_002").loopAnimation = true
+      animaPack.getAnimationGroupByName("TextAction_003").play();
+      animaPack.getAnimationGroupByName("TextAction_003").loopAnimation = true
+    }
+
+
 
 
 
