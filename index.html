@@ -171,17 +171,17 @@
       (meshArray) => {
         let model1CMesh = meshArray[0];
         model1CMesh.name = 'model1C'
-        model1CMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        model1CMesh.position = new BABYLON.Vector3(1, 1, 1);
+        model1CMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
+        model1CMesh.position = new BABYLON.Vector3(0.5, 0.5, 0);
         model1CMesh.rotation = new BABYLON.Vector3(0, 0, 0);
         model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
         model1CMesh.receiveShadows = true; //принимаемая тень
-        model1CMesh.animationGroups[0].play();
-        model1CMesh.animationGroups[0].loopAnimation = true
-        model1CMesh.animationGroups[1].play();
-        model1CMesh.animationGroups[1].loopAnimation = true
-        model1CMesh.animationGroups[2].play();
-        model1CMesh.animationGroups[2].loopAnimation = true
+//        model1CMesh.animationGroups[0].play();
+//        model1CMesh.animationGroups[0].loopAnimation = true
+        getAnimationGroupByName("TextAction_002").play();
+        getAnimationGroupByName("TextAction_002").loopAnimation = true
+        getAnimationGroupByName("TextAction_003").play();
+        getAnimationGroupByName("TextAction_003").loopAnimation = true
       }
     );
 
