@@ -162,36 +162,22 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
-    // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
-    var plane_drone = BABYLON.MeshBuilder.CreatePlane("panel_drone", {width:1.5, height:1}, scene);
-    plane_drone.material = new BABYLON.StandardMaterial("mat", scene);
-    plane_drone.material.diffuseTexture = new BABYLON.Texture('pictures/textures/tBots.png', scene);
-    plane_drone.position = new BABYLON.Vector3(-1.75, 1.25, 4.5);
-    plane_drone.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
-    plane_drone.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
     BABYLON.SceneLoader.ImportMesh(
       null, 
-      'assets/steampunk/', 
-      'steampunk.glb', 
+      'assets/model1C/', 
+      'model1C.glb', 
       scene, 
       (meshArray) => {
-        let steampunkMesh = meshArray[0];
-        steampunkMesh.name = 'steampunk'
-        steampunkMesh.scaling = new BABYLON.Vector3(0.15, 0.15, 0.15);
-        steampunkMesh.position = new BABYLON.Vector3(1, 1, 1);
-        steampunkMesh.rotation = new BABYLON.Vector3(0, 90, 0);
-        shadowGenerator.addShadowCaster(steampunkMesh); //отбрасываемая тень
-        steampunkMesh.receiveShadows = true; //принимаемая тень
+        let model1CMesh = meshArray[0];
+        model1CMesh.name = 'steampunk'
+        model1CMesh.scaling = new BABYLON.Vector3(1, 1, 1);
+        model1CMesh.position = new BABYLON.Vector3(1, 1, 1);
+        model1CMesh.rotation = new BABYLON.Vector3(0, 0, 0);
+        model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
+        model1CMesh.receiveShadows = true; //принимаемая тень
       }
     );
-    // ПЛАШКА СУЩЕСТВУЕТ НЕЗАВИСИМО ОТ МОДЕЛИ
-    var plane_steampunk = BABYLON.MeshBuilder.CreatePlane("panel_steampunk", {width:1.5, height:1}, scene);
-    plane_steampunk.material = new BABYLON.StandardMaterial("mat", scene);
-    plane_steampunk.material.diffuseTexture = new BABYLON.Texture('pictures/textures/ARBC.png', scene);
-    plane_steampunk.position = new BABYLON.Vector3(2.5, 1.5, 0.25);
-    plane_steampunk.rotation = new BABYLON.Vector3(0, 0, (-Math.PI / 2));
-    plane_steampunk.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL; // Плашка всегда смотрит на камеру
 
 
 
