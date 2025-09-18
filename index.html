@@ -150,6 +150,22 @@
     // ДОБАВЛЕНИЕ МОДЕЛЕЙ
     BABYLON.SceneLoader.ImportMesh(
       null, 
+      'assets/model1C/', 
+      'model1C.glb', 
+      scene, 
+      (meshArray) => {
+        let model1CMesh = meshArray[0];
+        model1CMesh.name = 'model1C'
+        model1CMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
+        model1CMesh.position = new BABYLON.Vector3(-1, 0, 1.5);
+        model1CMesh.rotation = new BABYLON.Vector3(0, 1, 0);
+        model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
+        model1CMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+
+    BABYLON.SceneLoader.ImportMesh(
+      null, 
       'assets/drone/', 
       'drone.glb', 
       scene, 
@@ -162,24 +178,6 @@
         droneMesh.receiveShadows = true; //принимаемая тень
       }
     );
-
-    BABYLON.SceneLoader.ImportMesh(
-      null, 
-      'assets/model1C/', 
-      'model1C.glb', 
-      scene, 
-      (meshArray) => {
-        let model1CMesh = meshArray[0];
-        model1CMesh.name = 'model1C'
-        model1CMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
-        model1CMesh.position = new BABYLON.Vector3(-1, 0, 1.5);
-        model1CMesh.rotation = new BABYLON.Vector3(0, 0, 0);
-        model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
-        model1CMesh.receiveShadows = true; //принимаемая тень
-      }
-    );
-
-
 
 
 
