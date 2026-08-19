@@ -1,6 +1,7 @@
 <head>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <canvas></canvas>
   <div id="dom-overlay">
@@ -11,22 +12,22 @@
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <script type="module">
-    
+
     // ИЗВЛЕЧЕНИЕ ТЕГОВ ИЗ РАЗМЕТКИ
     let canvas = window.document.querySelector('canvas');
     let domOverlay = window.document.querySelector('#dom-overlay');
     let gizmoBlock = window.document.querySelector('#gizmo-block');
-    
+
     // СОЗДАНИЕ ДВИЖКА
     let engine = new BABYLON.Engine(canvas);
-    
+
     // СОЗДАНИЕ СЦЕНЫ И ПРИСОЕДИНЕНИЕ ЕЁ К ДВИЖКУ
     let scene = new BABYLON.Scene(engine);
     scene.createDefaultEnvironment({
       createSkybox: false,
       createGround: false
     });
-    
+
     // СОЗДАНИЕ СВЕТА
     let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
     light.intensity = 0.7;
@@ -34,11 +35,11 @@
     // ПОДКЛЮЧЕНИЕ WEBXR
     scene.createDefaultXRExperienceAsync({
       uiOptions: {
-        sessionMode: 'immersive-ar', 
+        sessionMode: 'immersive-ar',
         referenceSpaceType: 'local-floor',
       }
     });
-    
+
     // ПОДКЛЮЧЕНИЕ GIZMO
     let gizmoManager = new BABYLON.GizmoManager(scene);
 
@@ -76,7 +77,7 @@
       value: 1.0
     });
     animationPosition.setKeys(keysPosition);
-    
+
     // СОЗДАНИЕ АНИМАЦИИ ВРАЩЕНИЯ
     const animationRotate = new BABYLON.Animation(
       "rotationAnimation",
@@ -106,19 +107,22 @@
 
     const setGizmoOption = (option, _marker = '') => {
       clearGizmoOptions();
-      switch(option) {
+      switch (option) {
         case 'animation': {
-          switch(_marker) {
-            case 'drone': {
-              //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-              document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
+          switch (_marker) {
+            case 'base': {
+              document.location.href = 'https://autoknowledge.tech/ru/pages';
               break;
             }
             case 'diagnostic': {
-              //window.location = 'https://okru.ru/avtoremont/predlagau/877886';
               document.location.href = 'https://autoknowledge.tech/ru/pages/36';
               break;
             }
+            case 'oil': {
+              document.location.href = 'https://autoknowledge.tech/ru/pages/34';
+              break;
+            }
+
             // default: {
             //   //window.location = 'https://okru.ru/userpubl/aerospring';
             //   document.location.href = 'https://autoknowledge.tech/ru/pages/36';
@@ -148,6 +152,71 @@
 
 
     // ДОБАВЛЕНИЕ МОДЕЛЕЙ
+    BABYLON.SceneLoader.ImportMesh(
+      null,
+      'assets/engine_base/',
+      'engine_base.glb',
+      scene,
+      (meshArray) => {
+        let baseMesh = meshArray[0];
+        baseMesh.name = 'base'
+        baseMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
+        baseMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
+        baseMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
+        baseMesh.addShadowCaster(baseMesh); //отбрасываемая тень
+        baseMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+
+    BABYLON.SceneLoader.ImportMesh(
+      null,
+      'assets/diagnostic_group/',
+      'diagnostic_group.glb',
+      scene,
+      (meshArray) => {
+        let diagnosticMesh = meshArray[0];
+        diagnosticMesh.name = 'diagnostic'
+        diagnosticMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
+        diagnosticMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
+        diagnosticMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
+        diagnosticMesh.addShadowCaster(diagnosticMesh); //отбрасываемая тень
+        diagnosticMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+
+    BABYLON.SceneLoader.ImportMesh(
+      null,
+      'assets/p_oil/',
+      'p_oil.glb',
+      scene,
+      (meshArray) => {
+        let oilMesh = meshArray[0];
+        oilMesh.name = 'oil'
+        oilMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
+        oilMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
+        oilMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
+        oilMesh.addShadowCaster(oilMesh); //отбрасываемая тень
+        oilMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+
+    BABYLON.SceneLoader.ImportMesh(
+      null,
+      'assets/engine_smoke_service/',
+      'engine_smoke_service.glb',
+      scene,
+      (meshArray) => {
+        let smokeMesh = meshArray[0];
+        smokeMesh.name = 'smoke'
+        smokeMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
+        smokeMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
+        smokeMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
+        smokeMesh.addShadowCaster(smokeMesh); //отбрасываемая тень
+        smokeMesh.receiveShadows = true; //принимаемая тень
+      }
+    );
+
+
     // BABYLON.SceneLoader.ImportMesh(
     //   null, 
     //   'assets/model1C/', 
@@ -164,36 +233,36 @@
     //   }
     // );
 
-    BABYLON.SceneLoader.ImportMesh(
-      null, 
-      'assets/Diagnostic/', 
-      'Diagnostic.glb', 
-      scene, 
-      (meshArray) => {
-        let diagnosticMesh = meshArray[0];
-        diagnosticMesh.name = 'diagnostic'
-        diagnosticMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
-        diagnosticMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
-        diagnosticMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
-        diagnosticMesh.addShadowCaster(diagnosticMesh); //отбрасываемая тень
-        diagnosticMesh.receiveShadows = true; //принимаемая тень
-      }
-    );
+    // BABYLON.SceneLoader.ImportMesh(
+    //   null, 
+    //   'assets/Diagnostic_1/', 
+    //   'Diagnostic.glb', 
+    //   scene, 
+    //   (meshArray) => {
+    //     let diagnosticMesh = meshArray[0];
+    //     diagnosticMesh.name = 'diagnostic'
+    //     diagnosticMesh.scaling = new BABYLON.Vector3(-1.0, 1.0, 1.0);
+    //     diagnosticMesh.position = new BABYLON.Vector3(-0.5, 0.5, 1.5);
+    //     diagnosticMesh.rotation = new BABYLON.Vector3(0, 3.14, 0);
+    //     diagnosticMesh.addShadowCaster(diagnosticMesh); //отбрасываемая тень
+    //     diagnosticMesh.receiveShadows = true; //принимаемая тень
+    //   }
+    // );
 
-    BABYLON.SceneLoader.ImportMesh(
-      null, 
-      'assets/drone/', 
-      'drone.glb', 
-      scene, 
-      (meshArray) => {
-        let droneMesh = meshArray[0];
-        droneMesh.name = 'drone'
-        droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        droneMesh.position = new BABYLON.Vector3(1, 0, 2.5);
-        shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
-        droneMesh.receiveShadows = true; //принимаемая тень
-      }
-    );
+    // BABYLON.SceneLoader.ImportMesh(
+    //   null, 
+    //   'assets/drone/', 
+    //   'drone.glb', 
+    //   scene, 
+    //   (meshArray) => {
+    //     let droneMesh = meshArray[0];
+    //     droneMesh.name = 'drone'
+    //     droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    //     droneMesh.position = new BABYLON.Vector3(1, 0, 2.5);
+    //     shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
+    //     droneMesh.receiveShadows = true; //принимаемая тень
+    //   }
+    // );
 
 
 
