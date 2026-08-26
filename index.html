@@ -26,20 +26,21 @@
   <a-scene arjs="sourceType: webcam; debugUIEnabled: true;">
     <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
 
-    <!-- МАРКЕР С КОНУСОМ (ваши координаты) -->
+    <!-- ГИГАНТСКИЙ КОНУС НА ВАШИХ КООРДИНАТАХ -->
     <a-entity id="marker-1" 
-              gps-entity-place="latitude: 44.989412; longitude: 41.160781;">
+              gps-entity-place="latitude: 44.989412; longitude: 41.160780;">
       <a-cone color="red" 
-              radius-bottom="5" 
-              radius-top="0.5" 
-              height="10" 
+              radius-bottom="50" 
+              radius-top="5" 
+              height="100" 
               position="0 2.5 0"
-              scale="3 3 3">
+              scale="1 1 1">
       </a-cone>
+      <!-- Подпись тоже увеличим -->
       <a-plane id="label" 
-               position="0 -3 0" 
-               width="8" 
-               height="2"
+               position="0 -30 0" 
+               width="80" 
+               height="30"
                material="color: black; opacity: 0.8; transparent: true;">
       </a-plane>
     </a-entity>
@@ -54,19 +55,19 @@
       document.getElementById('debug').innerText = 'Страница загружена';
       console.log('Страница загружена');
 
-      // ===== 2. СОЗДАЁМ ПОДПИСЬ НА CANVAS =====
+      // ===== 2. СОЗДАЁМ ПОДПИСЬ НА CANVAS (увеличенную) =====
       const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 128;
+      canvas.width = 1024;
+      canvas.height = 256;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.roundRect(10, 10, 492, 108, 10);
+      ctx.roundRect(10, 10, 1004, 236, 20);
       ctx.fill();
-      ctx.font = 'bold 64px Arial';
+      ctx.font = 'bold 120px Arial';
       ctx.fillStyle = 'white';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('ТОЧКА 1', 256, 64);
+      ctx.fillText('ТОЧКА 1', 512, 128);
 
       if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
@@ -116,28 +117,12 @@
         }
         document.getElementById('debug').innerText = `Маркер найден: lat=${gps.latitude}, lon=${gps.longitude}`;
         console.log('Маркер найден:', gps);
-
-        // ===== 4. ЗАПАСНАЯ СФЕРА (если маркер не виден) =====
-        setTimeout(() => {
-          const scene = document.querySelector('a-scene');
-          if (scene) {
-            const fallback = document.createElement('a-entity');
-            fallback.setAttribute('position', '0 0 -5');
-            const sphere = document.createElement('a-sphere');
-            sphere.setAttribute('color', 'yellow');
-            sphere.setAttribute('radius', '2');
-            fallback.appendChild(sphere);
-            scene.appendChild(fallback);
-            document.getElementById('debug').innerText += ' | Добавлена запасная сфера';
-            console.log('Добавлена запасная сфера (на случай, если GPS-маркер не виден)');
-          }
-        }, 7000);
       }, 3000);
     });
 
-    // ===== 5. НАВИГАЦИОННАЯ ЛОГИКА (с вашими координатами) =====
+    // ===== 4. НАВИГАЦИОННАЯ ЛОГИКА (ваши координаты) =====
     const routePoints = [
-      { lat: 44.989412, lon: 41.160781, title: 'Точка 1' }
+      { lat: 44.989412, lon: 41.160780, title: 'Точка 1' }
     ];
     let currentPointIndex = 0;
 
