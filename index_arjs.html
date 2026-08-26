@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
@@ -8,18 +6,8 @@
   <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
-    #debug {
-      position: absolute; top: 10px; left: 10px;
-      background: rgba(0,0,0,0.8); color: #0f0; padding: 10px;
-      font-size: 14px; font-family: monospace; z-index: 200;
-      max-width: 90%; white-space: pre-wrap; pointer-events: none;
-    }
-    #info {
-      position: absolute; bottom: 20px; left: 0; right: 0;
-      text-align: center; color: white; font-family: sans-serif;
-      background: rgba(0,0,0,0.6); padding: 10px; z-index: 100;
-      pointer-events: none;
-    }
+    #info { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-family: sans-serif; background: rgba(0,0,0,0.6); padding: 10px; z-index: 100; pointer-events: none; }
+    #debug { position: absolute; top: 10px; left: 10px; background: white; color: red; padding: 5px; font-size: 14px; font-family: monospace; z-index: 200; }
   </style>
 </head>
 <body>
@@ -27,26 +15,27 @@
   <div id="info">Расстояние до точки: <span id="dist">--</span> м</div>
 
   <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- GPS-камера -->
     <a-entity id="camera" gps-camera="gpsMinDistance: 5;"></a-entity>
+
+    <!-- Маркер с вашими координатами и явной высотой -->
+    <a-entity id="marker"
+              gps-entity-place="latitude: 44.970586; longitude: 41.153324; altitude: 218;">
+      <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0"></a-cone>
+      <a-text value="ТОЧКА" color="white" position="0 -2 0" scale="2 2 2" align="center"
+              background="true" background-color="black" background-opacity="0.7" padding="0.5"></a-text>
+    </a-entity>
   </a-scene>
 
   <script>
-    // ===== ФУНКЦИЯ ДЛЯ ВЫВОДА НА ЭКРАН =====
-    function log(msg) {
-      const debug = document.getElementById('debug');
-      debug.innerText += '\n' + msg;
-      console.log(msg);
-    }
+    // ========== ОТЛАДКА ==========
+    const debug = document.getElementById('debug');
+    const distSpan = document.getElementById('dist');
 
-    log('Скрипт загружен');
+    // Целевые координаты
+    const TARGET = { lat: 44.970586, lon: 41.153324 };
 
-    const TARGET_LAT = 44.970586;
-    const TARGET_LON = 41.153324;
-    const TARGET_ALT = 200;
-
-    let markerCreated = false;
-
-    // ===== ФУНКЦИИ РАСЧЁТА =====
+    // Функции расчёта расстояния
     function toRad(deg) { return deg * Math.PI / 180; }
     function haversine(lat1, lon1, lat2, lon2) {
       const R = 6371000;
@@ -56,130 +45,34 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    // ===== СОЗДАНИЕ МАРКЕРА =====
-    function createMarker() {
-      log('createMarker() вызвана');
-      const scene = document.querySelector('a-scene');
-      if (!scene) {
-        log('Ошибка: сцена не найдена');
-        return;
-      }
-      log('Сцена найдена');
-
-      // Проверим, есть ли камера
-      const camera = document.querySelector('[gps-camera]');
-      if (!camera) {
-        log('Ошибка: gps-camera не найдена');
-      } else {
-        log('GPS-камера найдена');
-      }
-
-      // Создаём сущность
-      const marker = document.createElement('a-entity');
-      marker.id = 'dynamic-marker';
-      marker.setAttribute('gps-entity-place', {
-        latitude: TARGET_LAT,
-        longitude: TARGET_LON,
-        altitude: TARGET_ALT
-      });
-      log('Установлен gps-entity-place');
-
-      // Конус
-      const cone = document.createElement('a-cone');
-      cone.setAttribute('color', 'red');
-      cone.setAttribute('radius-bottom', '3');
-      cone.setAttribute('radius-top', '0.2');
-      cone.setAttribute('height', '6');
-      cone.setAttribute('position', '0 3 0');
-      marker.appendChild(cone);
-      log('Конус добавлен в маркер');
-
-      // Текст
-      const text = document.createElement('a-text');
-      text.setAttribute('value', 'ТОЧКА');
-      text.setAttribute('color', 'white');
-      text.setAttribute('position', '0 -2 0');
-      text.setAttribute('scale', '2 2 2');
-      text.setAttribute('align', 'center');
-      text.setAttribute('background', 'true');
-      text.setAttribute('background-color', 'black');
-      text.setAttribute('background-opacity', '0.7');
-      text.setAttribute('padding', '0.5');
-      marker.appendChild(text);
-      log('Текст добавлен');
-
-      scene.appendChild(marker);
-      markerCreated = true;
-      log('Маркер добавлен в сцену');
-
-      // Проверим атрибут через секунду
-      setTimeout(() => {
-        const gps = marker.getAttribute('gps-entity-place');
-        if (gps) {
-          log('Проверка: gps-entity-place = ' + JSON.stringify(gps));
-        } else {
-          log('Проверка: gps-entity-place НЕ УСТАНОВЛЕН');
-        }
-      }, 1000);
-
-      // Запасной вариант: добавить огромный куб на случай, если маркер не появится через 5 секунд
-      setTimeout(() => {
-        if (!marker.parentNode) {
-          log('Маркер не в сцене! Создаём запасной объект');
-          const fallback = document.createElement('a-entity');
-          fallback.setAttribute('position', '0 0 -5');
-          const box = document.createElement('a-box');
-          box.setAttribute('color', 'yellow');
-          box.setAttribute('width', '2');
-          box.setAttribute('height', '2');
-          box.setAttribute('depth', '2');
-          fallback.appendChild(box);
-          scene.appendChild(fallback);
-          log('Запасной жёлтый куб добавлен прямо перед камерой');
-        }
-      }, 5000);
-    }
-
-    // ===== ЗАПУСК ПОСЛЕ ЗАГРУЗКИ =====
-    window.addEventListener('load', () => {
-      log('Событие load сработало');
-      // Ждём 3 секунды, чтобы AR.js инициализировался
-      setTimeout(createMarker, 3000);
-    });
-
-    // ===== ОТСЛЕЖИВАНИЕ GPS =====
+    // Слежение за GPS
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (pos) => {
-          const dist = haversine(pos.coords.latitude, pos.coords.longitude, TARGET_LAT, TARGET_LON);
-          document.getElementById('dist').textContent = Math.round(dist);
+          const dist = haversine(pos.coords.latitude, pos.coords.longitude, TARGET.lat, TARGET.lon);
+          distSpan.textContent = Math.round(dist);
+          debug.innerText = `Ваша позиция: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)} | Расст: ${Math.round(dist)} м`;
         },
         (err) => {
-          log('Ошибка GPS: ' + err.message);
-          document.getElementById('dist').textContent = 'Ошибка';
+          console.error(err);
+          distSpan.textContent = 'Ошибка';
         },
         { enableHighAccuracy: true, maximumAge: 1000 }
       );
-    } else {
-      log('GPS не поддерживается');
-      document.getElementById('dist').textContent = 'Нет GPS';
     }
 
-    // ===== ПЕРИОДИЧЕСКАЯ ПРОВЕРКА =====
-    setInterval(() => {
-      const marker = document.getElementById('dynamic-marker');
+    // Проверка позиции маркера через 3 секунды
+    setTimeout(() => {
+      const marker = document.getElementById('marker');
       if (marker) {
         const gps = marker.getAttribute('gps-entity-place');
-        if (gps) {
-          // Попробуем получить мировую позицию
-          const worldPos = new THREE.Vector3();
-          marker.object3D.getWorldPosition(worldPos);
-          log('Маркер существует, позиция: ' + worldPos.x.toFixed(2) + ', ' + worldPos.y.toFixed(2) + ', ' + worldPos.z.toFixed(2));
-        }
-      } else {
-        if (markerCreated) log('Маркер был создан, но исчез из DOM');
+        debug.innerText += ` | Маркер: lat=${gps.latitude}, lon=${gps.longitude}, alt=${gps.altitude}`;
+        // Получаем мировую позицию
+        const worldPos = new THREE.Vector3();
+        marker.object3D.getWorldPosition(worldPos);
+        console.log('Мировая позиция маркера:', worldPos);
+        debug.innerText += ` | Позиция: ${worldPos.x.toFixed(1)}, ${worldPos.y.toFixed(1)}, ${worldPos.z.toFixed(1)}`;
       }
-    }, 5000);
+    }, 4000);
   </script>
 </body>
-</html>
