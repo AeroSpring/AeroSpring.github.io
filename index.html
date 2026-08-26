@@ -1,150 +1,168 @@
+<!DOCTYPE html>
+<html>
 <head>
-  <title>AR Guide GPS</title>
-  <!-- 1. Подключаем A-Frame -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>AR Guide GPS — LocAR.js</title>
+  <!-- Подключаем A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <!-- 2. Подключаем ar.js (рекомендуемая библиотека) -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script> -->
-  <!-- 2. Подключаем LocAR.js (рекомендуемая библиотека) -->
-  <script src="https://cdn.jsdelivr.net/npm/locar.js@latest/dist/locar.min.js"></script>
+  <!-- Подключаем LocAR.js (последняя стабильная) -->
   <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /* Стили для информационной панели */
-    #info-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      font-family: sans-serif;
-      text-align: center;
+    body { margin: 0; overflow: hidden; }
+    #info {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      text-align: center; color: white; font-family: sans-serif;
+      background: rgba(0,0,0,0.6); padding: 10px; z-index: 100;
       pointer-events: none;
-      z-index: 100;
     }
-
-    #info-panel .title {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-
-    #info-panel .distance {
-      font-size: 1em;
-      opacity: 0.9;
+    #debug {
+      position: absolute; top: 10px; left: 10px;
+      background: white; color: red; padding: 5px;
+      font-size: 14px; font-family: monospace; z-index: 200;
+      max-width: 80%;
     }
   </style>
 </head>
-
 <body>
+  <div id="debug">Инициализация...</div>
+  <div id="info">Расстояние до точки: <span id="dist">--</span> м</div>
 
-  <!-- Панель для отображения информации о следующей точке -->
-  <div id="info-panel">
-    <div class="title" id="next-point-title">Загрузка...</div>
-    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
-  </div>
-
-  <!-- ОСНОВНАЯ AR СЦЕНА -->
   <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true">
-    <!-- Камера с GPS-функционалом -->
-    <a-entity gps-new-camera="gpsMinDistance: 5"></a-entity>
+    <!-- GPS-камера через LocAR.js -->
+    <a-entity id="camera" gps-new-camera="gpsMinDistance: 5;"></a-entity>
 
-    <!-- ЗДЕСЬ БУДУТ НАШИ AR-МАРКЕРЫ -->
-
-    <!-- Группа, объединяющая маркер и его подпись -->
-    <a-entity gps-new-entity-place="latitude: 44.970586; longitude: 41.153324">
-
-      <!-- 3D Маркер (конус). Объект может оказаться под землей. Убедитесь, что значение position="0 2.5 0" (высота 2.5 метра) -->
-      <a-cone 
-        color="red" 
-        radius-bottom="2" 
-        radius-top="0.1" 
-        height="5" 
-        position="0 2.5 0"
-      ></a-cone>
-
+    <!-- Маркер с целевыми координатами -->
+    <a-entity id="marker"
+              gps-new-entity-place="latitude: 44.970586; longitude: 41.153324; altitude: 218;">
+      <!-- Конус (умеренных размеров) -->
+      <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0"></a-cone>
+      <!-- Плоскость для подписи (будет заполнена canvas-текстом) -->
+      <a-plane id="label" position="0 -2 0" width="4" height="1.5"
+               material="transparent: true; opacity: 0.8; color: black;"></a-plane>
     </a-entity>
   </a-scene>
 
   <script>
-    // --- 1. Данные о точках маршрута ---
-    const routePoints = [
-      // { lat: 44.989322, lon: 41.160974, title: 'Старт' },
-      { lat: 44.970586, lon: 41.153324, title: 'Старт' },
-      { lat: 44.989459, lon: 41.160683, title: 'Точка 2' },
-      // ... добавьте остальные точки
-    ];
-    let currentPointIndex = 0; // Индекс текущей целевой точки
+    const debug = document.getElementById('debug');
+    const distSpan = document.getElementById('dist');
 
-    // --- 2. Вспомогательные функции ---
-    // Конвертация градусов в радианы
-    function toRadians(deg) { return deg * (Math.PI / 180); }
+    const TARGET_LAT = 44.970586;
+    const TARGET_LON = 41.153324;
+    const TARGET_ALT = 218;
 
-    // Расчет расстояния по формуле гаверсинусов (в метрах)
-    function haversineDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371000; // Радиус Земли в метрах
-      const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon2 - lon1);
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
+    // ========== ГЕО-ФУНКЦИИ ==========
+    function toRad(deg) { return deg * Math.PI / 180; }
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    // Расчет азимута (направления) от точки 1 к точке 2
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRadians(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
-      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
-        Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
-      let bearing = Math.atan2(y, x);
-      return (toDegrees(bearing) + 360) % 360; // Нормализуем в 0-360
+    // ========== СОЗДАНИЕ ПОДПИСИ НА CANVAS ==========
+    function createLabel(text, width = 512, height = 128) {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      // Прозрачный фон с округлённым прямоугольником
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      const r = 10;
+      const x = 10, y = 10, w = width - 20, h = height - 20;
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+      ctx.fill();
+
+      // Текст
+      ctx.font = `bold ${height * 0.45}px Arial, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white';
+      ctx.fillText(text, width / 2, height / 2);
+      return canvas;
     }
-    function toDegrees(rad) { return rad * (180 / Math.PI); }
 
-    // --- 3. Обновление интерфейса навигации ---
-    function updateNavigation(userLat, userLon) {
-      if (currentPointIndex >= routePoints.length) {
-        document.getElementById('next-point-title').innerText = '🏁 Маршрут завершен!';
-        document.getElementById('next-point-distance').innerText = '';
-        return;
-      }
-      const target = routePoints[currentPointIndex];
-      const dist = haversineDistance(userLat, userLon, target.lat, target.lon);
-      const bearing = calculateBearing(userLat, userLon, target.lat, target.lon);
+    // ========== ПРИМЕНЯЕМ ПОДПИСЬ ПОСЛЕ ЗАГРУЗКИ СЦЕНЫ ==========
+    window.addEventListener('load', () => {
+      debug.innerText = 'Страница загружена';
 
-      document.getElementById('next-point-title').innerHTML = `📍 ${target.title}`;
-      document.getElementById('next-point-distance').innerHTML =
-        `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
+      // Даём время на инициализацию AR
+      setTimeout(() => {
+        const labelPlane = document.getElementById('label');
+        if (labelPlane) {
+          const canvas = createLabel('ТОЧКА 1');
+          const texture = new THREE.CanvasTexture(canvas);
+          texture.needsUpdate = true;
+          const material = labelPlane.components.material.material;
+          if (material) {
+            material.map = texture;
+            material.needsUpdate = true;
+            debug.innerText += ' | Подпись применена';
+          } else {
+            debug.innerText += ' | Ошибка: материал не найден';
+          }
+        } else {
+          debug.innerText += ' | Ошибка: плоскость #label не найдена';
+        }
 
-      // (Опционально) Логика перехода к следующей точке при приближении
-      // if (dist < 20) { currentPointIndex++; }
-    }
+        // Попытка принудительно обновить позицию маркера (если нужно)
+        const marker = document.getElementById('marker');
+        if (marker && marker.components['gps-new-entity-place']) {
+          const comp = marker.components['gps-new-entity-place'];
+          if (typeof comp.updatePosition === 'function') {
+            comp.updatePosition();
+            debug.innerText += ' | Вызван updatePosition()';
+          }
+        }
+      }, 2000);
+    });
 
-    // --- 4. Запуск навигации и слежение за GPS ---
-    if ("geolocation" in navigator) {
-      // Используем watchPosition для непрерывного обновления
+    // ========== ОТСЛЕЖИВАНИЕ GPS И ОБНОВЛЕНИЕ РАССТОЯНИЯ ==========
+    if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          updateNavigation(latitude, longitude);
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const dist = haversine(lat, lon, TARGET_LAT, TARGET_LON);
+          distSpan.textContent = Math.round(dist);
+          debug.innerText = `Вы: ${lat.toFixed(6)}, ${lon.toFixed(6)} | Расст: ${Math.round(dist)} м`;
         },
-        (error) => {
-          console.error('Ошибка геолокации:', error);
-          document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
+        (err) => {
+          console.error(err);
+          distSpan.textContent = 'Ошибка GPS';
         },
         { enableHighAccuracy: true, maximumAge: 1000 }
       );
     } else {
-      document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
+      distSpan.textContent = 'GPS не поддерживается';
     }
-  </script>
 
+    // ========== ПЕРИОДИЧЕСКАЯ ОТЛАДКА ПОЗИЦИИ МАРКЕРА ==========
+    setInterval(() => {
+      const marker = document.getElementById('marker');
+      if (marker) {
+        const worldPos = new THREE.Vector3();
+        marker.object3D.getWorldPosition(worldPos);
+        console.log('Маркер (мир):', worldPos.x.toFixed(2), worldPos.y.toFixed(2), worldPos.z.toFixed(2));
+        // Также проверим, есть ли у него компонент и его атрибуты
+        const gps = marker.getAttribute('gps-new-entity-place');
+        if (gps) {
+          console.log('GPS-атрибут:', gps);
+        }
+      }
+    }, 5000);
+  </script>
 </body>
+</html>
