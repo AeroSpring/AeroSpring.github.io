@@ -26,8 +26,8 @@
 
 
   <!-- ОСНОВНАЯ AR СЦЕНА -->
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
-  <!-- <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;"> -->
+  <!-- <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh> -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
 
     <!-- <a-assets>
       <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
@@ -36,14 +36,14 @@
     <a-camera gps-new-camera='gpsMinDistance: 2'></a-camera>
 
     <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
-       
+
     <a-entity 
-      gps-new-entity-place="latitude: 44.970756; longitude: 41.153319"
+      gps-new-entity-place="latitude: 44.989412; longitude: 41.160780"
     >
       <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
+      <!-- <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
         background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text>
+      </a-text> -->
     </a-entity>
 
   </a-scene>
