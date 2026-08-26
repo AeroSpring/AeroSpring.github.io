@@ -1,211 +1,158 @@
+<!DOCTYPE html>
+<html>
+
 <head>
-  <link rel="stylesheet" href="style.css">
+  <title>AR Guide GPS</title>
+  <!-- 1. Подключаем A-Frame -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- 2. Подключаем LocAR.js (рекомендуемая библиотека) -->
+  <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Стили для информационной панели */
+    #info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: sans-serif;
+      text-align: center;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #info-panel .title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    #info-panel .distance {
+      font-size: 1em;
+      opacity: 0.9;
+    }
+  </style>
 </head>
+
 <body>
-  <canvas></canvas>
-  <div id="dom-overlay">
-    <div id="gizmo-block">
-    </div>
+  
+  <!-- Панель для отображения информации о следующей точке -->
+  <div id="info-panel">
+    <div class="title" id="next-point-title">Загрузка...</div>
+    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
   </div>
 
-  <script src="https://cdn.babylonjs.com/babylon.js"></script>
-  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-  <script type="module">
-    
-    // ИЗВЛЕЧЕНИЕ ТЕГОВ ИЗ РАЗМЕТКИ
-    let canvas = window.document.querySelector('canvas');
-    let domOverlay = window.document.querySelector('#dom-overlay');
-    let gizmoBlock = window.document.querySelector('#gizmo-block');
-    
-    // СОЗДАНИЕ ДВИЖКА
-    let engine = new BABYLON.Engine(canvas);
-    
-    // СОЗДАНИЕ СЦЕНЫ И ПРИСОЕДИНЕНИЕ ЕЁ К ДВИЖКУ
-    let scene = new BABYLON.Scene(engine);
-    scene.createDefaultEnvironment({
-      createSkybox: false,
-      createGround: false
-    });
-    
-    // СОЗДАНИЕ СВЕТА
-    let light = new BABYLON.PointLight('light', new BABYLON.Vector3(10, 10, -2), scene);
-    light.intensity = 0.7;
-
-    // ПОДКЛЮЧЕНИЕ WEBXR
-    scene.createDefaultXRExperienceAsync({
-      uiOptions: {
-        sessionMode: 'immersive-ar', 
-        referenceSpaceType: 'local-floor',
-      }
-    });
-    
-    // ПОДКЛЮЧЕНИЕ GIZMO
-    let gizmoManager = new BABYLON.GizmoManager(scene);
+  <!-- ОСНОВНАЯ AR СЦЕНА -->
+  <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true">
+    <!-- Камера с GPS-функционалом -->
+    <a-camera gps-new-camera="gpsMinDistance: 5"></a-camera>
 
 
+    <!-- ЗДЕСЬ БУДУТ НАШИ AR-МАРКЕРЫ -->
 
-    // ПЕРЕМЕННЫЕ
-    let editingElement = null;
-    const frameRate = 20; // скорость анимации (кадров в секунду)
+    <!-- Группа, объединяющая маркер и его подпись -->
+    <a-entity gps-new-entity-place="latitude: 44.989322; longitude: 41.160974">
+      <!-- 3D Маркер (конус) -->
+      <!-- Объект может оказаться под землей. Убедитесь, что значение position="0 2.5 0" (высота 2.5 метра) -->
+      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
+      <!-- Текст-подпись -->
+      <a-text
+        value="Точка 1"
+        color="white"
+        align="center"
+        position="0 -2 0"
+        scale="3 3 3"
+        background="true"
+        background-color="black"
+        background-opacity="0.7"
+        padding="0.3"
+      ></a-text>
+    </a-entity>
 
+  </a-scene>
 
+  <script>
+    // --- 1. Данные о точках маршрута ---
+    const routePoints = [
+      { lat: 44.989322, lon: 41.160974, title: 'Старт' },
+      { lat: 44.989459, lon: 41.160683, title: 'Точка 2' },
+      // ... добавьте остальные точки
+    ];
+    let currentPointIndex = 0; // Индекс текущей целевой точки
 
-    // ФУНКЦИИ
+    // --- 2. Вспомогательные функции ---
+    // Конвертация градусов в радианы
+    function toRadians(deg) { return deg * (Math.PI / 180); }
 
-    // ФУНКЦИИ АНИМАЦИИ
-
-    // СОЗДАНИЕ АНИМАЦИИ ПЕРЕМЕЩЕНИЯ
-    const animationPosition = new BABYLON.Animation(
-      "positionAnimation",
-      "position.y", // анимируемое свойство
-      frameRate, // скорость анимации (кадров в секунду)
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
-    );
-    // СОЗДАНИЕ КАДРОВ АНИМАЦИИ ПЕРЕМЕЩЕНИЯ
-    const keysPosition = [];
-    keysPosition.push({
-      frame: 0,
-      value: 1.0
-    });
-    keysPosition.push({
-      frame: frameRate,
-      value: 1.5
-    });
-    keysPosition.push({
-      frame: 2 * frameRate,
-      value: 1.0
-    });
-    animationPosition.setKeys(keysPosition);
-    
-    // СОЗДАНИЕ АНИМАЦИИ ВРАЩЕНИЯ
-    const animationRotate = new BABYLON.Animation(
-      "rotationAnimation",
-      "rotation.y", // анимируемое свойство
-      30, // скорость анимации (кадров в секунду)
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT // тип данных
-    );
-    // СОЗДАНИЕ КАДРОВ АНИМАЦИИ ВРАЩЕНИЯ
-    const keysRotate = [];
-    keysRotate.push({
-      frame: 0,
-      value: 0
-    });
-    keysRotate.push({
-      frame: frameRate,
-      value: Math.PI * 2 // Оборачиваемся на 360 градусов (2 * PI)
-    });
-    animationRotate.setKeys(keysRotate);
-
-
-
-    // ФУНКЦИИ ДЛЯ GIZMO
-    const clearGizmoOptions = () => {
-      gizmoManager.positionGizmoEnabled = false;
-      gizmoManager.boundingBoxGizmoEnabled = false;
+    // Расчет расстояния по формуле гаверсинусов (в метрах)
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // Радиус Земли в метрах
+      const dLat = toRadians(lat2 - lat1);
+      const dLon = toRadians(lon2 - lon1);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
     }
 
-    const setGizmoOption = (option, _marker = '') => {
-      clearGizmoOptions();
-      switch(option) {
-        case 'animation': {
-          switch(_marker) {
-            case 'drone': {
-              //window.location = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-              document.location.href = 'https://okru.ru/kompyuternye-uslugi/predlagau/897101';
-              break;
-            }
-            case 'steampunk': {
-              //window.location = 'https://okru.ru/avtoremont/predlagau/877886';
-              document.location.href = 'https://okru.ru/avtoremont/predlagau/877886';
-              break;
-            }
-            default: {
-              //window.location = 'https://okru.ru/userpubl/aerospring';
-              document.location.href = 'https://okru.ru/userpubl/aerospring';
-            }
-          }
-          closeGizmo()
-          break;
-        }
-        case 'dispose': {
-          closeGizmo(true)
-          break;
-        }
-        default: break;
+    // Расчет азимута (направления) от точки 1 к точке 2
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRadians(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
+      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
+                Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
+      let bearing = Math.atan2(y, x);
+      return (toDegrees(bearing) + 360) % 360; // Нормализуем в 0-360
+    }
+    function toDegrees(rad) { return rad * (180 / Math.PI); }
+
+    // --- 3. Обновление интерфейса навигации ---
+    function updateNavigation(userLat, userLon) {
+      if (currentPointIndex >= routePoints.length) {
+        document.getElementById('next-point-title').innerText = '🏁 Маршрут завершен!';
+        document.getElementById('next-point-distance').innerText = '';
+        return;
       }
+      const target = routePoints[currentPointIndex];
+      const dist = haversineDistance(userLat, userLon, target.lat, target.lon);
+      const bearing = calculateBearing(userLat, userLon, target.lat, target.lon);
+
+      document.getElementById('next-point-title').innerHTML = `📍 ${target.title}`;
+      document.getElementById('next-point-distance').innerHTML =
+        `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
+
+      // (Опционально) Логика перехода к следующей точке при приближении
+      // if (dist < 20) { currentPointIndex++; }
     }
 
-    const closeGizmo = (needDispose = false) => {
-      clearGizmoOptions();
-      gizmoManager._attachedMesh = null;
-      gizmoManager.enableAutoPicking = true;
-      gizmoBlock.style.display = 'none';
-      (needDispose)
-        ? editingElement.dispose()
-        : editingElement = null;
+    // --- 4. Запуск навигации и слежение за GPS ---
+    if ("geolocation" in navigator) {
+      // Используем watchPosition для непрерывного обновления
+      navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          updateNavigation(latitude, longitude);
+        },
+        (error) => {
+          console.error('Ошибка геолокации:', error);
+          document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
+        },
+        { enableHighAccuracy: true, maximumAge: 1000 }
+      );
+    } else {
+      document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
     }
-
-
-
-    // ДОБАВЛЕНИЕ МОДЕЛЕЙ
-    BABYLON.SceneLoader.ImportMesh(
-      null, 
-      'assets/model1C/', 
-      'model1C.glb', 
-      scene, 
-      (meshArray) => {
-        let model1CMesh = meshArray[0];
-        model1CMesh.name = 'model1C'
-        model1CMesh.scaling = new BABYLON.Vector3(0.25, 0.25, 0.25);
-        model1CMesh.position = new BABYLON.Vector3(-1, 0, 1.5);
-        model1CMesh.rotation = new BABYLON.Vector3(0, -0.3, 0);
-        model1CMesh.addShadowCaster(model1CMesh); //отбрасываемая тень
-        model1CMesh.receiveShadows = true; //принимаемая тень
-      }
-    );
-
-    BABYLON.SceneLoader.ImportMesh(
-      null, 
-      'assets/drone/', 
-      'drone.glb', 
-      scene, 
-      (meshArray) => {
-        let droneMesh = meshArray[0];
-        droneMesh.name = 'drone'
-        droneMesh.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-        droneMesh.position = new BABYLON.Vector3(1, 0, 2.5);
-        shadowGenerator.addShadowCaster(droneMesh); //отбрасываемая тень
-        droneMesh.receiveShadows = true; //принимаемая тень
-      }
-    );
-
-
-
-    engine.runRenderLoop(() => scene.render());
-
-
-
-    // ОБРАБОТЧИКИ СОБЫТИЙ
-
-    // ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ GIZMO
-    gizmoManager.onAttachedToMeshObservable.add((mesh) => {
-      // ПОЛУЧАЕМ ИМЯ НАЖАТОЙ МОДЕЛИ
-      const marker = scene.getMeshByName(mesh.name);
-      //alert(marker.name);
-
-      editingElement = mesh;
-
-      // ВКЛЮЧЕНИЕ АНИМАЦИИ ПРИ НАЖАТИИ
-      editingElement.animations = [animationPosition];
-      scene.beginAnimation(editingElement, 0, 2 * frameRate); //, true); //циклическое воспроизведение анимации
-      //editingElement.animations = [animationRotate];
-      //scene.beginAnimation(editingElement, 0, frameRate); // , true); // циклическое воспроизведение анимации
-
-      // ВЫБОР ТОГО, ЧТО ПРОИЗОЙДЁТ ПРИ НАЖАТИИ. ВЫБРАТЬ ЧТО-ТО ОДНО:
-      //setGizmoOption('dispose');
-      setGizmoOption('animation', marker.name);
-      //setGizmoOption('');
-    });
-
   </script>
+
 </body>
+
+</html>
