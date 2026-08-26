@@ -13,32 +13,6 @@
       margin: 0;
       overflow: hidden;
     }
-
-    /* Стили для информационной панели */
-    #info-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      font-family: sans-serif;
-      text-align: center;
-      pointer-events: none;
-      z-index: 100;
-    }
-
-    #info-panel .title {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-
-    #info-panel .distance {
-      font-size: 1em;
-      opacity: 0.9;
-    }
   </style>
 </head>
 
@@ -61,16 +35,16 @@
 
     <a-camera gps-new-camera='gpsMinDistance: 2'></a-camera>
 
-    <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
+    <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box>
        
-    <a-entity 
+    <!-- <a-entity 
       gps-new-entity-place="latitude: 44.970756; longitude: 41.153319"
     >
       <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <!-- <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
+      <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
         background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text> -->
-    </a-entity>
+      </a-text>
+    </a-entity> -->
 
   </a-scene>
 
