@@ -27,42 +27,24 @@
 
   <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
     <!-- GPS-камера -->
-    <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
-
-    <!-- Маркер с вашими координатами -->
-    <a-entity id="marker"
-              gps-entity-place="latitude: 44.970586; longitude: 41.153324; altitude: 200;">
-      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <a-text value="Точка 1" color="white" position="0 -1.5 0" scale="1 1 1" align="center"></a-text>
-    </a-entity>
+    <a-entity id="camera" gps-camera="gpsMinDistance: 5;"></a-entity>
   </a-scene>
 
   <script>
-    // Отладка: проверяем, загрузилась ли сцена
-    document.getElementById('debug').innerText = 'Скрипт загружен';
+    // ========== 1. ОТЛАДКА И ПЕРЕМЕННЫЕ ==========
+    const debug = document.getElementById('debug');
+    const distSpan = document.getElementById('dist');
 
-    // Проверяем, что маркер появился в DOM
-    setTimeout(() => {
-      const marker = document.getElementById('marker');
-      if (marker) {
-        document.getElementById('debug').innerText = 'Маркер найден в DOM';
-        console.log('Маркер существует:', marker);
-        // Проверяем атрибут gps-entity-place
-        const gps = marker.getAttribute('gps-entity-place');
-        if (gps) {
-          document.getElementById('debug').innerText += ` | GPS: lat=${gps.latitude}, lon=${gps.longitude}, alt=${gps.altitude}`;
-        } else {
-          document.getElementById('debug').innerText += ' | Ошибка: нет gps-entity-place';
-        }
-      } else {
-        document.getElementById('debug').innerText = 'Маркер НЕ найден!';
-      }
-    }, 2000);
+    // Ваши координаты
+    const TARGET_LAT = 44.970586;
+    const TARGET_LON = 41.153324;
+    // Высота над уровнем моря в Армавире (примерно 200 м), но можно уточнить
+    const TARGET_ALT = 200;
 
-    // Расчёт расстояния до точки (для информационной панели)
-    // const target = { lat: 44.989412, lon: 41.160780 };
-    const target = { lat: 44.970586, lon: 41.153324 };
-    
+    let markerEntity = null;
+    let scene = null;
+
+    // ========== 2. ФУНКЦИИ РАСЧЁТА РАССТОЯНИЯ ==========
     function toRad(deg) { return deg * Math.PI / 180; }
     function haversine(lat1, lon1, lat2, lon2) {
       const R = 6371000;
@@ -72,23 +54,103 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
+    // ========== 3. СОЗДАНИЕ МАРКЕРА (ПРОГРАММНО) ==========
+    function createMarker() {
+      scene = document.querySelector('a-scene');
+      if (!scene) {
+        debug.innerText = 'Ошибка: сцена не найдена';
+        return;
+      }
+
+      // Создаём сущность с компонентом gps-entity-place через setAttribute
+      markerEntity = document.createElement('a-entity');
+      markerEntity.id = 'dynamic-marker';
+      // Важно: передаём altitude, чтобы объект был на правильной высоте
+      markerEntity.setAttribute('gps-entity-place', {
+        latitude: TARGET_LAT,
+        longitude: TARGET_LON,
+        altitude: TARGET_ALT
+      });
+
+      // Добавляем конус
+      const cone = document.createElement('a-cone');
+      cone.setAttribute('color', 'red');
+      cone.setAttribute('radius-bottom', '3');
+      cone.setAttribute('radius-top', '0.2');
+      cone.setAttribute('height', '6');
+      cone.setAttribute('position', '0 3 0'); // поднят на 3 метра над землёй
+      markerEntity.appendChild(cone);
+
+      // Добавляем текстовую подпись (a-text безопасно использовать только для коротких слов)
+      const text = document.createElement('a-text');
+      text.setAttribute('value', 'ТОЧКА');
+      text.setAttribute('color', 'white');
+      text.setAttribute('position', '0 -2 0');
+      text.setAttribute('scale', '2 2 2');
+      text.setAttribute('align', 'center');
+      text.setAttribute('background', 'true');
+      text.setAttribute('background-color', 'black');
+      text.setAttribute('background-opacity', '0.7');
+      text.setAttribute('padding', '0.5');
+      markerEntity.appendChild(text);
+
+      // Добавляем маркер в сцену
+      scene.appendChild(markerEntity);
+      debug.innerText = 'Маркер создан и добавлен в сцену';
+      console.log('Маркер добавлен:', markerEntity);
+
+      // Через секунду проверим, есть ли у маркера компонент gps-entity-place
+      setTimeout(() => {
+        const gps = markerEntity.getAttribute('gps-entity-place');
+        if (gps) {
+          debug.innerText += ` | GPS: lat=${gps.latitude}, lon=${gps.longitude}, alt=${gps.altitude}`;
+        } else {
+          debug.innerText += ' | Ошибка: gps-entity-place не установлен';
+        }
+      }, 1000);
+    }
+
+    // ========== 4. ЗАПУСК ПОСЛЕ ЗАГРУЗКИ СТРАНИЦЫ ==========
+    window.addEventListener('load', () => {
+      debug.innerText = 'Страница загружена';
+      // Даём AR.js время на инициализацию
+      setTimeout(createMarker, 3000);
+    });
+
+    // ========== 5. ОТСЛЕЖИВАНИЕ ПОЗИЦИИ ПОЛЬЗОВАТЕЛЯ ==========
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (pos) => {
-          const dist = haversine(pos.coords.latitude, pos.coords.longitude, target.lat, target.lon);
-          document.getElementById('dist').textContent = Math.round(dist);
-          // Дополнительно выведем в консоль текущие координаты для отладки
-          console.log(`Ваши координаты: ${pos.coords.latitude}, ${pos.coords.longitude}`);
+          const dist = haversine(pos.coords.latitude, pos.coords.longitude, TARGET_LAT, TARGET_LON);
+          distSpan.textContent = Math.round(dist);
+
+          // Дополнительная отладка: выведем позицию пользователя
+          console.log(`Вы: ${pos.coords.latitude}, ${pos.coords.longitude}, высота: ${pos.coords.altitude}`);
         },
         (err) => {
-          console.error('Ошибка GPS:', err);
-          document.getElementById('dist').textContent = 'Ошибка GPS';
+          console.error('GPS ошибка:', err);
+          distSpan.textContent = 'Ошибка GPS';
         },
         { enableHighAccuracy: true, maximumAge: 1000 }
       );
     } else {
-      document.getElementById('dist').textContent = 'GPS не поддерживается';
+      distSpan.textContent = 'GPS не поддерживается';
     }
+
+    // ========== 6. ПЕРИОДИЧЕСКАЯ ОТЛАДКА ПОЛОЖЕНИЯ МАРКЕРА ==========
+    setInterval(() => {
+      if (markerEntity) {
+        // Пытаемся получить его мировую позицию
+        const worldPos = new THREE.Vector3();
+        markerEntity.object3D.getWorldPosition(worldPos);
+        console.log('Текущая мировая позиция маркера:', worldPos);
+        // Также лог компонента gps-entity-place
+        const gps = markerEntity.getAttribute('gps-entity-place');
+        if (gps) {
+          console.log('GPS-атрибут маркера:', gps);
+        }
+      }
+    }, 5000);
   </script>
 </body>
 </html>
