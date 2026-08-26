@@ -3,10 +3,11 @@
   <!-- 1. Подключаем A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <!-- 2. Подключаем ar.js (рекомендуемая библиотека) -->
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script> -->
   <!-- 2. Подключаем LocAR.js (рекомендуемая библиотека) -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@latest/dist/locar.min.js"></script> -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/locar.js@latest/dist/locar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script>
+
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
   <style>
     body {
@@ -51,14 +52,16 @@
   </div>
 
   <!-- ОСНОВНАЯ AR СЦЕНА -->
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-    
-    <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
+  <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true">
+    <!-- Камера с GPS-функционалом -->
+    <a-entity gps-new-camera="gpsMinDistance: 5"></a-entity>
 
-    <a-entity 
-      gps-entity-place="latitude: 44.989412; longitude: 41.160780"
-    >
+    <!-- ЗДЕСЬ БУДУТ НАШИ AR-МАРКЕРЫ -->
 
+    <!-- Группа, объединяющая маркер и его подпись -->
+    <a-entity gps-new-entity-place="latitude: 44.989412; longitude: 41.160780">
+
+      <!-- 3D Маркер (конус). Объект может оказаться под землей. Убедитесь, что значение position="0 2.5 0" (высота 2.5 метра) -->
       <a-cone 
         color="red" 
         radius-bottom="2" 
@@ -67,7 +70,8 @@
         position="0 2.5 0"
       ></a-cone>
 
-      <a-text 
+      <!-- Текст-подпись -->
+      <!-- <a-text 
         value="Точка 1" 
         color="white" 
         text-align="center" 
@@ -77,10 +81,9 @@
         background-color="black" 
         background-opacity="0.7" 
         padding="0.3"
-      ></a-text>
+      ></a-text> -->
 
     </a-entity>
-
   </a-scene>
 
   <script>
