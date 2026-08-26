@@ -54,12 +54,12 @@
   <!-- ОСНОВНАЯ AR СЦЕНА -->
   <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true">
     <!-- Камера с GPS-функционалом -->
-    <a-entity gps-camera="gpsMinDistance: 5"></a-entity>
+    <a-entity gps-new-camera="gpsMinDistance: 5"></a-entity>
 
     <!-- ЗДЕСЬ БУДУТ НАШИ AR-МАРКЕРЫ -->
 
     <!-- Группа, объединяющая маркер и его подпись -->
-    <a-entity gps-entity-place="latitude: 44.970586; longitude: 41.153324">
+    <a-entity gps-new-entity-place="latitude: 44.970586; longitude: 41.153324">
 
       <!-- 3D Маркер (конус). Объект может оказаться под землей. Убедитесь, что значение position="0 2.5 0" (высота 2.5 метра) -->
       <a-cone 
