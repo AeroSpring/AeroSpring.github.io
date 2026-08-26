@@ -26,21 +26,20 @@
   <a-scene arjs="sourceType: webcam; debugUIEnabled: true;">
     <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
 
-    <!-- ГИГАНТСКИЙ КОНУС НА ВАШИХ КООРДИНАТАХ -->
+    <!-- КОНУС С ВАШИМИ КООРДИНАТАМИ И ЯВНОЙ ВЫСОТОЙ -->
     <a-entity id="marker-1" 
-              gps-entity-place="latitude: 44.989412; longitude: 41.160780;">
+              gps-entity-place="latitude: 44.989412; longitude: 41.160780; altitude: 200;">
       <a-cone color="red" 
-              radius-bottom="50" 
-              radius-top="5" 
-              height="100" 
-              position="0 2.5 0"
-              scale="1 1 1">
+              radius-bottom="2" 
+              radius-top="0.1" 
+              height="5" 
+              position="0 2.5 0">
       </a-cone>
-      <!-- Подпись тоже увеличим -->
+      <!-- Подпись (canvas) -->
       <a-plane id="label" 
-               position="0 -30 0" 
-               width="80" 
-               height="30"
+               position="0 -2 0" 
+               width="4" 
+               height="1.5"
                material="color: black; opacity: 0.8; transparent: true;">
       </a-plane>
     </a-entity>
@@ -55,19 +54,19 @@
       document.getElementById('debug').innerText = 'Страница загружена';
       console.log('Страница загружена');
 
-      // ===== 2. СОЗДАЁМ ПОДПИСЬ НА CANVAS (увеличенную) =====
+      // ===== 2. СОЗДАЁМ ПОДПИСЬ НА CANVAS =====
       const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 256;
+      canvas.width = 512;
+      canvas.height = 128;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.roundRect(10, 10, 1004, 236, 20);
+      ctx.roundRect(10, 10, 492, 108, 10);
       ctx.fill();
-      ctx.font = 'bold 120px Arial';
+      ctx.font = 'bold 64px Arial';
       ctx.fillStyle = 'white';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('ТОЧКА 1', 512, 128);
+      ctx.fillText('ТОЧКА 1', 256, 64);
 
       if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
@@ -115,8 +114,8 @@
           console.error('Атрибут gps-entity-place не задан');
           return;
         }
-        document.getElementById('debug').innerText = `Маркер найден: lat=${gps.latitude}, lon=${gps.longitude}`;
-        console.log('Маркер найден:', gps);
+        document.getElementById('debug').innerText = `Маркер: lat=${gps.latitude}, lon=${gps.longitude}, alt=${gps.altitude}`;
+        console.log('Маркер:', gps);
       }, 3000);
     });
 
@@ -162,7 +161,11 @@
 
     if ("geolocation" in navigator) {
       navigator.geolocation.watchPosition(
-        (pos) => updateNavigation(pos.coords.latitude, pos.coords.longitude),
+        (pos) => {
+          updateNavigation(pos.coords.latitude, pos.coords.longitude);
+          // Дополнительно выведем высоту пользователя для отладки
+          console.log('Ваша высота (м):', pos.coords.altitude);
+        },
         (err) => {
           console.error(err);
           document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
