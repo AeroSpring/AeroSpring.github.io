@@ -1,10 +1,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>AR Guide GPS — гибрид</title>
-  <!-- A-Frame -->
+  <title>AR Guide GPS — стабильный</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <!-- AR.js (для видеофона) -->
   <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
@@ -17,12 +15,12 @@
   <div id="info">Расстояние до точки: <span id="dist">--</span> м</div>
 
   <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
-    <!-- GPS-камера AR.js (даёт видео) -->
+    <!-- GPS-камера -->
     <a-entity id="camera" gps-camera="gpsMinDistance: 5;"></a-entity>
 
-    <!-- Маркер – позиционируем вручную -->
+    <!-- Маркер в сцене (будем обновлять позицию каждый кадр) -->
     <a-entity id="marker" position="0 0 -10">
-      <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0"></a-cone>
+      <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0" scale="1 1 1"></a-cone>
       <a-plane id="label" position="0 -2 0" width="4" height="1.5" material="transparent: true; opacity: 0.8; color: black;"></a-plane>
     </a-entity>
   </a-scene>
@@ -56,7 +54,7 @@
       return (toDeg(Math.atan2(y, x)) + 360) % 360;
     }
 
-    // ========== ОБНОВЛЕНИЕ ПОЗИЦИИ МАРКЕРА ==========
+    // ========== ОБНОВЛЕНИЕ ПОЗИЦИИ МАРКЕРА (будет вызываться каждый кадр) ==========
     function updateMarkerPosition() {
       if (userLat === null || userLon === null) return;
 
@@ -83,8 +81,18 @@
       const marker = document.getElementById('marker');
       if (marker) {
         marker.setAttribute('position', markerWorldPos);
-        debug.innerText = `Маркер: (${markerWorldPos.x.toFixed(1)}, ${markerWorldPos.y.toFixed(1)}, ${markerWorldPos.z.toFixed(1)}) | Расст: ${Math.round(dist)} м`;
+        // Обновляем отладочную информацию не каждый кадр, а реже (раз в секунду)
+        if (!updateMarkerPosition._lastDebug || Date.now() - updateMarkerPosition._lastDebug > 1000) {
+          debug.innerText = `Маркер: (${markerWorldPos.x.toFixed(1)}, ${markerWorldPos.y.toFixed(1)}, ${markerWorldPos.z.toFixed(1)}) | Расст: ${Math.round(dist)} м`;
+          updateMarkerPosition._lastDebug = Date.now();
+        }
       }
+    }
+
+    // Запускаем бесконечный цикл обновления (60 fps)
+    function animate() {
+      updateMarkerPosition();
+      requestAnimationFrame(animate);
     }
 
     // ========== ПОДПИСЬ ==========
@@ -116,8 +124,7 @@
           userAlt = pos.coords.altitude || 218;
           const dist = haversine(userLat, userLon, TARGET_LAT, TARGET_LON);
           distSpan.textContent = Math.round(dist);
-          debug.innerText = `Вы: ${userLat.toFixed(6)}, ${userLon.toFixed(6)} | Расст: ${Math.round(dist)} м`;
-          updateMarkerPosition();
+          // Не обновляем debug здесь, чтобы не засорять
         },
         (err) => { console.error(err); distSpan.textContent = 'Ошибка GPS'; },
         { enableHighAccuracy: true, maximumAge: 1000 }
@@ -126,12 +133,13 @@
       distSpan.textContent = 'GPS не поддерживается';
     }
 
-    // Обновляем позицию каждые 500 мс для стабильности
-    setInterval(updateMarkerPosition, 500);
-
-    // ========== ПРИМЕНЯЕМ ПОДПИСЬ ==========
+    // ========== ЗАПУСК ==========
     window.addEventListener('load', () => {
       debug.innerText = 'Страница загружена';
+      // Запускаем анимацию
+      animate();
+
+      // Применяем подпись через 2 секунды
       setTimeout(() => {
         const labelPlane = document.getElementById('label');
         if (labelPlane) {
