@@ -1,20 +1,18 @@
+<!DOCTYPE html>
+<html>
+
 <head>
-  <title>AR Guide GPS</title>
+  <!-- <title>AR Guide GPS</title> -->
   <!-- 1. Подключаем A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <!-- 2. Подключаем ar.js (рекомендуемая библиотека) -->
   <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
-  <!-- 2. Подключаем LocAR.js (рекомендуемая библиотека) -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@latest/dist/locar.min.js"></script> -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script> -->
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
   <style>
     body {
       margin: 0;
       overflow: hidden;
     }
 
-    /* Стили для информационной панели */
     #info-panel {
       position: absolute;
       bottom: 20px;
@@ -51,23 +49,30 @@
   </div>
 
   <!-- ОСНОВНАЯ AR СЦЕНА -->
+  <!-- <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh> -->
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-    <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
 
-    <a-entity 
-      gps-entity-place="latitude: 44.989412; longitude: 41.160780"
-    >
+    <!-- <a-assets>
+      <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
+    </a-assets> -->
+
+    <a-camera gps-camera='gpsMinDistance: 5'></a-camera>
+
+    <a-entity gps-entity-place="latitude: 44.989412; longitude: 41.160780">
+      <!-- <a-entity gps-entity-place="latitude: 44.970955; longitude: 41.152524"> -->
+      <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
       <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <!-- <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
-        background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text> -->
+      <a-text value="Точка 1" color="white" position="0 -2 0" scale="3 3 3" background-color="black"
+        background-opacity="0.7" padding="0.3"></a-text>
     </a-entity>
+
   </a-scene>
 
   <script>
     // --- 1. Данные о точках маршрута ---
     const routePoints = [
-      { lat: 44.989322, lon: 41.160974, title: 'Старт' },
+      { lat: 44.989412, lon: 41.160780, title: 'Старт' },
+      // { lat: 44.970955, lon: 41.152524, title: 'Старт' },
       { lat: 44.989459, lon: 41.160683, title: 'Точка 2' },
       // ... добавьте остальные точки
     ];
@@ -116,7 +121,7 @@
         `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
 
       // (Опционально) Логика перехода к следующей точке при приближении
-      // if (dist < 20) { currentPointIndex++; }
+      if (dist < 20) { currentPointIndex++; }
     }
 
     // --- 4. Запуск навигации и слежение за GPS ---
@@ -139,3 +144,5 @@
   </script>
 
 </body>
+
+</html>

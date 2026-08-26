@@ -1,150 +1,164 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AR Guide GPS</title>
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <!-- AR.js (классический) -->
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
 
-<head>
-  <!-- <title>AR Guide GPS</title> -->
-  <!-- 1. Подключаем A-Frame -->
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <!-- 2. Подключаем ar.js (рекомендуемая библиотека) -->
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /* Стили для информационной панели */
-    #info-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      font-family: sans-serif;
-      text-align: center;
-      pointer-events: none;
-      z-index: 100;
-    }
-
-    #info-panel .title {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-
-    #info-panel .distance {
-      font-size: 1em;
-      opacity: 0.9;
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- Панель для отображения информации о следующей точке -->
-  <div id="info-panel">
-    <div class="title" id="next-point-title">Загрузка...</div>
-    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
-  </div>
-
-  <!-- ОСНОВНАЯ AR СЦЕНА -->
-  <!-- <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh> -->
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-
-    <!-- <a-assets>
-      <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
-    </a-assets> -->
-
-    <a-camera gps-camera='gpsMinDistance: 5'></a-camera>
-
-    <a-entity gps-entity-place="latitude: 44.989412; longitude: 41.160780">
-    <!-- <a-entity gps-entity-place="latitude: 44.970955; longitude: 41.152524"> -->
-      <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
-      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <a-text value="Точка 1" color="white" position="0 -2 0" scale="3 3 3" background="true"
-        background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text>
-    </a-entity>
-
-  </a-scene>
-
-  <script>
-    // --- 1. Данные о точках маршрута ---
-    const routePoints = [
-      { lat: 44.989412, lon: 41.160780, title: 'Старт' },
-      // { lat: 44.970955, lon: 41.152524, title: 'Старт' },
-      { lat: 44.989459, lon: 41.160683, title: 'Точка 2' },
-      // ... добавьте остальные точки
-    ];
-    let currentPointIndex = 0; // Индекс текущей целевой точки
-
-    // --- 2. Вспомогательные функции ---
-    // Конвертация градусов в радианы
-    function toRadians(deg) { return deg * (Math.PI / 180); }
-
-    // Расчет расстояния по формуле гаверсинусов (в метрах)
-    function haversineDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371000; // Радиус Земли в метрах
-      const dLat = toRadians(lat2 - lat1);
-      const dLon = toRadians(lon2 - lon1);
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    }
-
-    // Расчет азимута (направления) от точки 1 к точке 2
-    function calculateBearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRadians(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
-      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
-        Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
-      let bearing = Math.atan2(y, x);
-      return (toDegrees(bearing) + 360) % 360; // Нормализуем в 0-360
-    }
-    function toDegrees(rad) { return rad * (180 / Math.PI); }
-
-    // --- 3. Обновление интерфейса навигации ---
-    function updateNavigation(userLat, userLon) {
-      if (currentPointIndex >= routePoints.length) {
-        document.getElementById('next-point-title').innerText = '🏁 Маршрут завершен!';
-        document.getElementById('next-point-distance').innerText = '';
-        return;
+    <style>
+      body { margin: 0; overflow: hidden; }
+      #info-panel {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: sans-serif;
+        text-align: center;
+        pointer-events: none;
+        z-index: 100;
       }
-      const target = routePoints[currentPointIndex];
-      const dist = haversineDistance(userLat, userLon, target.lat, target.lon);
-      const bearing = calculateBearing(userLat, userLon, target.lat, target.lon);
+      #info-panel .title { font-weight: bold; font-size: 1.2em; }
+      #info-panel .distance { font-size: 1em; opacity: 0.9; }
+    </style>
+  </head>
+  <body>
+    <div id="info-panel">
+      <div class="title" id="next-point-title">Загрузка...</div>
+      <div class="distance" id="next-point-distance">Расстояние: -- м</div>
+    </div>
 
-      document.getElementById('next-point-title').innerHTML = `📍 ${target.title}`;
-      document.getElementById('next-point-distance').innerHTML =
-        `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
+    <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
+      <!-- GPS-камера -->
+      <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
 
-      // (Опционально) Логика перехода к следующей точке при приближении
-      if (dist < 20) { currentPointIndex++; }
-    }
+      <!-- Маркер с конусом и подписью (canvas) -->
+      <a-entity id="marker-1" gps-entity-place="latitude: 44.989412; longitude: 41.160780;">
+        <!-- Конус: поднимем повыше, чтобы точно не ушёл под землю -->
+        <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 3 0"></a-cone>
+        <!-- Плоскость для подписи (будет заполнена canvas-текстом) -->
+        <a-plane id="label-plane" position="0 -1.5 0" width="4" height="1.5"
+                 material="transparent: true; opacity: 1; color: #000000;"></a-plane>
+      </a-entity>
+    </a-scene>
 
-    // --- 4. Запуск навигации и слежение за GPS ---
-    if ("geolocation" in navigator) {
-      // Используем watchPosition для непрерывного обновления
-      navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          updateNavigation(latitude, longitude);
-        },
-        (error) => {
-          console.error('Ошибка геолокации:', error);
-          document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
-        },
-        { enableHighAccuracy: true, maximumAge: 1000 }
-      );
-    } else {
-      document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
-    }
-  </script>
+    <script>
+      // ========== 1. СОЗДАНИЕ ПОДПИСИ НА CANVAS ==========
+      function createLabel(text, width = 512, height = 128) {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
 
-</body>
+        // Фон (прозрачный, но с полупрозрачной подложкой)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        const padding = 10;
+        ctx.roundRect(padding, padding, width - padding * 2, height - padding * 2, 10);
+        ctx.fill();
 
+        // Текст
+        ctx.font = `bold ${height * 0.45}px Arial, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'white';
+        ctx.fillText(text, width / 2, height / 2);
+
+        return canvas;
+      }
+
+      // Полифилл roundRect для старых браузеров (если нет)
+      if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+          if (r > w/2) r = w/2;
+          if (r > h/2) r = h/2;
+          this.moveTo(x + r, y);
+          this.lineTo(x + w - r, y);
+          this.quadraticCurveTo(x + w, y, x + w, y + r);
+          this.lineTo(x + w, y + h - r);
+          this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          this.lineTo(x + r, y + h);
+          this.quadraticCurveTo(x, y + h, x, y + h - r);
+          this.lineTo(x, y + r);
+          this.quadraticCurveTo(x, y, x + r, y);
+          return this;
+        };
+      }
+
+      // Применяем подпись к плоскости после загрузки сцены
+      window.addEventListener('load', () => {
+        const canvas = createLabel('Точка 1', 512, 128);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.needsUpdate = true;
+        const plane = document.querySelector('#label-plane');
+        if (plane && plane.components && plane.components.material) {
+          const material = plane.components.material.material;
+          material.map = texture;
+          material.transparent = true;
+          material.needsUpdate = true;
+        }
+      });
+
+      // ========== 2. НАВИГАЦИОННАЯ ЛОГИКА ==========
+      const routePoints = [
+        { lat: 44.989412, lon: 41.160780, title: 'Точка 1' },
+        // добавьте другие точки
+      ];
+      let currentPointIndex = 0;
+
+      function toRadians(deg) { return deg * (Math.PI / 180); }
+      function toDegrees(rad) { return rad * (180 / Math.PI); }
+
+      function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+        const a = Math.sin(dLat/2)**2 + Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                  Math.sin(dLon/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      }
+
+      function calculateBearing(lat1, lon1, lat2, lon2) {
+        const dLon = toRadians(lon2 - lon1);
+        const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
+        const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
+                  Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
+        return (toDegrees(Math.atan2(y, x)) + 360) % 360;
+      }
+
+      function updateNavigation(userLat, userLon) {
+        if (currentPointIndex >= routePoints.length) {
+          document.getElementById('next-point-title').innerText = '🏁 Маршрут завершён!';
+          document.getElementById('next-point-distance').innerText = '';
+          return;
+        }
+        const target = routePoints[currentPointIndex];
+        const dist = haversineDistance(userLat, userLon, target.lat, target.lon);
+        const bearing = calculateBearing(userLat, userLon, target.lat, target.lon);
+        document.getElementById('next-point-title').innerHTML = `📍 ${target.title}`;
+        document.getElementById('next-point-distance').innerHTML =
+          `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
+      }
+
+      // Слежение за GPS
+      if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+          (pos) => updateNavigation(pos.coords.latitude, pos.coords.longitude),
+          (err) => {
+            console.error(err);
+            document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
+          },
+          { enableHighAccuracy: true, maximumAge: 1000 }
+        );
+      } else {
+        document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
+      }
+    </script>
+  </body>
 </html>
