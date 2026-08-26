@@ -1,13 +1,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>AR Guide GPS — ручное позиционирование</title>
+  <title>AR Guide GPS — гибрид</title>
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vconsole"></script>
-  <script>
-    var vConsole = new VConsole();
-  </script>
+  <!-- AR.js (для видеофона) -->
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
   <style>
     body { margin: 0; overflow: hidden; }
     #info { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-family: sans-serif; background: rgba(0,0,0,0.6); padding: 10px; z-index: 100; pointer-events: none; }
@@ -18,11 +16,11 @@
   <div id="debug">Инициализация...</div>
   <div id="info">Расстояние до точки: <span id="dist">--</span> м</div>
 
-  <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true" background="color: transparent">
-    <!-- Камера с GPS -->
-    <a-entity id="camera" gps-new-camera="gpsMinDistance: 5; sourceType: webcam;"></a-entity>
+  <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
+    <!-- GPS-камера AR.js (даёт видео) -->
+    <a-entity id="camera" gps-camera="gpsMinDistance: 5;"></a-entity>
 
-    <!-- Маркер – мы будем управлять его позицией вручную -->
+    <!-- Маркер – позиционируем вручную -->
     <a-entity id="marker" position="0 0 -10">
       <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0"></a-cone>
       <a-plane id="label" position="0 -2 0" width="4" height="1.5" material="transparent: true; opacity: 0.8; color: black;"></a-plane>
@@ -35,7 +33,7 @@
 
     const TARGET_LAT = 44.970586;
     const TARGET_LON = 41.153324;
-    const TARGET_ALT = 218; // твоя высота
+    const TARGET_ALT = 218;
 
     let userLat = null, userLon = null, userAlt = null;
 
@@ -65,12 +63,9 @@
       const dist = haversine(userLat, userLon, TARGET_LAT, TARGET_LON);
       const brng = bearing(userLat, userLon, TARGET_LAT, TARGET_LON);
 
-      // Преобразуем в смещение по X (вправо) и Z (вперёд) в метрах
       const angleRad = toRad(brng);
       const dx = dist * Math.sin(angleRad);
-      const dz = -dist * Math.cos(angleRad); // север = -Z в A-Frame
-
-      // Высота: разница между высотой цели и пользователя (если есть)
+      const dz = -dist * Math.cos(angleRad); // север = -Z
       const dy = (userAlt !== null) ? (TARGET_ALT - userAlt) : 0;
 
       // Получаем мировую позицию камеры
@@ -79,14 +74,12 @@
       const camPos = new THREE.Vector3();
       camera.object3D.getWorldPosition(camPos);
 
-      // Вычисляем позицию маркера в мировых координатах
       const markerWorldPos = new THREE.Vector3(
         camPos.x + dx,
-        camPos.y + dy,   // можно поднять на 2-3 метра для видимости
+        camPos.y + dy + 2, // поднимаем на 2 метра для видимости
         camPos.z + dz
       );
 
-      // Применяем к маркеру
       const marker = document.getElementById('marker');
       if (marker) {
         marker.setAttribute('position', markerWorldPos);
@@ -121,26 +114,20 @@
           userLat = pos.coords.latitude;
           userLon = pos.coords.longitude;
           userAlt = pos.coords.altitude || 218;
-
           const dist = haversine(userLat, userLon, TARGET_LAT, TARGET_LON);
           distSpan.textContent = Math.round(dist);
           debug.innerText = `Вы: ${userLat.toFixed(6)}, ${userLon.toFixed(6)} | Расст: ${Math.round(dist)} м`;
-
-          // Обновляем позицию маркера сразу
           updateMarkerPosition();
         },
-        (err) => {
-          console.error(err);
-          distSpan.textContent = 'Ошибка GPS';
-        },
+        (err) => { console.error(err); distSpan.textContent = 'Ошибка GPS'; },
         { enableHighAccuracy: true, maximumAge: 1000 }
       );
     } else {
       distSpan.textContent = 'GPS не поддерживается';
     }
 
-    // ========== ПЕРИОДИЧЕСКОЕ ОБНОВЛЕНИЕ (на всякий случай) ==========
-    setInterval(updateMarkerPosition, 1000);
+    // Обновляем позицию каждые 500 мс для стабильности
+    setInterval(updateMarkerPosition, 500);
 
     // ========== ПРИМЕНЯЕМ ПОДПИСЬ ==========
     window.addEventListener('load', () => {
