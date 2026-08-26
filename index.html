@@ -2,77 +2,13 @@
 <html>
 
 <head>
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
   <!-- <title>AR.js A-Frame Location-based</title> -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script type='text/javascript'
     src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/three.js/build/ar-threex-location-only.js'></script>
   <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /* Стили для информационной панели */
-    #info-panel {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 15px;
-      border-radius: 10px;
-      font-family: sans-serif;
-      text-align: center;
-      pointer-events: none;
-      z-index: 100;
-    }
-
-    #info-panel .title {
-      font-weight: bold;
-      font-size: 1.2em;
-    }
-
-    #info-panel .distance {
-      font-size: 1em;
-      opacity: 0.9;
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- Панель для отображения информации о следующей точке -->
-  <div id="info-panel">
-    <div class="title" id="next-point-title">Загрузка...</div>
-    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
-  </div>
-
-
-  <!-- ОСНОВНАЯ AR СЦЕНА -->
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
-
-    <a-assets>
-      <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
-    </a-assets>
-
-    <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
-
-    <a-box color="red" gps-new-entity-place="latitude: 44.989337; longitude: 41.160899" depth="10" height="10" width="10"></a-box>
-       
-    <a-entity 
-      gps-new-entity-place="latitude: 44.970756; longitude: 41.153319"
-    >
-      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
-        background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text>
-    </a-entity>
-
-  </a-scene>
-
+  
   <script>
     // --- 1. Данные о точках маршрута ---
     const routePoints = [
@@ -146,6 +82,71 @@
       document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
     }
   </script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Стили для информационной панели */
+    #info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: sans-serif;
+      text-align: center;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #info-panel .title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    #info-panel .distance {
+      font-size: 1em;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Панель для отображения информации о следующей точке -->
+  <div id="info-panel">
+    <div class="title" id="next-point-title">Загрузка...</div>
+    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
+  </div>
+
+
+  <!-- ОСНОВНАЯ AR СЦЕНА -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh>
+
+    <a-assets>
+      <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
+    </a-assets>
+
+    <a-camera gps-new-camera='gpsMinDistance: 5'></a-camera>
+
+    <a-box color="red" gps-new-entity-place="latitude: 44.989337; longitude: 41.160899" depth="10" height="10" width="10"></a-box>
+       
+    <a-entity 
+      gps-new-entity-place="latitude: 44.970756; longitude: 41.153319"
+    >
+      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
+      <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
+        background-color="black" background-opacity="0.7" padding="0.3">
+      </a-text>
+    </a-entity>
+
+  </a-scene>
 
 </body>
 
