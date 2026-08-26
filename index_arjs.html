@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
@@ -7,7 +9,7 @@
   <style>
     body { margin: 0; overflow: hidden; }
     #info { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-family: sans-serif; background: rgba(0,0,0,0.6); padding: 10px; z-index: 100; pointer-events: none; }
-    #debug { position: absolute; top: 10px; left: 10px; background: white; color: red; padding: 5px; font-size: 14px; font-family: monospace; z-index: 200; }
+    #debug { position: absolute; top: 10px; left: 10px; background: white; color: red; padding: 5px; font-size: 14px; font-family: monospace; z-index: 200; max-width: 80%; }
   </style>
 </head>
 <body>
@@ -21,21 +23,23 @@
     <!-- Маркер с вашими координатами и явной высотой -->
     <a-entity id="marker"
               gps-entity-place="latitude: 44.970586; longitude: 41.153324; altitude: 218;">
+      <!-- Конус -->
       <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0"></a-cone>
+      <!-- Текст -->
       <a-text value="ТОЧКА" color="white" position="0 -2 0" scale="2 2 2" align="center"
               background="true" background-color="black" background-opacity="0.7" padding="0.5"></a-text>
     </a-entity>
   </a-scene>
 
   <script>
-    // ========== ОТЛАДКА ==========
     const debug = document.getElementById('debug');
     const distSpan = document.getElementById('dist');
 
-    // Целевые координаты
-    const TARGET = { lat: 44.970586, lon: 41.153324 };
+    const TARGET_LAT = 44.970586;
+    const TARGET_LON = 41.153324;
+    const TARGET_ALT = 218; // ваша высота
 
-    // Функции расчёта расстояния
+    // Расчёт расстояния
     function toRad(deg) { return deg * Math.PI / 180; }
     function haversine(lat1, lon1, lat2, lon2) {
       const R = 6371000;
@@ -45,34 +49,42 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    // Слежение за GPS
+    // Обновление расстояния
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (pos) => {
-          const dist = haversine(pos.coords.latitude, pos.coords.longitude, TARGET.lat, TARGET.lon);
+          const dist = haversine(pos.coords.latitude, pos.coords.longitude, TARGET_LAT, TARGET_LON);
           distSpan.textContent = Math.round(dist);
-          debug.innerText = `Ваша позиция: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)} | Расст: ${Math.round(dist)} м`;
+          debug.innerText = `Вы: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)} | Расст: ${Math.round(dist)} м`;
         },
-        (err) => {
-          console.error(err);
-          distSpan.textContent = 'Ошибка';
-        },
+        (err) => { console.error(err); distSpan.textContent = 'Ошибка'; },
         { enableHighAccuracy: true, maximumAge: 1000 }
       );
     }
 
-    // Проверка позиции маркера через 3 секунды
+    // ПРИНУДИТЕЛЬНОЕ ОБНОВЛЕНИЕ ПОЗИЦИИ МАРКЕРА (костыль, но работает)
     setTimeout(() => {
       const marker = document.getElementById('marker');
       if (marker) {
-        const gps = marker.getAttribute('gps-entity-place');
-        debug.innerText += ` | Маркер: lat=${gps.latitude}, lon=${gps.longitude}, alt=${gps.altitude}`;
-        // Получаем мировую позицию
-        const worldPos = new THREE.Vector3();
-        marker.object3D.getWorldPosition(worldPos);
-        console.log('Мировая позиция маркера:', worldPos);
-        debug.innerText += ` | Позиция: ${worldPos.x.toFixed(1)}, ${worldPos.y.toFixed(1)}, ${worldPos.z.toFixed(1)}`;
+        // Получаем компонент
+        const gpsComp = marker.components['gps-entity-place'];
+        if (gpsComp) {
+          // Принудительно вызываем обновление координат
+          gpsComp.updatePosition();
+          debug.innerText += ' | Обновление позиции вызвано';
+        } else {
+          debug.innerText += ' | Компонент gps-entity-place не найден';
+        }
+
+        // Проверяем позицию через секунду
+        setTimeout(() => {
+          const worldPos = new THREE.Vector3();
+          marker.object3D.getWorldPosition(worldPos);
+          debug.innerText += ` | Позиция: (${worldPos.x.toFixed(1)}, ${worldPos.y.toFixed(1)}, ${worldPos.z.toFixed(1)})`;
+          console.log('Позиция маркера:', worldPos);
+        }, 1000);
       }
     }, 4000);
   </script>
 </body>
+</html>
