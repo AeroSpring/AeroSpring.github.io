@@ -1,0 +1,18 @@
+
+  <a-scene vr-mode-ui="enabled: false" renderer="antialias: true; alpha: true">
+    <!-- Камера с GPS-функционалом -->
+    <a-entity gps-new-camera="gpsMinDistance: 5"></a-entity>
+
+
+    <!-- ЗДЕСЬ БУДУТ НАШИ AR-МАРКЕРЫ -->
+
+    <!-- Группа, объединяющая маркер и его подпись -->
+    <a-entity gps-new-entity-place="latitude: 44.989322; longitude: 41.160974">
+      <!-- 3D Маркер (конус) -->
+      <!-- Объект может оказаться под землей. Убедитесь, что значение position="0 2.5 0" (высота 2.5 метра) -->
+      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
+      <!-- Текст-подпись -->
+      <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
+        background-color="black" background-opacity="0.7" padding="0.3"></a-text>
+    </a-entity>
+  </a-scene>
