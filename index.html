@@ -1,162 +1,76 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>AR Guide GPS — стабильный</title>
+  <title>AR Guide GPS</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
+  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/three.js/build/ar-threex-location-only.js'></script>
+  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
   <style>
-    body { margin: 0; overflow: hidden; }
-    #info { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; color: white; font-family: sans-serif; background: rgba(0,0,0,0.6); padding: 10px; z-index: 100; pointer-events: none; }
-    #debug { position: absolute; top: 10px; left: 10px; background: white; color: red; padding: 5px; font-size: 14px; font-family: monospace; z-index: 200; max-width: 80%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Стили для информационной панели */
+    #info-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-family: sans-serif;
+      text-align: center;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #info-panel .title {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    #info-panel .distance {
+      font-size: 1em;
+      opacity: 0.9;
+    }
   </style>
 </head>
+
 <body>
-  <div id="debug">Инициализация...</div>
-  <div id="info">Расстояние до точки: <span id="dist">--</span> м</div>
 
-  <a-scene arjs="sourceType: webcam; debugUIEnabled: false;">
-    <!-- GPS-камера -->
-    <a-entity id="camera" gps-camera="gpsMinDistance: 5;"></a-entity>
+  <!-- Панель для отображения информации о следующей точке -->
+  <div id="info-panel">
+    <div class="title" id="next-point-title">Загрузка...</div>
+    <div class="distance" id="next-point-distance">Расстояние: -- м</div>
+  </div>
 
-    <!-- Маркер в сцене (будем обновлять позицию каждый кадр) -->
-    <a-entity id="marker" position="0 0 -10">
-      <a-cone color="red" radius-bottom="3" radius-top="0.2" height="6" position="0 3 0" scale="1 1 1"></a-cone>
-      <a-plane id="label" position="0 -2 0" width="4" height="1.5" material="transparent: true; opacity: 0.8; color: black;"></a-plane>
+  <!-- ОСНОВНАЯ AR СЦЕНА -->
+  <!-- <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" raycaster-autorefresh> -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+
+    <!-- <a-assets>
+      <a-asset id="animated-asset" src="./assets/Interactive/Interactive.glb"></a-asset>
+    </a-assets> -->
+
+    <a-camera gps-camera='gpsMinDistance: 5'></a-camera>
+
+    <a-entity 
+      gps-entity-place="latitude: 44.989412; longitude: 41.160780"
+    >
+      <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
+      <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
+      <!-- <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
+        background-color="black" background-opacity="0.7" padding="0.3">
+      </a-text> -->
     </a-entity>
+
   </a-scene>
 
-  <script>
-    const debug = document.getElementById('debug');
-    const distSpan = document.getElementById('dist');
-
-    const TARGET_LAT = 44.970586;
-    const TARGET_LON = 41.153324;
-    const TARGET_ALT = 218;
-
-    let userLat = null, userLon = null, userAlt = null;
-
-    // ========== ГЕО-ФУНКЦИИ ==========
-    function toRad(deg) { return deg * Math.PI / 180; }
-    function toDeg(rad) { return rad * 180 / Math.PI; }
-
-    function haversine(lat1, lon1, lat2, lon2) {
-      const R = 6371000;
-      const dLat = toRad(lat2 - lat1);
-      const dLon = toRad(lon2 - lon1);
-      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
-
-    function bearing(lat1, lon1, lat2, lon2) {
-      const dLon = toRad(lon2 - lon1);
-      const y = Math.sin(dLon) * Math.cos(toRad(lat2));
-      const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) - Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
-      return (toDeg(Math.atan2(y, x)) + 360) % 360;
-    }
-
-    // ========== ОБНОВЛЕНИЕ ПОЗИЦИИ МАРКЕРА (будет вызываться каждый кадр) ==========
-    function updateMarkerPosition() {
-      if (userLat === null || userLon === null) return;
-
-      const dist = haversine(userLat, userLon, TARGET_LAT, TARGET_LON);
-      const brng = bearing(userLat, userLon, TARGET_LAT, TARGET_LON);
-
-      const angleRad = toRad(brng);
-      const dx = dist * Math.sin(angleRad);
-      const dz = -dist * Math.cos(angleRad); // север = -Z
-      const dy = (userAlt !== null) ? (TARGET_ALT - userAlt) : 0;
-
-      // Получаем мировую позицию камеры
-      const camera = document.getElementById('camera');
-      if (!camera) return;
-      const camPos = new THREE.Vector3();
-      camera.object3D.getWorldPosition(camPos);
-
-      const markerWorldPos = new THREE.Vector3(
-        camPos.x + dx,
-        camPos.y + dy + 2, // поднимаем на 2 метра для видимости
-        camPos.z + dz
-      );
-
-      const marker = document.getElementById('marker');
-      if (marker) {
-        marker.setAttribute('position', markerWorldPos);
-        // Обновляем отладочную информацию не каждый кадр, а реже (раз в секунду)
-        if (!updateMarkerPosition._lastDebug || Date.now() - updateMarkerPosition._lastDebug > 1000) {
-          debug.innerText = `Маркер: (${markerWorldPos.x.toFixed(1)}, ${markerWorldPos.y.toFixed(1)}, ${markerWorldPos.z.toFixed(1)}) | Расст: ${Math.round(dist)} м`;
-          updateMarkerPosition._lastDebug = Date.now();
-        }
-      }
-    }
-
-    // Запускаем бесконечный цикл обновления (60 fps)
-    function animate() {
-      updateMarkerPosition();
-      requestAnimationFrame(animate);
-    }
-
-    // ========== ПОДПИСЬ ==========
-    function createLabel(text, width=512, height=128) {
-      const canvas = document.createElement('canvas');
-      canvas.width = width; canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(0,0,0,0.7)';
-      const r=10, x=10, y=10, w=width-20, h=height-20;
-      ctx.beginPath();
-      ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-      ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-      ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-      ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
-      ctx.closePath(); ctx.fill();
-      ctx.font = `bold ${height*0.45}px Arial`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'white';
-      ctx.fillText(text, width/2, height/2);
-      return canvas;
-    }
-
-    // ========== ОТСЛЕЖИВАНИЕ GPS ==========
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
-        (pos) => {
-          userLat = pos.coords.latitude;
-          userLon = pos.coords.longitude;
-          userAlt = pos.coords.altitude || 218;
-          const dist = haversine(userLat, userLon, TARGET_LAT, TARGET_LON);
-          distSpan.textContent = Math.round(dist);
-          // Не обновляем debug здесь, чтобы не засорять
-        },
-        (err) => { console.error(err); distSpan.textContent = 'Ошибка GPS'; },
-        { enableHighAccuracy: true, maximumAge: 1000 }
-      );
-    } else {
-      distSpan.textContent = 'GPS не поддерживается';
-    }
-
-    // ========== ЗАПУСК ==========
-    window.addEventListener('load', () => {
-      debug.innerText = 'Страница загружена';
-      // Запускаем анимацию
-      animate();
-
-      // Применяем подпись через 2 секунды
-      setTimeout(() => {
-        const labelPlane = document.getElementById('label');
-        if (labelPlane) {
-          const canvas = createLabel('ТОЧКА 1');
-          const texture = new THREE.CanvasTexture(canvas);
-          texture.needsUpdate = true;
-          const material = labelPlane.components.material.material;
-          if (material) {
-            material.map = texture;
-            material.needsUpdate = true;
-            debug.innerText += ' | Подпись применена';
-          }
-        }
-      }, 2000);
-    });
-  </script>
 </body>
+
 </html>
