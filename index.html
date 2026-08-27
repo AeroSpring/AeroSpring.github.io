@@ -10,7 +10,7 @@
   <!-- 2. Подключаем LocAR.js (рекомендуемая библиотека) -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@latest/dist/locar.min.js"></script> -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/locar.js@0.1.0/dist/locar.min.js"></script> -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> -->
   <style>
     body {
       margin: 0;
@@ -55,7 +55,7 @@
 
   <!-- ОСНОВНАЯ AR СЦЕНА -->
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
-    <a-entity gps-camera="gpsMinDistance: 2;"></a-entity>
+    <a-entity gps-camera="gpsMinDistance: 5;"></a-entity>
 
     <a-box color="red" gps-new-entity-place="latitude: 44.989337; longitude: 41.160899" depth="10" height="10" width="10"></a-box>
 
