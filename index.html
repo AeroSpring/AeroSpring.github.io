@@ -2,18 +2,17 @@
 <html>
 
 <head>
-  <title>AR Guide GPS</title>
+  <!-- <title>AR Guide GPS</title> -->
+  <!-- 1. Подключаем A-Frame -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/three.js/build/ar-threex-location-only.js'></script>
-  <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js'></script>
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+  <!-- 2. Подключаем ar.js (рекомендуемая библиотека) -->
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@2.2.2/aframe/build/aframe-ar.min.js"></script>
   <style>
     body {
       margin: 0;
       overflow: hidden;
     }
 
-    /* Стили для информационной панели */
     #info-panel {
       position: absolute;
       bottom: 20px;
@@ -59,17 +58,90 @@
 
     <a-camera gps-camera='gpsMinDistance: 5'></a-camera>
 
-    <a-entity 
-      gps-entity-place="latitude: 44.989412; longitude: 41.160780"
-    >
+    <a-entity gps-entity-place="latitude: 44.989412; longitude: 41.160780">
+      <!-- <a-entity gps-entity-place="latitude: 44.970955; longitude: 41.152524"> -->
       <!-- <a-box color="red" gps-new-entity-place="latitude: 44.970756; longitude: 41.153319" depth="10" height="10" width="10"></a-box> -->
       <a-cone color="red" radius-bottom="2" radius-top="0.1" height="5" position="0 2.5 0"></a-cone>
-      <!-- <a-text value="Точка 1" color="white" align="center" position="0 -2 0" scale="3 3 3" background="true"
-        background-color="black" background-opacity="0.7" padding="0.3">
-      </a-text> -->
+      <a-text value="Точка 1" color="white" position="0 -2 0" scale="3 3 3" background-color="black"
+        background-opacity="0.7" padding="0.3"></a-text>
     </a-entity>
 
   </a-scene>
+
+  <script>
+    // --- 1. Данные о точках маршрута ---
+    const routePoints = [
+      { lat: 44.989412, lon: 41.160780, title: 'Старт' },
+      // { lat: 44.970955, lon: 41.152524, title: 'Старт' },
+      { lat: 44.989459, lon: 41.160683, title: 'Точка 2' },
+      // ... добавьте остальные точки
+    ];
+    let currentPointIndex = 0; // Индекс текущей целевой точки
+
+    // --- 2. Вспомогательные функции ---
+    // Конвертация градусов в радианы
+    function toRadians(deg) { return deg * (Math.PI / 180); }
+
+    // Расчет расстояния по формуле гаверсинусов (в метрах)
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // Радиус Земли в метрах
+      const dLat = toRadians(lat2 - lat1);
+      const dLon = toRadians(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // Расчет азимута (направления) от точки 1 к точке 2
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+      const dLon = toRadians(lon2 - lon1);
+      const y = Math.sin(dLon) * Math.cos(toRadians(lat2));
+      const x = Math.cos(toRadians(lat1)) * Math.sin(toRadians(lat2)) -
+        Math.sin(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.cos(dLon);
+      let bearing = Math.atan2(y, x);
+      return (toDegrees(bearing) + 360) % 360; // Нормализуем в 0-360
+    }
+    function toDegrees(rad) { return rad * (180 / Math.PI); }
+
+    // --- 3. Обновление интерфейса навигации ---
+    function updateNavigation(userLat, userLon) {
+      if (currentPointIndex >= routePoints.length) {
+        document.getElementById('next-point-title').innerText = '🏁 Маршрут завершен!';
+        document.getElementById('next-point-distance').innerText = '';
+        return;
+      }
+      const target = routePoints[currentPointIndex];
+      const dist = haversineDistance(userLat, userLon, target.lat, target.lon);
+      const bearing = calculateBearing(userLat, userLon, target.lat, target.lon);
+
+      document.getElementById('next-point-title').innerHTML = `📍 ${target.title}`;
+      document.getElementById('next-point-distance').innerHTML =
+        `Расстояние: <strong>${Math.round(dist)} м</strong> | Направление: <strong>${Math.round(bearing)}°</strong>`;
+
+      // (Опционально) Логика перехода к следующей точке при приближении
+      if (dist < 20) { currentPointIndex++; }
+    }
+
+    // --- 4. Запуск навигации и слежение за GPS ---
+    if ("geolocation" in navigator) {
+      // Используем watchPosition для непрерывного обновления
+      navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          updateNavigation(latitude, longitude);
+        },
+        (error) => {
+          console.error('Ошибка геолокации:', error);
+          document.getElementById('next-point-title').innerText = '❌ Ошибка GPS';
+        },
+        { enableHighAccuracy: true, maximumAge: 1000 }
+      );
+    } else {
+      document.getElementById('next-point-title').innerText = '❌ GPS не поддерживается';
+    }
+  </script>
 
 </body>
 
