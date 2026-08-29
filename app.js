@@ -1,71 +1,3 @@
-// Надежный компонент принудительного запуска анимаций с защитой от race condition
-AFRAME.registerComponent('drone-animation', {
-  init: function () {
-    const el = this.el;
-    const modelStatusEl = document.getElementById('model-status');
-    const animListEl = document.getElementById('anim-list');
-    let initialized = false;
-
-    const startMixer = (model, animations) => {
-      if (initialized) return;
-      initialized = true;
-
-      if (modelStatusEl) {
-        modelStatusEl.innerText = 'OK (Загружена)';
-        modelStatusEl.style.color = '#00ff66';
-      }
-
-      if (animations && animations.length > 0) {
-        const allNames = animations.map(a => a.name).join(', ');
-        console.log('Доступные анимации в модели:', allNames);
-
-        let targetClip = animations.find(a => a.name.includes('Start_Liftoff_Drone_Controller')) 
-                      || animations.find(a => a.name.includes('Drone_Controller'))
-                      || animations[0];
-
-        if (animListEl) {
-          animListEl.innerText = targetClip.name;
-          animListEl.style.color = '#00ff66';
-        }
-
-        this.mixer = new THREE.AnimationMixer(model);
-        this.action = this.mixer.clipAction(targetClip);
-        this.action.setLoop(THREE.LoopRepeat);
-        this.action.play();
-      } else {
-        if (animListEl) {
-          animListEl.innerText = 'Треки анимации не найдены';
-          animListEl.style.color = '#ff3366';
-        }
-      }
-    };
-
-    // 1. Штатный перехват события model-loaded
-    el.addEventListener('model-loaded', (e) => {
-      const model = e.detail.model;
-      const animations = e.detail.animations || model.animations || [];
-      startMixer(model, animations);
-    });
-
-    // 2. Принудительный опрос на случай, если событие уже пролетело
-    const checkInterval = setInterval(() => {
-      const mesh = el.getObject3D('mesh');
-      const gltfComp = el.components['gltf-model'];
-      if (mesh) {
-        const animations = (gltfComp && gltfComp.model && gltfComp.model.animations) || mesh.animations || [];
-        startMixer(mesh, animations);
-        clearInterval(checkInterval);
-      }
-    }, 200);
-  },
-
-  tick: function (t, dt) {
-    if (this.mixer) {
-      this.mixer.update(dt / 1000);
-    }
-  }
-});
-
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
@@ -131,10 +63,89 @@ if ('geolocation' in navigator) {
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusInput = document.getElementById('radius-input');
+  const modelEl = document.getElementById('ar-model');
+  const modelStatusEl = document.getElementById('model-status');
+  const animListEl = document.getElementById('anim-list');
 
   if (radiusInput) {
     radiusInput.addEventListener('input', checkRadiusFilter);
   }
+
+  // Принудительный сканер сцены для поиска анимаций вне зависимости от событий A-Frame
+  setTimeout(() => {
+    if (modelEl) {
+      if (modelStatusEl) {
+        modelStatusEl.innerText = 'OK (Загружена)';
+        modelStatusEl.style.color = '#00ff66';
+      }
+
+      // Ищем объект модели через разные доступные свойства A-Frame
+      let gltfObject = null;
+      if (modelEl.object3D && modelEl.object3D.children.length > 0) {
+        gltfObject = modelEl.object3D;
+      } else if (modelEl.components && modelEl.components['gltf-model'] && modelEl.components['gltf-model'].model) {
+        gltfObject = modelEl.components['gltf-model'].model;
+      }
+
+      // Проверяем наличие анимаций у объекта или его дочерних элементов
+      let foundAnimations = [];
+      if (gltfObject) {
+        gltfObject.traverse((node) => {
+          if (node.animations && node.animations.length > 0) {
+            foundAnimations = foundAnimations.concat(node.animations);
+          }
+        });
+      }
+
+      // Также проверяем анимации в самом компоненте загрузчика
+      if (modelEl.components && modelEl.components['gltf-model'] && modelEl.components['gltf-model'].animations) {
+        foundAnimations = foundAnimations.concat(modelEl.components['gltf-model'].animations);
+      }
+
+      // Убираем дубликаты по имени
+      foundAnimations = Array.from(new Set(foundAnimations.map(a => a.name)))
+        .map(name => foundAnimations.find(a => a.name === name));
+
+      if (foundAnimations.length > 0) {
+        const names = foundAnimations.map(a => a.name).join(', ');
+        if (animListEl) {
+          animListEl.innerText = names;
+          animListEl.style.color = '#00ff66';
+        }
+        console.log('Успешно найдены анимации:', names);
+
+        // Если aframe-extras не запустил анимацию автоматически, запускаем вручную через THREE.AnimationMixer
+        if (gltfObject && (!window.activeMixer)) {
+          const mixer = new THREE.AnimationMixer(gltfObject);
+          foundAnimations.forEach(clip => {
+            const action = mixer.clipAction(clip);
+            action.setLoop(THREE.LoopRepeat);
+            action.play();
+          });
+
+          const clock = new THREE.Clock();
+          sceneEl.add(new THREE.Object3D()); // триггер тика сцены
+          sceneEl.addEventListener('tick', () => {
+            mixer.update(clock.getDelta());
+          });
+          
+          // Альтернативный тикер через requestAnimationFrame для надежности
+          const globalTick = () => {
+            mixer.update(0.016);
+            requestAnimationFrame(globalTick);
+          };
+          globalTick();
+          window.activeMixer = mixer;
+        }
+      } else {
+        if (animListEl) {
+          animListEl.innerText = 'Анимации не обнаружены сканером';
+          animListEl.style.color = '#ff3366';
+        }
+        console.warn('Сканер не нашел анимационных клипов в объекте:', gltfObject);
+      }
+    }
+  }, 1500);
 
   const setupPointerRaycaster = () => {
     const raycaster = new THREE.Raycaster();
