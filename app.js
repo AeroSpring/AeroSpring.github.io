@@ -13,11 +13,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-window.addEventListener('gps-camera-update-position', (e) => {
-  const lat = e.detail.position.latitude;
-  const lng = e.detail.position.longitude;
-  const accuracy = e.detail.position.accuracy;
-
+function updateUIData(lat, lng, accuracy) {
   document.getElementById('gps-status').innerText = 'Активен';
   document.getElementById('my-coords').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
   
@@ -27,4 +23,18 @@ window.addEventListener('gps-camera-update-position', (e) => {
 
   const distanceMeters = calculateDistance(lat, lng, TARGET_LAT, TARGET_LNG);
   document.getElementById('calc-dist').innerText = `${Math.round(distanceMeters)} м`;
+}
+
+// 1. Основной поток от AR.js
+window.addEventListener('gps-camera-update-position', (e) => {
+  updateUIData(e.detail.position.latitude, e.detail.position.longitude, e.detail.position.accuracy);
 });
+
+// 2. Прямой дублирующий опрос GPS
+if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(
+    (pos) => updateUIData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+    (err) => { document.getElementById('gps-status').innerText = `Ошибка: ${err.message}`; },
+    { enableHighAccuracy: true }
+  );
+}

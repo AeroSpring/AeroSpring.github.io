@@ -10,15 +10,6 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Отладочная панель -->
-  <div id="debug-panel">
-    <div><b>Статус GPS:</b> <span id="gps-status">Поиск...</span></div>
-    <div><b>Мои координаты:</b> <span id="my-coords">-</span></div>
-    <div><b>Точка:</b> 44.970635, 41.153389</div>
-    <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
-    <div><b>Точность GPS:</b> <span id="gps-accuracy">-</span></div>
-  </div>
-
   <a-scene
     vr-mode-ui="enabled: false"
     embedded
@@ -26,16 +17,24 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 2000;" rotation-reader></a-camera>
 
-    <!-- Корректировка: высота 12 метров, радиус 4 метра -->
+    <!-- Поднимаем сферу на 25 метров над землей -->
     <a-sphere
       id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
-      position="0 12 0"
-      radius="4"
+      position="0 25 0"
+      radius="5"
       material="color: #ff3366; shader: flat;">
     </a-sphere>
 
   </a-scene>
+
+  <!-- Гарантированная инфо-панель поверх всех слоев AR -->
+  <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
+    <div><b>Статус GPS:</b> <span id="gps-status">Поиск...</span></div>
+    <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
+    <div><b>Точность:</b> <span id="gps-accuracy">-</span></div>
+    <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
+  </div>
 
   <script src="app.js"></script>
 </body>
