@@ -7,23 +7,21 @@
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <link rel="stylesheet" href="styles.css">
-  
-  <!-- Загружаем JS до сцены -->
-  <script src="app.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Информационная плитка (показывается/скрывается при клике) -->
+  <!-- Плитка с информацией -->
   <div id="info-tile" class="info-tile hidden">
     <div class="tile-title">Информация о точке</div>
     <div id="tile-coords">Координаты: 44.970635, 41.153389</div>
     <div id="tile-distance">Расстояние: -</div>
   </div>
 
-  <!-- Панель со статусом -->
+  <!-- Отладочная панель -->
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
+    <div><b>Статус клика:</b> <span id="click-status">Нажмите на сферу...</span></div>
   </div>
 
   <a-scene
@@ -31,25 +29,19 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <a-camera 
-      gps-camera="minDistance: 0; maxDistance: 100000;" 
-      camera="far: 100000;"
-      rotation-reader
-      raycaster="objects: .clickable; far: 100000;"
-      cursor="fuse: false; rayOrigin: mouse">
-    </a-camera>
+    <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <!-- Сфера с высотой 225 и компонентом marker-click -->
+    <!-- Сфера радиусом 8м на высоте 225m -->
     <a-sphere
       id="target-marker"
-      class="clickable"
-      marker-click
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0"
-      radius="5"
+      radius="4"
       material="color: #ff3366; shader: flat;">
     </a-sphere>
 
   </a-scene>
+
+  <script src="app.js"></script>
 </body>
 </html>

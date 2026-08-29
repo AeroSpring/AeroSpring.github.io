@@ -1,29 +1,6 @@
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 
-// Компонент A-Frame для клика / тапа по 3D-объекту
-AFRAME.registerComponent('marker-click', {
-  init: function () {
-    const el = this.el;
-
-    const handleTap = (e) => {
-      // Предотвращаем фантомные двойные срабатывания на телефонах
-      if (e.type === 'touchstart') {
-        e.preventDefault();
-      }
-
-      const infoTile = document.getElementById('info-tile');
-      if (infoTile) {
-        infoTile.classList.toggle('hidden');
-      }
-    };
-
-    // Слушаем и клик мыши, и касание пальцем на мобильном
-    el.addEventListener('click', handleTap);
-    el.addEventListener('touchstart', handleTap);
-  }
-});
-
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -59,3 +36,42 @@ if ('geolocation' in navigator) {
     { enableHighAccuracy: true }
   );
 }
+
+// Прямой Three.js Raycaster для обработки тапов по экрану
+document.addEventListener('DOMContentLoaded', () => {
+  const sceneEl = document.querySelector('a-scene');
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function checkTap(event) {
+    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+    // Перевод координат экрана в диапазон [-1, 1]
+    mouse.x = (clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+    const camera = sceneEl.camera;
+    if (!camera) return;
+
+    raycaster.setFromCamera(mouse, camera);
+
+    const markerEl = document.getElementById('target-marker');
+    if (!markerEl || !markerEl.object3D) return;
+
+    // Проверка пересечения с 3D-сеткой маркера
+    const intersects = raycaster.intersectObject(markerEl.object3D, true);
+    const statusEl = document.getElementById('click-status');
+
+    if (intersects.length > 0) {
+      if (statusEl) statusEl.innerText = 'Попадание!';
+      const infoTile = document.getElementById('info-tile');
+      if (infoTile) infoTile.classList.toggle('hidden');
+    } else {
+      if (statusEl) statusEl.innerText = 'Мимо объекта';
+    }
+  }
+
+  window.addEventListener('click', checkTap);
+  window.addEventListener('touchstart', checkTap);
+});
