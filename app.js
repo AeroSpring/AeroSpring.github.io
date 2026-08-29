@@ -1,3 +1,4 @@
+// Компонент плавного сглаживания позиции (фильтрация GPS-дрожи)
 AFRAME.registerComponent('smooth-position', {
   init: function () {
     this.targetPos = new THREE.Vector3();
@@ -44,17 +45,20 @@ function updateUIData(userLat, userLng) {
   currentUserLat = userLat;
   currentUserLng = userLng;
 
-  document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
+  const myCoordsEl = document.getElementById('my-coords');
+  if (myCoordsEl) {
+    myCoordsEl.innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
+  }
 
-  const maxRadiusKm = parseFloat(document.getElementById('radius-input').value) || 0;
+  const radiusInput = document.getElementById('radius-input');
+  const maxRadiusKm = radiusInput ? parseFloat(radiusInput.value) || 0 : 1;
 
   const hitboxes = document.querySelectorAll('.clickable-hitbox');
   hitboxes.forEach(hb => {
     const lat = parseFloat(hb.getAttribute('data-lat'));
     const lng = parseFloat(hb.getAttribute('data-lng'));
     const distId = hb.getAttribute('data-dist-id');
-    const markerId = hb.parentElement.id;
-    const marker = document.getElementById(markerId);
+    const marker = hb.parentElement;
 
     const distMeters = calculateDistance(userLat, userLng, lat, lng);
     const distKm = distMeters / 1000;
@@ -80,6 +84,20 @@ if ('geolocation' in navigator) {
     null,
     { enableHighAccuracy: true }
   );
+}
+
+// Функция для получения высоты земли по координатам через Open-Elevation API
+async function fetchElevation(lat, lng) {
+  try {
+    const response = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`);
+    const data = await response.json();
+    if (data && data.results && data.results.length > 0) {
+      return data.results[0].elevation;
+    }
+  } catch (e) {
+    console.warn('Не удалось загрузить высоту рельефа, используем дефолтную', e);
+  }
+  return 218; // Дефолтная высота для Армавира
 }
 
 function loadModelToContainer(config) {
@@ -119,7 +137,7 @@ function loadModelToContainer(config) {
   );
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusInput = document.getElementById('radius-input');
 
@@ -131,12 +149,40 @@ window.addEventListener('load', () => {
     });
   }
 
+  // Список моделей с координатами и привязкой к маркерам
   const modelsToLoad = [
-    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
-    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [2, 2, 2], statusElId: 'model2-status' }
+    { 
+      containerId: 'model1-container', 
+      markerId: 'target-marker-1',
+      url: 'assets/drone/drone.glb', 
+      scale: [2, 2, 2], 
+      statusElId: 'model-status',
+      lat: 44.970635, 
+      lng: 41.153389 
+    },
+    { 
+      containerId: 'model2-container', 
+      markerId: 'target-marker-2',
+      url: 'assets/model1C/model1C.glb', 
+      scale: [2, 2, 2], 
+      statusElId: 'model2-status',
+      lat: 44.970218, 
+      lng: 41.152996 
+    }
   ];
 
-  modelsToLoad.forEach(config => loadModelToContainer(config));
+  // Загрузка моделей и автоматическое определение высоты рельефа + 4 метра над землей
+  for (const config of modelsToLoad) {
+    loadModelToContainer(config);
+
+    const groundElevation = await fetchElevation(config.lat, config.lng);
+    const targetHeight = groundElevation + 4; // Высота рельефа земли + 4 метра
+
+    const markerEl = document.getElementById(config.markerId);
+    if (markerEl) {
+      markerEl.setAttribute('position', `0 ${targetHeight} 0`);
+    }
+  }
 
   const clock = new THREE.Clock();
   const animateTicker = () => {
@@ -191,7 +237,6 @@ window.addEventListener('load', () => {
           const lat = parseFloat(matchedEl.getAttribute('data-lat'));
           const lng = parseFloat(matchedEl.getAttribute('data-lng'));
 
-          // Вычисляем дистанцию заново прямо при клике
           let distText = 'Ожидание GPS...';
           if (currentUserLat !== null && currentUserLng !== null) {
             const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
