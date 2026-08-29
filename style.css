@@ -94,12 +94,12 @@ video {
   user-select: none;
 } */
 
-#dom-overlay {
+/* #dom-overlay {
   display: none;
   user-select: none;
-}    
+}     */
 
-#gizmo-block {
+/* #gizmo-block {
   display: none;
   position: absolute;
   bottom: 25vh;
@@ -112,4 +112,4 @@ video {
 }
 #gizmo-block span {
   font-size: 5vh;
-}
+} */
