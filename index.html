@@ -31,13 +31,26 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <a-sphere
+    <!-- Общий GPS-контейнер точки -->
+    <a-entity
       id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
-      position="0 225 0"
-      radius="4"
-      material="color: #ff3366; shader: flat;">
-    </a-sphere>
+      position="0 225 0">
+
+      <!-- 1. Компактная видимая сфера (красивая и умещается на экране) -->
+      <a-sphere
+        radius="2"
+        material="color: #ff3366; shader: flat;">
+      </a-sphere>
+
+      <!-- 2. Невидимая гигантская сфера-хитбокс для идеального тапа -->
+      <a-sphere
+        id="hitbox"
+        radius="12"
+        material="opacity: 0; transparent: true;">
+      </a-sphere>
+
+    </a-entity>
 
   </a-scene>
 

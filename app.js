@@ -37,46 +37,57 @@ if ('geolocation' in navigator) {
   );
 }
 
-// Инициализация рейкастера после готовности A-Frame
+// Инициализация рейкастера по хитбоксу
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
 
   const setupPointerRaycaster = () => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
+    let isClickBlocked = false;
 
     function handlePointer(e) {
+      if (isClickBlocked) return;
+
+      const hitboxEl = document.getElementById('hitbox');
+      const camera = sceneEl.camera;
       const statusEl = document.getElementById('click-status');
-      
-      // Вычисляем координаты тапа
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      if (!camera || !hitboxEl || !hitboxEl.object3D) return;
+
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+
+      if (clientX === null || clientY === null) return;
+
+      // Обновляем матрицу именно прозрачного хитбокса
+      camera.updateMatrixWorld(true);
+      hitboxEl.object3D.updateMatrixWorld(true);
 
       mouse.x = (clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-      const camera = sceneEl.camera;
-      const markerEl = document.getElementById('target-marker');
-
-      if (!camera || !markerEl || !markerEl.object3D) {
-        if (statusEl) statusEl.innerText = '3D-сцена загружается...';
-        return;
-      }
-
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObject(markerEl.object3D, true);
+      
+      // Проверяем лучевое пересечение с 3D-сеткой невидимого хитбокса
+      const intersects = raycaster.intersectObject(hitboxEl.object3D, true);
 
       if (intersects.length > 0) {
-        if (statusEl) statusEl.innerText = 'Попадание!';
+        isClickBlocked = true;
+        setTimeout(() => { isClickBlocked = false; }, 300);
+
+        if (statusEl) statusEl.innerText = 'ПОПАДАНИЕ ПО ХИТБОКСУ!';
+        
         const infoTile = document.getElementById('info-tile');
-        if (infoTile) infoTile.classList.toggle('hidden');
+        if (infoTile) {
+          infoTile.classList.toggle('hidden');
+        }
       } else {
-        if (statusEl) statusEl.innerText = `Клик [${Math.round(clientX)}, ${Math.round(clientY)}] — Мимо`;
+        if (statusEl) statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
       }
     }
 
-    document.addEventListener('pointerdown', handlePointer);
-    document.addEventListener('touchstart', handlePointer, { passive: true });
+    window.addEventListener('pointerdown', handlePointer);
   };
 
   if (sceneEl.hasLoaded) {
