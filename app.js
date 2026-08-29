@@ -1,6 +1,6 @@
 // Данные точек
 const points = [
-  { id: 1, lat: 44.989334, lng: 41.160912, name: "Первая точка" }
+  { id: 1, lat: 44.970635, lng: 41.153389, name: "Первая точка" }
 ];
 
 let userCoords = null;
