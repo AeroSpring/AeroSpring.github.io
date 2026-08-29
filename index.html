@@ -48,12 +48,12 @@
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <!-- Прямая загрузка модели без блокировки сцены -->
+      <!-- Модель Дрона с точным топиком анимации Drone_Controller и масштабом 2 2 2 -->
       <a-gltf-model
         id="ar-model"
         src="assets/drone/drone.glb"
         scale="2 2 2"
-        animation-mixer>
+        animation-mixer="clip: Drone_Controller; loop: repeat; timeScale: 1;">
       </a-gltf-model>
 
       <!-- Невидимый хитбокс -->
