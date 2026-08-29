@@ -1,19 +1,23 @@
-// Кастомный компонент с защитой от гонки состояний (race condition)
-AFRAME.registerComponent('direct-gltf-animator', {
+// Надежный компонент принудительного запуска анимаций с защитой от race condition
+AFRAME.registerComponent('drone-animation', {
   init: function () {
+    const el = this.el;
     const modelStatusEl = document.getElementById('model-status');
     const animListEl = document.getElementById('anim-list');
+    let initialized = false;
 
-    const handleModelReady = (model, animations) => {
+    const startMixer = (model, animations) => {
+      if (initialized) return;
+      initialized = true;
+
       if (modelStatusEl) {
         modelStatusEl.innerText = 'OK (Загружена)';
         modelStatusEl.style.color = '#00ff66';
       }
 
       if (animations && animations.length > 0) {
-        // Выводим все доступные имена для точной диагностики
         const allNames = animations.map(a => a.name).join(', ');
-        console.log('Доступные анимации:', allNames);
+        console.log('Доступные анимации в модели:', allNames);
 
         let targetClip = animations.find(a => a.name.includes('Start_Liftoff_Drone_Controller')) 
                       || animations.find(a => a.name.includes('Drone_Controller'))
@@ -30,28 +34,29 @@ AFRAME.registerComponent('direct-gltf-animator', {
         this.action.play();
       } else {
         if (animListEl) {
-          animListEl.innerText = 'Нет анимационных треков';
+          animListEl.innerText = 'Треки анимации не найдены';
           animListEl.style.color = '#ff3366';
         }
       }
     };
 
-    // 1. Слушаем стандартное событие загрузки A-Frame
-    this.el.addEventListener('model-loaded', (evt) => {
-      const gltf = evt.detail.model;
-      const animations = evt.detail.animations || gltf.animations || [];
-      handleModelReady(gltf, animations);
+    // 1. Штатный перехват события model-loaded
+    el.addEventListener('model-loaded', (e) => {
+      const model = e.detail.model;
+      const animations = e.detail.animations || model.animations || [];
+      startMixer(model, animations);
     });
 
-    // 2. Страховка: если модель уже успела загрузиться до инициализации компонента
-    setTimeout(() => {
-      const currentMesh = this.el.getObject3D('mesh');
-      const gltfComponent = this.el.components['gltf-model'];
-      if (currentMesh && !this.mixer) {
-        const animations = (gltfComponent && gltfComponent.model && gltfComponent.model.animations) || currentMesh.animations || [];
-        handleModelReady(currentMesh, animations);
+    // 2. Принудительный опрос на случай, если событие уже пролетело
+    const checkInterval = setInterval(() => {
+      const mesh = el.getObject3D('mesh');
+      const gltfComp = el.components['gltf-model'];
+      if (mesh) {
+        const animations = (gltfComp && gltfComp.model && gltfComp.model.animations) || mesh.animations || [];
+        startMixer(mesh, animations);
+        clearInterval(checkInterval);
       }
-    }, 500);
+    }, 200);
   },
 
   tick: function (t, dt) {
