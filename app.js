@@ -1,24 +1,20 @@
-// Кастомный компонент A-Frame для прямого захвата Three.js AnimationMixer
+// Кастомный компонент с защитой от гонки состояний (race condition)
 AFRAME.registerComponent('direct-gltf-animator', {
   init: function () {
-    this.el.addEventListener('model-loaded', (evt) => {
-      const modelStatusEl = document.getElementById('model-status');
-      const animListEl = document.getElementById('anim-list');
+    const modelStatusEl = document.getElementById('model-status');
+    const animListEl = document.getElementById('anim-list');
 
+    const handleModelReady = (model, animations) => {
       if (modelStatusEl) {
         modelStatusEl.innerText = 'OK (Загружена)';
         modelStatusEl.style.color = '#00ff66';
       }
 
-      // Извлекаем GLTF данные прямо из события загрузки A-Frame
-      const gltf = evt.detail.model;
-      if (!gltf) return;
+      if (animations && animations.length > 0) {
+        // Выводим все доступные имена для точной диагностики
+        const allNames = animations.map(a => a.name).join(', ');
+        console.log('Доступные анимации:', allNames);
 
-      // Получаем клипы напрямую из структуры GLTF
-      const animations = gltf.animations || [];
-
-      if (animations.length > 0) {
-        // Ищем целевой клип или берем первый
         let targetClip = animations.find(a => a.name.includes('Start_Liftoff_Drone_Controller')) 
                       || animations.find(a => a.name.includes('Drone_Controller'))
                       || animations[0];
@@ -28,21 +24,36 @@ AFRAME.registerComponent('direct-gltf-animator', {
           animListEl.style.color = '#00ff66';
         }
 
-        // Запускаем миксер на базе сцены Three.js
-        this.mixer = new THREE.AnimationMixer(gltf);
+        this.mixer = new THREE.AnimationMixer(model);
         this.action = this.mixer.clipAction(targetClip);
         this.action.setLoop(THREE.LoopRepeat);
         this.action.play();
       } else {
         if (animListEl) {
-          animListEl.innerText = 'Клипы не найдены в GLTF';
+          animListEl.innerText = 'Нет анимационных треков';
           animListEl.style.color = '#ff3366';
         }
       }
+    };
+
+    // 1. Слушаем стандартное событие загрузки A-Frame
+    this.el.addEventListener('model-loaded', (evt) => {
+      const gltf = evt.detail.model;
+      const animations = evt.detail.animations || gltf.animations || [];
+      handleModelReady(gltf, animations);
     });
+
+    // 2. Страховка: если модель уже успела загрузиться до инициализации компонента
+    setTimeout(() => {
+      const currentMesh = this.el.getObject3D('mesh');
+      const gltfComponent = this.el.components['gltf-model'];
+      if (currentMesh && !this.mixer) {
+        const animations = (gltfComponent && gltfComponent.model && gltfComponent.model.animations) || currentMesh.animations || [];
+        handleModelReady(currentMesh, animations);
+      }
+    }, 500);
   },
 
-  // Обновляем миксер на каждом кадре через циклы A-Frame (tick)
   tick: function (t, dt) {
     if (this.mixer) {
       this.mixer.update(dt / 1000);
