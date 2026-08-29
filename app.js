@@ -1,3 +1,29 @@
+// Компонент плавного сглаживания позиции (фильтрация GPS-дрожи)
+AFRAME.registerComponent('smooth-position', {
+  init: function () {
+    this.targetPos = new THREE.Vector3();
+    this.initialized = false;
+  },
+  tick: function (time, delta) {
+    // Получаем текущую позицию, куда AR.js пытается поставить объект по GPS
+    const currentPositionAttr = this.el.getAttribute('position');
+    if (!currentPositionAttr) return;
+
+    this.targetPos.set(currentPositionAttr.x, currentPositionAttr.y, currentPositionAttr.z);
+
+    if (!this.initialized) {
+      // При самом первом кадре ставим без задержки
+      this.el.object3D.position.copy(this.targetPos);
+      this.initialized = true;
+      return;
+    }
+
+    // Плавное приближение (lerp). Чем меньше коэффициент (например, 0.05), тем плавнее и инертнее движение.
+    const smoothingFactor = 0.08; 
+    this.el.object3D.position.lerp(this.targetPos, smoothingFactor);
+  }
+});
+
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
@@ -72,7 +98,6 @@ window.addEventListener('load', () => {
     radiusInput.addEventListener('input', checkRadiusFilter);
   }
 
-  // Загружаем через подключенный GLTFLoader
   const loader = new THREE.GLTFLoader();
   loader.load(
     'assets/drone/drone.glb',
@@ -93,7 +118,6 @@ window.addEventListener('load', () => {
           animListEl.innerText = names;
           animListEl.style.color = '#00ff66';
         }
-        console.log('Найдены анимации GLTF:', names);
 
         mixer = new THREE.AnimationMixer(model);
         const clip = animations.find(a => a.name.includes('Drone_Controller') || a.name.includes('Liftoff')) || animations[0];
@@ -180,6 +204,6 @@ window.addEventListener('load', () => {
   if (sceneEl.hasLoaded) {
     setupPointerRaycaster();
   } else {
-    sceneEl.addEventListener('loaded', setupPointerRaycaster);
+    setupPointerRaycaster();
   }
 });
