@@ -9,6 +9,8 @@
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <!-- AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <!-- GLTFLoader для Three.js r137 (соответствует A-Frame 1.3.0) -->
+  <script src="https://unpkg.com/three@0.137.0/examples/js/loaders/GLTFLoader.js"></script>
   
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -46,13 +48,13 @@
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <!-- Пустая сущность, куда JavaScript загрузит модель через GLTFLoader -->
+      <!-- Контейнер для модели -->
       <a-entity id="drone-container"></a-entity>
 
       <!-- Невидимый хитбокс -->
       <a-sphere
         id="hitbox"
-        radius="8"
+        radius="12"
         material="opacity: 0; transparent: true;">
       </a-sphere>
 

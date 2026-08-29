@@ -72,7 +72,7 @@ window.addEventListener('load', () => {
     radiusInput.addEventListener('input', checkRadiusFilter);
   }
 
-  // Прямая загрузка через THREE.GLTFLoader обходя ограничения A-Frame
+  // Загружаем через подключенный GLTFLoader
   const loader = new THREE.GLTFLoader();
   loader.load(
     'assets/drone/drone.glb',
@@ -84,11 +84,8 @@ window.addEventListener('load', () => {
 
       const model = gltf.scene;
       model.scale.set(2, 2, 2);
-      
-      // Добавляем модель в контейнер A-Frame сцены
       container.object3D.add(model);
 
-      // Проверяем анимации
       const animations = gltf.animations;
       if (animations && animations.length > 0) {
         const names = animations.map(a => a.name).join(', ');
@@ -98,7 +95,6 @@ window.addEventListener('load', () => {
         }
         console.log('Найдены анимации GLTF:', names);
 
-        // Создаем миксер и запускаем первый или нужный клип
         mixer = new THREE.AnimationMixer(model);
         const clip = animations.find(a => a.name.includes('Drone_Controller') || a.name.includes('Liftoff')) || animations[0];
         const action = mixer.clipAction(clip);
@@ -111,9 +107,7 @@ window.addEventListener('load', () => {
         }
       }
     },
-    (xhr) => {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
+    undefined,
     (error) => {
       if (modelStatusEl) {
         modelStatusEl.innerText = 'ОШИБКА ЗАГРУЗКИ';
@@ -123,7 +117,6 @@ window.addEventListener('load', () => {
     }
   );
 
-  // Кадровый обновлятор для миксера анимаций
   const clock = new THREE.Clock();
   const animateTicker = () => {
     requestAnimationFrame(animateTicker);
