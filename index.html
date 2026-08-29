@@ -4,8 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>AR Guide GPS</title>
+
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-look-controls.js"></script>
+  
+  <!-- AR.js с поддержкой Location-Based -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body style="margin: 0; overflow: hidden;">
@@ -15,12 +20,10 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Камера с привязкой к GPS и ориентации -->
     <a-camera gps-camera rotation-reader></a-camera>
 
-    <!-- Тестовый 3D-маркер на заданной точке, поднятый на 4 метра -->
     <a-sphere
-      gps-entity-place="latitude: 44.970586; longitude: 41.153324;"
+      gps-entity-place="latitude: 44.989334; longitude: 41.160912;"
       position="0 4 0"
       radius="1.5"
       material="color: #ff3366;">

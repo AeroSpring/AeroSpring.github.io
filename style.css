@@ -1,9 +1,37 @@
-body, canvas {
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Принудительное растягивание видеопотока камеры */
+video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  z-index: 1;
+}
+
+/* 3D-сцена A-Frame поверх видео */
+.a-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+/* body, canvas {
   margin: 0;
   width: 100vw;
   height: 100vh;
   user-select: none;
-}
+} */
+
 #dom-overlay {
   display: none;
   user-select: none;
