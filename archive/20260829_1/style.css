@@ -4,9 +4,9 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* Принудительное растягивание видеопотока камеры */
 video {
   position: absolute;
   top: 0;
@@ -17,6 +17,7 @@ video {
   z-index: 1;
 }
 
+/* 3D-сцена A-Frame поверх видео */
 .a-canvas {
   position: absolute;
   top: 0;
