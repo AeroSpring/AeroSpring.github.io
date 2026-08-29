@@ -26,10 +26,10 @@
   <!-- Отладочная панель -->
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
-    <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
+    <div><b>Дистанция до Дрона:</b> <span id="calc-dist">-</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
-    <div><b>Статус модели:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span></div>
-    <div><b>Найденный клип:</b> <span id="anim-list" style="color: #38bdf8;">Поиск...</span></div>
+    <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> | <span id="anim-list" style="color: #38bdf8;">Поиск...</span></div>
+    <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> | <span id="anim2-list" style="color: #38bdf8;">Поиск...</span></div>
     <div style="margin-top: 8px; pointer-events: auto;">
       <label for="radius-input"><b>Радиус показа (км):</b></label>
       <input type="number" id="radius-input" value="1" min="0.001" step="0.01" style="width: 70px; background: #1e293b; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 4px;">
@@ -43,21 +43,24 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <!-- Добавлен компонент smooth-position для сглаживания рывков -->
+    <!-- Первая модель (Дрон) -->
     <a-entity
-      id="target-marker"
+      id="target-marker-1"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0"
       smooth-position>
+      <a-entity id="model1-container"></a-entity>
+      <a-sphere id="hitbox-1" class="clickable-hitbox" radius="12" material="opacity: 0; transparent: true;"></a-sphere>
+    </a-entity>
 
-      <a-entity id="drone-container"></a-entity>
-
-      <a-sphere
-        id="hitbox"
-        radius="12"
-        material="opacity: 0; transparent: true;">
-      </a-sphere>
-
+    <!-- Вторая модель (Model 1C) -->
+    <a-entity
+      id="target-marker-2"
+      gps-entity-place="latitude: 44.970218; longitude: 41.152996;"
+      position="0 220 0"
+      smooth-position>
+      <a-entity id="model2-container"></a-entity>
+      <a-sphere id="hitbox-2" class="clickable-hitbox" radius="12" material="opacity: 0; transparent: true;"></a-sphere>
     </a-entity>
 
   </a-scene>

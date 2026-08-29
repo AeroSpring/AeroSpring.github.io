@@ -4,21 +4,18 @@ AFRAME.registerComponent('smooth-position', {
     this.targetPos = new THREE.Vector3();
     this.initialized = false;
   },
-  tick: function (time, delta) {
-    // Получаем текущую позицию, куда AR.js пытается поставить объект по GPS
+  tick: function () {
     const currentPositionAttr = this.el.getAttribute('position');
     if (!currentPositionAttr) return;
 
     this.targetPos.set(currentPositionAttr.x, currentPositionAttr.y, currentPositionAttr.z);
 
     if (!this.initialized) {
-      // При самом первом кадре ставим без задержки
       this.el.object3D.position.copy(this.targetPos);
       this.initialized = true;
       return;
     }
 
-    // Плавное приближение (lerp). Чем меньше коэффициент (например, 0.05), тем плавнее и инертнее движение.
     const smoothingFactor = 0.08; 
     this.el.object3D.position.lerp(this.targetPos, smoothingFactor);
   }
@@ -27,7 +24,7 @@ AFRAME.registerComponent('smooth-position', {
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
-let mixer = null;
+const mixers = []; // Массив для всех анимационных миксеров
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -43,21 +40,25 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 function checkRadiusFilter() {
   const radiusInput = document.getElementById('radius-input');
-  const targetMarker = document.getElementById('target-marker');
+  const marker1 = document.getElementById('target-marker-1');
+  const marker2 = document.getElementById('target-marker-2');
   const infoTile = document.getElementById('info-tile');
 
-  if (!radiusInput || !targetMarker) return;
+  if (!radiusInput) return;
 
   const maxRadiusKm = parseFloat(radiusInput.value) || 0;
   const currentDistanceKm = currentDistanceMeters / 1000;
 
-  if (currentDistanceKm <= maxRadiusKm) {
-    targetMarker.setAttribute('visible', 'true');
-  } else {
-    targetMarker.setAttribute('visible', 'false');
-    if (infoTile) {
-      infoTile.style.display = 'none';
-    }
+  // Пример фильтрации для первой точки (можно настраивать для каждой индивидуально)
+  if (marker1) {
+    marker1.setAttribute('visible', currentDistanceKm <= maxRadiusKm ? 'true' : 'false');
+  }
+  if (marker2) {
+    marker2.setAttribute('visible', currentDistanceKm <= maxRadiusKm ? 'true' : 'false');
+  }
+
+  if (currentDistanceKm > maxRadiusKm && infoTile) {
+    infoTile.style.display = 'none';
   }
 }
 
@@ -87,70 +88,96 @@ if ('geolocation' in navigator) {
   );
 }
 
-window.addEventListener('load', () => {
-  const sceneEl = document.querySelector('a-scene');
-  const radiusInput = document.getElementById('radius-input');
-  const container = document.getElementById('drone-container');
-  const modelStatusEl = document.getElementById('model-status');
-  const animListEl = document.getElementById('anim-list');
-
-  if (radiusInput) {
-    radiusInput.addEventListener('input', checkRadiusFilter);
-  }
-
+// Универсальная функция загрузки моделей с помощью конфигурационного массива
+function loadModelToContainer(config) {
   const loader = new THREE.GLTFLoader();
+  const container = document.getElementById(config.containerId);
+  const statusEl = document.getElementById(config.statusElId);
+  const animEl = document.getElementById(config.animElId);
+
   loader.load(
-    'assets/drone/drone.glb',
+    config.url,
     (gltf) => {
-      if (modelStatusEl) {
-        modelStatusEl.innerText = 'OK (Загружена)';
-        modelStatusEl.style.color = '#00ff66';
+      if (statusEl) {
+        statusEl.innerText = 'OK';
+        statusEl.style.color = '#00ff66';
       }
 
       const model = gltf.scene;
-      model.scale.set(2, 2, 2);
+      model.scale.set(...config.scale);
       container.object3D.add(model);
 
       const animations = gltf.animations;
       if (animations && animations.length > 0) {
         const names = animations.map(a => a.name).join(', ');
-        if (animListEl) {
-          animListEl.innerText = names;
-          animListEl.style.color = '#00ff66';
+        if (animEl) {
+          animEl.innerText = names;
+          animEl.style.color = '#38bdf8';
         }
 
-        mixer = new THREE.AnimationMixer(model);
-        const clip = animations.find(a => a.name.includes('Drone_Controller') || a.name.includes('Liftoff')) || animations[0];
-        const action = mixer.clipAction(clip);
+        const mixer = new THREE.AnimationMixer(model);
+        const action = mixer.clipAction(animations[0]); // Запускаем первую доступную анимацию
         action.setLoop(THREE.LoopRepeat);
         action.play();
+        mixers.push(mixer);
       } else {
-        if (animListEl) {
-          animListEl.innerText = 'Анимации отсутствуют в файле';
-          animListEl.style.color = '#ff3366';
+        if (animEl) {
+          animEl.innerText = 'Нет анимаций';
+          animEl.style.color = '#ff3366';
         }
       }
     },
     undefined,
     (error) => {
-      if (modelStatusEl) {
-        modelStatusEl.innerText = 'ОШИБКА ЗАГРУЗКИ';
-        modelStatusEl.style.color = '#ff3366';
+      if (statusEl) {
+        statusEl.innerText = 'ОШИБКА';
+        statusEl.style.color = '#ff3366';
       }
-      console.error('Ошибка загрузки GLTF:', error);
+      console.error(`Ошибка загрузки модели (${config.url}):`, error);
     }
   );
+}
 
+window.addEventListener('load', () => {
+  const sceneEl = document.querySelector('a-scene');
+  const radiusInput = document.getElementById('radius-input');
+
+  if (radiusInput) {
+    radiusInput.addEventListener('input', checkRadiusFilter);
+  }
+
+  // Список всех моделей, которые нужно загрузить на карту. 
+  // Чтобы добавить третью модель, достаточно просто дописать объект в этот массив!
+  const modelsToLoad = [
+    {
+      containerId: 'model1-container',
+      url: 'assets/drone/drone.glb',
+      scale: [2, 2, 2],
+      statusElId: 'model-status',
+      animElId: 'anim-list'
+    },
+    {
+      containerId: 'model2-container',
+      url: 'assets/model1C/model1C.glb',
+      scale: [2, 2, 2], // Подправь масштаб под модель 1C, если окажется слишком большой/маленькой
+      statusElId: 'model2-status',
+      animElId: 'anim2-list'
+    }
+  ];
+
+  // Запускаем загрузку каждой модели
+  modelsToLoad.forEach(config => loadModelToContainer(config));
+
+  // Единый тикер для обновления всех анимационных миксеров
   const clock = new THREE.Clock();
   const animateTicker = () => {
     requestAnimationFrame(animateTicker);
     const delta = clock.getDelta();
-    if (mixer) {
-      mixer.update(delta);
-    }
+    mixers.forEach(mixer => mixer.update(delta));
   };
   animateTicker();
 
+  // Настройка кликов по хитбоксам
   const setupPointerRaycaster = () => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -159,26 +186,26 @@ window.addEventListener('load', () => {
     function handlePointer(e) {
       if (isClickBlocked) return;
 
-      const hitboxEl = document.getElementById('hitbox');
-      const targetMarker = document.getElementById('target-marker');
       const camera = sceneEl.camera;
       const statusEl = document.getElementById('click-status');
-
-      if (!camera || !hitboxEl || !hitboxEl.object3D || targetMarker.getAttribute('visible') === 'false') return;
+      if (!camera) return;
 
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
       const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
-
       if (clientX === null || clientY === null) return;
 
       camera.updateMatrixWorld(true);
-      hitboxEl.object3D.updateMatrixWorld(true);
 
       mouse.x = (clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObject(hitboxEl.object3D, true);
+
+      // Ищем пересечения со всеми объектами, имеющими класс .clickable-hitbox
+      const hitboxes = Array.from(document.querySelectorAll('.clickable-hitbox'))
+                            .map(el => el.object3D)
+                            .filter(obj => obj !== undefined);
+
+      const intersects = raycaster.intersectObjects(hitboxes, true);
 
       if (intersects.length > 0) {
         isClickBlocked = true;
@@ -204,6 +231,6 @@ window.addEventListener('load', () => {
   if (sceneEl.hasLoaded) {
     setupPointerRaycaster();
   } else {
-    setupPointerRaycaster();
+    sceneEl.addEventListener('loaded', setupPointerRaycaster);
   }
 });
