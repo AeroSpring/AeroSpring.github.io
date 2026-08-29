@@ -1,4 +1,3 @@
-// Компонент плавного сглаживания позиции (фильтрация GPS-дрожи)
 AFRAME.registerComponent('smooth-position', {
   init: function () {
     this.targetPos = new THREE.Vector3();
@@ -45,20 +44,17 @@ function updateUIData(userLat, userLng) {
   currentUserLat = userLat;
   currentUserLng = userLng;
 
-  const myCoordsEl = document.getElementById('my-coords');
-  if (myCoordsEl) {
-    myCoordsEl.innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
-  }
+  document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
 
-  const radiusInput = document.getElementById('radius-input');
-  const maxRadiusKm = radiusInput ? parseFloat(radiusInput.value) || 0 : 1;
+  const maxRadiusKm = parseFloat(document.getElementById('radius-input').value) || 0;
 
   const hitboxes = document.querySelectorAll('.clickable-hitbox');
   hitboxes.forEach(hb => {
     const lat = parseFloat(hb.getAttribute('data-lat'));
     const lng = parseFloat(hb.getAttribute('data-lng'));
     const distId = hb.getAttribute('data-dist-id');
-    const marker = hb.parentElement;
+    const markerId = hb.parentElement.id;
+    const marker = document.getElementById(markerId);
 
     const distMeters = calculateDistance(userLat, userLng, lat, lng);
     const distKm = distMeters / 1000;
@@ -135,20 +131,9 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Список моделей для загрузки
   const modelsToLoad = [
-    { 
-      containerId: 'model1-container', 
-      url: 'assets/drone/drone.glb', 
-      scale: [2, 2, 2], 
-      statusElId: 'model-status' 
-    },
-    { 
-      containerId: 'model2-container', 
-      url: 'assets/model1C/model1C.glb', 
-      scale: [2, 2, 2], 
-      statusElId: 'model2-status' 
-    }
+    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
+    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [2, 2, 2], statusElId: 'model2-status' }
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
@@ -206,6 +191,7 @@ window.addEventListener('load', () => {
           const lat = parseFloat(matchedEl.getAttribute('data-lat'));
           const lng = parseFloat(matchedEl.getAttribute('data-lng'));
 
+          // Вычисляем дистанцию заново прямо при клике
           let distText = 'Ожидание GPS...';
           if (currentUserLat !== null && currentUserLng !== null) {
             const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
