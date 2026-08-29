@@ -40,11 +40,6 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Менеджер ресурсов для безопасной предзагрузки 3D-модели -->
-    <a-assets>
-      <a-asset-item id="glb-asset" src="assets/model.glb"></a-asset-item>
-    </a-assets>
-
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
     <!-- Точка на карте -->
@@ -53,11 +48,11 @@
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <!-- GLTF Модель -->
+      <!-- Прямая загрузка модели без блокировки сцены -->
       <a-gltf-model
         id="ar-model"
-        src="#glb-asset"
-        scale="2 2 2"
+        src="assets/model.glb"
+        scale="1 1 1"
         animation-mixer>
       </a-gltf-model>
 

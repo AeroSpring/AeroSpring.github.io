@@ -66,16 +66,17 @@ window.addEventListener('load', () => {
   const modelEl = document.getElementById('ar-model');
   const modelStatusEl = document.getElementById('model-status');
 
-  // Отслеживание статуса загрузки 3D файла
+  // Логирование состояния загрузки 3D модели
   if (modelEl && modelStatusEl) {
     modelEl.addEventListener('model-loaded', () => {
       modelStatusEl.innerText = 'OK (Загружена)';
       modelStatusEl.style.color = '#00ff66';
     });
 
-    modelEl.addEventListener('model-error', () => {
-      modelStatusEl.innerText = 'ОШИБКА (Файл не найден)';
+    modelEl.addEventListener('model-error', (evt) => {
+      modelStatusEl.innerText = 'ОШИБКА (Файл не найден/404)';
       modelStatusEl.style.color = '#ff3366';
+      console.error(' Ошибка загрузки GLTF:', evt);
     });
   }
 
