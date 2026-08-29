@@ -65,17 +65,52 @@ window.addEventListener('load', () => {
   const radiusInput = document.getElementById('radius-input');
   const modelEl = document.getElementById('ar-model');
   const modelStatusEl = document.getElementById('model-status');
+  const animListEl = document.getElementById('anim-list');
 
-  if (modelEl && modelStatusEl) {
-    modelEl.addEventListener('model-loaded', () => {
-      modelStatusEl.innerText = 'OK (Загружена)';
-      modelStatusEl.style.color = '#00ff66';
+  if (modelEl) {
+    modelEl.addEventListener('model-loaded', (e) => {
+      if (modelStatusEl) {
+        modelStatusEl.innerText = 'OK (Загружена)';
+        modelStatusEl.style.color = '#00ff66';
+      }
+
+      // Получаем встроенные анимации из 3D-модели Three.js
+      const model3D = modelEl.getObject3D('mesh');
+      const animations = e.detail.model.animations || (model3D ? model3D.animations : []);
+
+      if (animations && animations.length > 0) {
+        const names = animations.map(a => a.name).join(', ');
+        if (animListEl) animListEl.innerText = names;
+        console.log('Найденные анимации в GLTF:', names);
+
+        // Принудительный запуск первой найденной анимации через Three.js Mixer
+        const mixer = new THREE.AnimationMixer(model3D);
+        const action = mixer.clipAction(animations[0]);
+        action.play();
+
+        // Обновляем миксер каждый кадр
+        const clock = new THREE.Clock();
+        const tick = () => {
+          requestAnimationFrame(tick);
+          const delta = clock.getDelta();
+          mixer.update(delta);
+        };
+        tick();
+
+      } else {
+        if (animListEl) {
+          animListEl.innerText = 'НЕТ (0 треков)';
+          animListEl.style.color = '#ff3366';
+        }
+        console.warn('В файле drone.glb не найдено анимационных треков!');
+      }
     });
 
     modelEl.addEventListener('model-error', (evt) => {
-      modelStatusEl.innerText = 'ОШИБКА (Файл не найден)';
-      modelStatusEl.style.color = '#ff3366';
-      console.error(' Ошибка загрузки GLTF:', evt);
+      if (modelStatusEl) {
+        modelStatusEl.innerText = 'ОШИБКА (404 / не найден)';
+        modelStatusEl.style.color = '#ff3366';
+      }
     });
   }
 
