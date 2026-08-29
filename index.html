@@ -10,19 +10,28 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
+  <!-- Отладочная панель -->
+  <div id="debug-panel">
+    <div><b>Статус GPS:</b> <span id="gps-status">Поиск...</span></div>
+    <div><b>Мои координаты:</b> <span id="my-coords">-</span></div>
+    <div><b>Точка:</b> 44.970635, 41.153389</div>
+    <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
+    <div><b>Точность GPS:</b> <span id="gps-accuracy">-</span></div>
+  </div>
+
   <a-scene
     vr-mode-ui="enabled: false"
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Камера с широким диапазоном отрисовки -->
     <a-camera gps-camera="minDistance: 0; maxDistance: 2000;" rotation-reader></a-camera>
 
-    <!-- Сфера на точке в 15-20 метрах от вас, поднятая на 4 метра -->
+    <!-- Корректировка: высота 12 метров, радиус 4 метра -->
     <a-sphere
+      id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
-      position="0 4 0"
-      radius="3"
+      position="0 12 0"
+      radius="4"
       material="color: #ff3366; shader: flat;">
     </a-sphere>
 
