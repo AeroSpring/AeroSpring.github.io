@@ -8,25 +8,20 @@
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body style="margin: 0; overflow: hidden; width: 100vw; height: 100vh;">
+<body style="margin: 0; overflow: hidden;">
 
-  <!-- Главный экранированный оверлей UI поверх 3D-сцены -->
-  <div id="ui-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999999; pointer-events: none;">
-    
-    <!-- Панель отладки -->
-    <div id="debug-panel" style="position: absolute; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; border: 1px solid #00ff66;">
-      <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
-      <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
-      <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
-    </div>
+  <!-- Плитка с информацией -->
+  <div id="info-tile" class="info-tile hidden">
+    <div class="tile-title">Информация о точке</div>
+    <div id="tile-coords">Координаты: 44.970635, 41.153389</div>
+    <div id="tile-distance">Расстояние: -</div>
+  </div>
 
-    <!-- Информационная плитка -->
-    <div id="info-tile" style="display: none; position: absolute; bottom: 50px; left: 5%; width: 90%; background: #0f172a; color: #ffffff; padding: 16px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; text-align: center; border: 2px solid #38bdf8; box-shadow: 0 4px 25px rgba(0,0,0,0.8); pointer-events: auto;">
-      <div style="font-weight: bold; font-size: 16px; margin-bottom: 6px; color: #38bdf8;">Информация о точке</div>
-      <div id="tile-coords" style="margin: 4px 0;">Координаты: 44.970635, 41.153389</div>
-      <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
-    </div>
-
+  <!-- Отладочная панель -->
+  <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
+    <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
+    <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
+    <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
   </div>
 
   <a-scene
@@ -36,13 +31,24 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
+    <!-- Общий GPS-контейнер точки -->
     <a-entity
       id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <a-sphere radius="2" material="color: #ff3366; shader: flat;"></a-sphere>
-      <a-sphere id="hitbox" radius="12" material="opacity: 0; transparent: true;"></a-sphere>
+      <!-- 1. Компактная видимая сфера (красивая и умещается на экране) -->
+      <a-sphere
+        radius="2"
+        material="color: #ff3366; shader: flat;">
+      </a-sphere>
+
+      <!-- 2. Невидимая гигантская сфера-хитбокс для идеального тапа -->
+      <a-sphere
+        id="hitbox"
+        radius="12"
+        material="opacity: 0; transparent: true;">
+      </a-sphere>
 
     </a-entity>
 
