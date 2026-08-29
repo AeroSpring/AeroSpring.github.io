@@ -1,3 +1,55 @@
+// Кастомный компонент A-Frame для прямого захвата Three.js AnimationMixer
+AFRAME.registerComponent('direct-gltf-animator', {
+  init: function () {
+    this.el.addEventListener('model-loaded', (evt) => {
+      const modelStatusEl = document.getElementById('model-status');
+      const animListEl = document.getElementById('anim-list');
+
+      if (modelStatusEl) {
+        modelStatusEl.innerText = 'OK (Загружена)';
+        modelStatusEl.style.color = '#00ff66';
+      }
+
+      // Извлекаем GLTF данные прямо из события загрузки A-Frame
+      const gltf = evt.detail.model;
+      if (!gltf) return;
+
+      // Получаем клипы напрямую из структуры GLTF
+      const animations = gltf.animations || [];
+
+      if (animations.length > 0) {
+        // Ищем целевой клип или берем первый
+        let targetClip = animations.find(a => a.name.includes('Start_Liftoff_Drone_Controller')) 
+                      || animations.find(a => a.name.includes('Drone_Controller'))
+                      || animations[0];
+
+        if (animListEl) {
+          animListEl.innerText = targetClip.name;
+          animListEl.style.color = '#00ff66';
+        }
+
+        // Запускаем миксер на базе сцены Three.js
+        this.mixer = new THREE.AnimationMixer(gltf);
+        this.action = this.mixer.clipAction(targetClip);
+        this.action.setLoop(THREE.LoopRepeat);
+        this.action.play();
+      } else {
+        if (animListEl) {
+          animListEl.innerText = 'Клипы не найдены в GLTF';
+          animListEl.style.color = '#ff3366';
+        }
+      }
+    });
+  },
+
+  // Обновляем миксер на каждом кадре через циклы A-Frame (tick)
+  tick: function (t, dt) {
+    if (this.mixer) {
+      this.mixer.update(dt / 1000);
+    }
+  }
+});
+
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
@@ -63,56 +115,6 @@ if ('geolocation' in navigator) {
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusInput = document.getElementById('radius-input');
-  const modelEl = document.getElementById('ar-model');
-  const modelStatusEl = document.getElementById('model-status');
-  const animListEl = document.getElementById('anim-list');
-
-  if (modelEl) {
-    modelEl.addEventListener('model-loaded', (e) => {
-      if (modelStatusEl) {
-        modelStatusEl.innerText = 'OK (Загружена)';
-        modelStatusEl.style.color = '#00ff66';
-      }
-
-      // Получаем встроенные анимации из 3D-модели Three.js
-      const model3D = modelEl.getObject3D('mesh');
-      const animations = e.detail.model.animations || (model3D ? model3D.animations : []);
-
-      if (animations && animations.length > 0) {
-        const names = animations.map(a => a.name).join(', ');
-        if (animListEl) animListEl.innerText = names;
-        console.log('Найденные анимации в GLTF:', names);
-
-        // Принудительный запуск первой найденной анимации через Three.js Mixer
-        const mixer = new THREE.AnimationMixer(model3D);
-        const action = mixer.clipAction(animations[0]);
-        action.play();
-
-        // Обновляем миксер каждый кадр
-        const clock = new THREE.Clock();
-        const tick = () => {
-          requestAnimationFrame(tick);
-          const delta = clock.getDelta();
-          mixer.update(delta);
-        };
-        tick();
-
-      } else {
-        if (animListEl) {
-          animListEl.innerText = 'НЕТ (0 треков)';
-          animListEl.style.color = '#ff3366';
-        }
-        console.warn('В файле drone.glb не найдено анимационных треков!');
-      }
-    });
-
-    modelEl.addEventListener('model-error', (evt) => {
-      if (modelStatusEl) {
-        modelStatusEl.innerText = 'ОШИБКА (404 / не найден)';
-        modelStatusEl.style.color = '#ff3366';
-      }
-    });
-  }
 
   if (radiusInput) {
     radiusInput.addEventListener('input', checkRadiusFilter);
