@@ -10,11 +10,11 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Плитка с информацией -->
-  <div id="info-tile" class="info-tile hidden">
-    <div class="tile-title">Информация о точке</div>
-    <div id="tile-coords">Координаты: 44.970635, 41.153389</div>
-    <div id="tile-distance">Расстояние: -</div>
+  <!-- Информационная плитка со встроенными стилями предельного уровня (z-index) -->
+  <div id="info-tile" style="display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); color: #ffffff; padding: 16px 20px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; z-index: 999999; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: auto;">
+    <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #38bdf8;">Информация о точке</div>
+    <div id="tile-coords" style="margin: 4px 0;">Координаты: 44.970635, 41.153389</div>
+    <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
   </div>
 
   <!-- Отладочная панель -->
@@ -31,19 +31,18 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <!-- Общий GPS-контейнер точки -->
     <a-entity
       id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <!-- 1. Компактная видимая сфера (красивая и умещается на экране) -->
+      <!-- Компактный маркер -->
       <a-sphere
         radius="2"
         material="color: #ff3366; shader: flat;">
       </a-sphere>
 
-      <!-- 2. Невидимая гигантская сфера-хитбокс для идеального тапа -->
+      <!-- Невидимый хитбокс -->
       <a-sphere
         id="hitbox"
         radius="12"

@@ -37,7 +37,7 @@ if ('geolocation' in navigator) {
   );
 }
 
-// Инициализация рейкастера по хитбоксу
+// Переключение видимости плитки при клике по хитбоксу
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
 
@@ -60,7 +60,6 @@ window.addEventListener('load', () => {
 
       if (clientX === null || clientY === null) return;
 
-      // Обновляем матрицу именно прозрачного хитбокса
       camera.updateMatrixWorld(true);
       hitboxEl.object3D.updateMatrixWorld(true);
 
@@ -68,19 +67,20 @@ window.addEventListener('load', () => {
       mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      
-      // Проверяем лучевое пересечение с 3D-сеткой невидимого хитбокса
       const intersects = raycaster.intersectObject(hitboxEl.object3D, true);
 
       if (intersects.length > 0) {
         isClickBlocked = true;
         setTimeout(() => { isClickBlocked = false; }, 300);
 
-        if (statusEl) statusEl.innerText = 'ПОПАДАНИЕ ПО ХИТБОКСУ!';
-        
         const infoTile = document.getElementById('info-tile');
         if (infoTile) {
-          infoTile.classList.toggle('hidden');
+          const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
+          infoTile.style.display = isHidden ? 'block' : 'none';
+          
+          if (statusEl) {
+            statusEl.innerText = isHidden ? 'ПОПАДАНИЕ! (Плитка открыта)' : 'ПОПАДАНИЕ! (Плитка скрыта)';
+          }
         }
       } else {
         if (statusEl) statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
