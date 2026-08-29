@@ -21,7 +21,7 @@
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
-    <div><b>Статус клика:</b> <span id="click-status">Нажмите на сферу...</span></div>
+    <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
   </div>
 
   <a-scene
@@ -31,7 +31,6 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <!-- Сфера радиусом 8м на высоте 225m -->
     <a-sphere
       id="target-marker"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"

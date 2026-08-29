@@ -37,41 +37,51 @@ if ('geolocation' in navigator) {
   );
 }
 
-// Прямой Three.js Raycaster для обработки тапов по экрану
-document.addEventListener('DOMContentLoaded', () => {
+// Инициализация рейкастера после готовности A-Frame
+window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
 
-  function checkTap(event) {
-    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  const setupPointerRaycaster = () => {
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
 
-    // Перевод координат экрана в диапазон [-1, 1]
-    mouse.x = (clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+    function handlePointer(e) {
+      const statusEl = document.getElementById('click-status');
+      
+      // Вычисляем координаты тапа
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    const camera = sceneEl.camera;
-    if (!camera) return;
+      mouse.x = (clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, camera);
+      const camera = sceneEl.camera;
+      const markerEl = document.getElementById('target-marker');
 
-    const markerEl = document.getElementById('target-marker');
-    if (!markerEl || !markerEl.object3D) return;
+      if (!camera || !markerEl || !markerEl.object3D) {
+        if (statusEl) statusEl.innerText = '3D-сцена загружается...';
+        return;
+      }
 
-    // Проверка пересечения с 3D-сеткой маркера
-    const intersects = raycaster.intersectObject(markerEl.object3D, true);
-    const statusEl = document.getElementById('click-status');
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObject(markerEl.object3D, true);
 
-    if (intersects.length > 0) {
-      if (statusEl) statusEl.innerText = 'Попадание!';
-      const infoTile = document.getElementById('info-tile');
-      if (infoTile) infoTile.classList.toggle('hidden');
-    } else {
-      if (statusEl) statusEl.innerText = 'Мимо объекта';
+      if (intersects.length > 0) {
+        if (statusEl) statusEl.innerText = 'Попадание!';
+        const infoTile = document.getElementById('info-tile');
+        if (infoTile) infoTile.classList.toggle('hidden');
+      } else {
+        if (statusEl) statusEl.innerText = `Клик [${Math.round(clientX)}, ${Math.round(clientY)}] — Мимо`;
+      }
     }
-  }
 
-  window.addEventListener('click', checkTap);
-  window.addEventListener('touchstart', checkTap);
+    document.addEventListener('pointerdown', handlePointer);
+    document.addEventListener('touchstart', handlePointer, { passive: true });
+  };
+
+  if (sceneEl.hasLoaded) {
+    setupPointerRaycaster();
+  } else {
+    sceneEl.addEventListener('loaded', setupPointerRaycaster);
+  }
 });
