@@ -16,20 +16,19 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Информационная плитка -->
+  <!-- Информационная плитка (теперь с динамическими ID для текста) -->
   <div id="info-tile" style="display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); color: #ffffff; padding: 16px 20px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; z-index: 999999; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: auto;">
-    <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #38bdf8;">Информация о точке</div>
-    <div id="tile-coords" style="margin: 4px 0;">Координаты: 44.970635, 41.153389</div>
+    <div id="tile-title" style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #38bdf8;">Информация о точке</div>
+    <div id="tile-coords" style="margin: 4px 0;">Координаты: -</div>
     <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
   </div>
 
   <!-- Отладочная панель -->
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
-    <div><b>Дистанция до Дрона:</b> <span id="calc-dist">-</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
-    <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> | <span id="anim-list" style="color: #38bdf8;">Поиск...</span></div>
-    <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> | <span id="anim2-list" style="color: #38bdf8;">Поиск...</span></div>
+    <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-1">-</span>)</div>
+    <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-2">-</span>)</div>
     <div style="margin-top: 8px; pointer-events: auto;">
       <label for="radius-input"><b>Радиус показа (км):</b></label>
       <input type="number" id="radius-input" value="1" min="0.001" step="0.01" style="width: 70px; background: #1e293b; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 4px;">
@@ -50,7 +49,17 @@
       position="0 225 0"
       smooth-position>
       <a-entity id="model1-container"></a-entity>
-      <a-sphere id="hitbox-1" class="clickable-hitbox" radius="12" material="opacity: 0; transparent: true;"></a-sphere>
+      <!-- Добавили data-атрибуты для привязки информации к хитбоксу -->
+      <a-sphere 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        radius="12" 
+        material="opacity: 0; transparent: true;"
+        data-title="Дрон (Главный)"
+        data-lat="44.970635"
+        data-lng="41.153389"
+        data-dist-id="dist-1">
+      </a-sphere>
     </a-entity>
 
     <!-- Вторая модель (Model 1C) -->
@@ -60,7 +69,17 @@
       position="0 220 0"
       smooth-position>
       <a-entity id="model2-container"></a-entity>
-      <a-sphere id="hitbox-2" class="clickable-hitbox" radius="12" material="opacity: 0; transparent: true;"></a-sphere>
+      <!-- Добавили data-атрибуты для второй модели -->
+      <a-sphere 
+        id="hitbox-2" 
+        class="clickable-hitbox" 
+        radius="12" 
+        material="opacity: 0; transparent: true;"
+        data-title="Модель 1C"
+        data-lat="44.970218"
+        data-lng="41.152996"
+        data-dist-id="dist-2">
+      </a-sphere>
     </a-entity>
 
   </a-scene>

@@ -1,4 +1,3 @@
-// Компонент плавного сглаживания позиции (фильтрация GPS-дрожи)
 AFRAME.registerComponent('smooth-position', {
   init: function () {
     this.targetPos = new THREE.Vector3();
@@ -21,10 +20,7 @@ AFRAME.registerComponent('smooth-position', {
   }
 });
 
-const TARGET_LAT = 44.970635;
-const TARGET_LNG = 41.153389;
-let currentDistanceMeters = 0;
-const mixers = []; // Массив для всех анимационных миксеров
+const mixers = [];
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -38,42 +34,38 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function checkRadiusFilter() {
-  const radiusInput = document.getElementById('radius-input');
-  const marker1 = document.getElementById('target-marker-1');
-  const marker2 = document.getElementById('target-marker-2');
-  const infoTile = document.getElementById('info-tile');
-
-  if (!radiusInput) return;
-
-  const maxRadiusKm = parseFloat(radiusInput.value) || 0;
-  const currentDistanceKm = currentDistanceMeters / 1000;
-
-  // Пример фильтрации для первой точки (можно настраивать для каждой индивидуально)
-  if (marker1) {
-    marker1.setAttribute('visible', currentDistanceKm <= maxRadiusKm ? 'true' : 'false');
-  }
-  if (marker2) {
-    marker2.setAttribute('visible', currentDistanceKm <= maxRadiusKm ? 'true' : 'false');
-  }
-
-  if (currentDistanceKm > maxRadiusKm && infoTile) {
-    infoTile.style.display = 'none';
-  }
+function formatDist(meters) {
+  return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
-function updateUIData(lat, lng) {
-  document.getElementById('my-coords').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+function updateUIData(userLat, userLng) {
+  document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
 
-  currentDistanceMeters = calculateDistance(lat, lng, TARGET_LAT, TARGET_LNG);
-  const distText = currentDistanceMeters < 1000 
-    ? `${Math.round(currentDistanceMeters)} м` 
-    : `${(currentDistanceMeters / 1000).toFixed(2)} км`;
+  const maxRadiusKm = parseFloat(document.getElementById('radius-input').value) || 0;
 
-  document.getElementById('calc-dist').innerText = distText;
-  document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+  // Обновляем дистанции для всех хитбоксов на основе их data-атрибутов
+  const hitboxes = document.querySelectorAll('.clickable-hitbox');
+  hitboxes.forEach(hb => {
+    const lat = parseFloat(hb.getAttribute('data-lat'));
+    const lng = parseFloat(hb.getAttribute('data-lng'));
+    const distId = hb.getAttribute('data-dist-id');
+    const markerId = hb.parentElement.id;
+    const marker = document.getElementById(markerId);
 
-  checkRadiusFilter();
+    const distMeters = calculateDistance(userLat, userLng, lat, lng);
+    const distKm = distMeters / 1000;
+
+    // Выводим дистанцию в отладочную панель
+    const distEl = document.getElementById(distId);
+    if (distEl) {
+      distEl.innerText = formatDist(distMeters);
+    }
+
+    // Фильтрация радиуса показа
+    if (marker) {
+      marker.setAttribute('visible', distKm <= maxRadiusKm ? 'true' : 'false');
+    }
+  });
 }
 
 window.addEventListener('gps-camera-update-position', (e) => {
@@ -88,12 +80,10 @@ if ('geolocation' in navigator) {
   );
 }
 
-// Универсальная функция загрузки моделей с помощью конфигурационного массива
 function loadModelToContainer(config) {
   const loader = new THREE.GLTFLoader();
   const container = document.getElementById(config.containerId);
   const statusEl = document.getElementById(config.statusElId);
-  const animEl = document.getElementById(config.animElId);
 
   loader.load(
     config.url,
@@ -109,22 +99,11 @@ function loadModelToContainer(config) {
 
       const animations = gltf.animations;
       if (animations && animations.length > 0) {
-        const names = animations.map(a => a.name).join(', ');
-        if (animEl) {
-          animEl.innerText = names;
-          animEl.style.color = '#38bdf8';
-        }
-
         const mixer = new THREE.AnimationMixer(model);
-        const action = mixer.clipAction(animations[0]); // Запускаем первую доступную анимацию
+        const action = mixer.clipAction(animations[0]);
         action.setLoop(THREE.LoopRepeat);
         action.play();
         mixers.push(mixer);
-      } else {
-        if (animEl) {
-          animEl.innerText = 'Нет анимаций';
-          animEl.style.color = '#ff3366';
-        }
       }
     },
     undefined,
@@ -143,32 +122,23 @@ window.addEventListener('load', () => {
   const radiusInput = document.getElementById('radius-input');
 
   if (radiusInput) {
-    radiusInput.addEventListener('input', checkRadiusFilter);
+    radiusInput.addEventListener('input', () => {
+      // Принудительно пересчитываем радиус с последними известными координатами или дефолтными
+      const myCoordsText = document.getElementById('my-coords').innerText;
+      if (myCoordsText.includes(',')) {
+        const [lat, lng] = myCoordsText.split(',').map(s => parseFloat(s.trim()));
+        if (!isNaN(lat) && !isNaN(lng)) updateUIData(lat, lng);
+      }
+    });
   }
 
-  // Список всех моделей, которые нужно загрузить на карту. 
-  // Чтобы добавить третью модель, достаточно просто дописать объект в этот массив!
   const modelsToLoad = [
-    {
-      containerId: 'model1-container',
-      url: 'assets/drone/drone.glb',
-      scale: [2, 2, 2],
-      statusElId: 'model-status',
-      animElId: 'anim-list'
-    },
-    {
-      containerId: 'model2-container',
-      url: 'assets/model1C/model1C.glb',
-      scale: [2, 2, 2], // Подправь масштаб под модель 1C, если окажется слишком большой/маленькой
-      statusElId: 'model2-status',
-      animElId: 'anim2-list'
-    }
+    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
+    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [2, 2, 2], statusElId: 'model2-status' }
   ];
 
-  // Запускаем загрузку каждой модели
   modelsToLoad.forEach(config => loadModelToContainer(config));
 
-  // Единый тикер для обновления всех анимационных миксеров
   const clock = new THREE.Clock();
   const animateTicker = () => {
     requestAnimationFrame(animateTicker);
@@ -177,7 +147,6 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Настройка кликов по хитбоксам
   const setupPointerRaycaster = () => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -200,29 +169,59 @@ window.addEventListener('load', () => {
       mouse.y = -(clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
 
-      // Ищем пересечения со всеми объектами, имеющими класс .clickable-hitbox
-      const hitboxes = Array.from(document.querySelectorAll('.clickable-hitbox'))
-                            .map(el => el.object3D)
-                            .filter(obj => obj !== undefined);
+      // Собираем все хитбоксы и их Three.js объекты
+      const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
+      const hitboxObjects = hitboxEls.map(el => el.object3D).filter(obj => obj !== undefined);
 
-      const intersects = raycaster.intersectObjects(hitboxes, true);
+      const intersects = raycaster.intersectObjects(hitboxObjects, true);
 
       if (intersects.length > 0) {
         isClickBlocked = true;
         setTimeout(() => { isClickBlocked = false; }, 300);
 
+        // Находим, в какой именно хитбокс попал луч
+        const intersectedObject = intersects[0].object;
+        let matchedEl = null;
+        hitboxEls.forEach(el => {
+          if (el.object3D === intersectedObject || el.object3D.children.includes(intersectedObject) || isChildOf(intersectedObject, el.object3D)) {
+            matchedEl = el;
+          }
+        });
+
         const infoTile = document.getElementById('info-tile');
-        if (infoTile) {
+        if (infoTile && matchedEl) {
+          // Читаем уникальные данные из data-атрибутов конкретного хитбокса
+          const title = matchedEl.getAttribute('data-title');
+          const lat = matchedEl.getAttribute('data-lat');
+          const lng = matchedEl.getAttribute('data-lng');
+          const distId = matchedEl.getAttribute('data-dist-id');
+          const currentDistText = document.getElementById(distId).innerText;
+
+          // Заполняем плитку уникальными данными выбранной модели
+          document.getElementById('tile-title').innerText = title;
+          document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
+          document.getElementById('tile-distance').innerText = `Расстояние: ${currentDistText}`;
+
           const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
           infoTile.style.display = isHidden ? 'block' : 'none';
           
           if (statusEl) {
-            statusEl.innerText = isHidden ? 'ПОПАДАНИЕ! (Плитка открыта)' : 'ПОПАДАНИЕ! (Плитка скрыта)';
+            statusEl.innerText = isHidden ? `ПОПАДАНИЕ (${title})!` : 'Плитка скрыта';
           }
         }
       } else {
         if (statusEl) statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
       }
+    }
+
+    // Вспомогательная функция для проверки вложенности Three.js объектов
+    function isChildOf(child, parent) {
+      let node = child.parent;
+      while (node) {
+        if (node === parent) return true;
+        node = node.parent;
+      }
+      return false;
     }
 
     window.addEventListener('pointerdown', handlePointer);
