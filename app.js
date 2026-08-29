@@ -21,6 +21,8 @@ AFRAME.registerComponent('smooth-position', {
 });
 
 const mixers = [];
+let currentUserLat = null;
+let currentUserLng = null;
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -39,11 +41,13 @@ function formatDist(meters) {
 }
 
 function updateUIData(userLat, userLng) {
+  currentUserLat = userLat;
+  currentUserLng = userLng;
+
   document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
 
   const maxRadiusKm = parseFloat(document.getElementById('radius-input').value) || 0;
 
-  // Обновляем дистанции для всех хитбоксов на основе их data-атрибутов
   const hitboxes = document.querySelectorAll('.clickable-hitbox');
   hitboxes.forEach(hb => {
     const lat = parseFloat(hb.getAttribute('data-lat'));
@@ -55,13 +59,11 @@ function updateUIData(userLat, userLng) {
     const distMeters = calculateDistance(userLat, userLng, lat, lng);
     const distKm = distMeters / 1000;
 
-    // Выводим дистанцию в отладочную панель
     const distEl = document.getElementById(distId);
     if (distEl) {
       distEl.innerText = formatDist(distMeters);
     }
 
-    // Фильтрация радиуса показа
     if (marker) {
       marker.setAttribute('visible', distKm <= maxRadiusKm ? 'true' : 'false');
     }
@@ -123,11 +125,8 @@ window.addEventListener('load', () => {
 
   if (radiusInput) {
     radiusInput.addEventListener('input', () => {
-      // Принудительно пересчитываем радиус с последними известными координатами или дефолтными
-      const myCoordsText = document.getElementById('my-coords').innerText;
-      if (myCoordsText.includes(',')) {
-        const [lat, lng] = myCoordsText.split(',').map(s => parseFloat(s.trim()));
-        if (!isNaN(lat) && !isNaN(lng)) updateUIData(lat, lng);
+      if (currentUserLat !== null && currentUserLng !== null) {
+        updateUIData(currentUserLat, currentUserLng);
       }
     });
   }
@@ -169,7 +168,6 @@ window.addEventListener('load', () => {
       mouse.y = -(clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
 
-      // Собираем все хитбоксы и их Three.js объекты
       const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
       const hitboxObjects = hitboxEls.map(el => el.object3D).filter(obj => obj !== undefined);
 
@@ -179,7 +177,6 @@ window.addEventListener('load', () => {
         isClickBlocked = true;
         setTimeout(() => { isClickBlocked = false; }, 300);
 
-        // Находим, в какой именно хитбокс попал луч
         const intersectedObject = intersects[0].object;
         let matchedEl = null;
         hitboxEls.forEach(el => {
@@ -190,17 +187,20 @@ window.addEventListener('load', () => {
 
         const infoTile = document.getElementById('info-tile');
         if (infoTile && matchedEl) {
-          // Читаем уникальные данные из data-атрибутов конкретного хитбокса
           const title = matchedEl.getAttribute('data-title');
-          const lat = matchedEl.getAttribute('data-lat');
-          const lng = matchedEl.getAttribute('data-lng');
-          const distId = matchedEl.getAttribute('data-dist-id');
-          const currentDistText = document.getElementById(distId).innerText;
+          const lat = parseFloat(matchedEl.getAttribute('data-lat'));
+          const lng = parseFloat(matchedEl.getAttribute('data-lng'));
 
-          // Заполняем плитку уникальными данными выбранной модели
+          // Вычисляем дистанцию заново прямо при клике
+          let distText = 'Ожидание GPS...';
+          if (currentUserLat !== null && currentUserLng !== null) {
+            const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
+            distText = formatDist(meters);
+          }
+
           document.getElementById('tile-title').innerText = title;
           document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
-          document.getElementById('tile-distance').innerText = `Расстояние: ${currentDistText}`;
+          document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
           const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
           infoTile.style.display = isHidden ? 'block' : 'none';
@@ -214,7 +214,6 @@ window.addEventListener('load', () => {
       }
     }
 
-    // Вспомогательная функция для проверки вложенности Three.js объектов
     function isChildOf(child, parent) {
       let node = child.parent;
       while (node) {
