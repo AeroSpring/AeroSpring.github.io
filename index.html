@@ -10,25 +10,21 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Плитка с информацией -->
-  <div id="info-tile" class="info-tile hidden">
-    <p id="info-coords">Координаты: -</p>
-    <p id="info-distance">Расстояние: -</p>
-  </div>
-
   <a-scene
     vr-mode-ui="enabled: false"
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Камера с тач-рейкастером и увеличенной дистанцией отрисовки -->
-    <a-camera 
-      gps-camera="minDistance: 0; maxDistance: 100000;" 
-      camera="far: 100000;"
-      rotation-reader 
-      raycaster="objects: .clickable" 
-      cursor="fuse: false; rayOrigin: mouse">
-    </a-camera>
+    <!-- Камера с широким диапазоном отрисовки -->
+    <a-camera gps-camera="minDistance: 0; maxDistance: 2000;" rotation-reader></a-camera>
+
+    <!-- Сфера на точке в 15-20 метрах от вас, поднятая на 4 метра -->
+    <a-sphere
+      gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
+      position="0 4 0"
+      radius="3"
+      material="color: #ff3366; shader: flat;">
+    </a-sphere>
 
   </a-scene>
 
