@@ -28,6 +28,7 @@
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
+    <div><b>Статус модели:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span></div>
     <div style="margin-top: 8px; pointer-events: auto;">
       <label for="radius-input"><b>Радиус показа (км):</b></label>
       <input type="number" id="radius-input" value="1" min="0.001" step="0.01" style="width: 70px; background: #1e293b; color: #00ff66; border: 1px solid #00ff66; border-radius: 4px; padding: 2px 4px;">
@@ -39,6 +40,11 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
+    <!-- Менеджер ресурсов для безопасной предзагрузки 3D-модели -->
+    <a-assets>
+      <a-asset-item id="glb-asset" src="assets/model.glb"></a-asset-item>
+    </a-assets>
+
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
     <!-- Точка на карте -->
@@ -47,17 +53,18 @@
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0">
 
-      <!-- 3D-модель с явным указанием воспроизведения всех клипов и бесконечным циклом -->
+      <!-- GLTF Модель -->
       <a-gltf-model
-        src="assets/model.glb"
-        scale="3 3 3"
-        animation-mixer="clip: *; loop: repeat; timeScale: 1;">
+        id="ar-model"
+        src="#glb-asset"
+        scale="2 2 2"
+        animation-mixer>
       </a-gltf-model>
 
-      <!-- Невидимый хитбокс для удобного тапа -->
+      <!-- Невидимый хитбокс -->
       <a-sphere
         id="hitbox"
-        radius="12"
+        radius="8"
         material="opacity: 0; transparent: true;">
       </a-sphere>
 

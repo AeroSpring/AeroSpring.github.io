@@ -63,6 +63,21 @@ if ('geolocation' in navigator) {
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusInput = document.getElementById('radius-input');
+  const modelEl = document.getElementById('ar-model');
+  const modelStatusEl = document.getElementById('model-status');
+
+  // Отслеживание статуса загрузки 3D файла
+  if (modelEl && modelStatusEl) {
+    modelEl.addEventListener('model-loaded', () => {
+      modelStatusEl.innerText = 'OK (Загружена)';
+      modelStatusEl.style.color = '#00ff66';
+    });
+
+    modelEl.addEventListener('model-error', () => {
+      modelStatusEl.innerText = 'ОШИБКА (Файл не найден)';
+      modelStatusEl.style.color = '#ff3366';
+    });
+  }
 
   if (radiusInput) {
     radiusInput.addEventListener('input', checkRadiusFilter);
