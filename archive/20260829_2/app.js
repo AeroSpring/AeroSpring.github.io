@@ -2,6 +2,7 @@ const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
 
+// Расчет дистанции в метрах
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -14,6 +15,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+// Фильтрация отображения маркера по радиусу в километрах
 function checkRadiusFilter() {
   const radiusInput = document.getElementById('radius-input');
   const targetMarker = document.getElementById('target-marker');
@@ -29,11 +31,12 @@ function checkRadiusFilter() {
   } else {
     targetMarker.setAttribute('visible', 'false');
     if (infoTile) {
-      infoTile.style.display = 'none';
+      infoTile.style.display = 'none'; // Скрываем плитку при выходе из радиуса
     }
   }
 }
 
+// Обновление интерфейса
 function updateUIData(lat, lng) {
   document.getElementById('my-coords').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
@@ -48,6 +51,7 @@ function updateUIData(lat, lng) {
   checkRadiusFilter();
 }
 
+// Получение GPS данных
 window.addEventListener('gps-camera-update-position', (e) => {
   updateUIData(e.detail.position.latitude, e.detail.position.longitude);
 });
@@ -60,10 +64,12 @@ if ('geolocation' in navigator) {
   );
 }
 
+// Инициализация рейкастера и событий
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusInput = document.getElementById('radius-input');
 
+  // Слушатель изменения радиуса пользователем
   if (radiusInput) {
     radiusInput.addEventListener('input', checkRadiusFilter);
   }
@@ -81,6 +87,7 @@ window.addEventListener('load', () => {
       const camera = sceneEl.camera;
       const statusEl = document.getElementById('click-status');
 
+      // Если маркер скрыт фильтром радиуса — клики не обрабатываем
       if (!camera || !hitboxEl || !hitboxEl.object3D || targetMarker.getAttribute('visible') === 'false') return;
 
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
