@@ -25,6 +25,37 @@ video {
   z-index: 2;
 }
 
+
+.info-tile {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.9);
+  color: #ffffff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  z-index: 999;
+  min-width: 260px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-tile p {
+  margin: 4px 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+
+
+/* FOR index_arjs.html */
 /* body, canvas {
   margin: 0;
   width: 100vw;
