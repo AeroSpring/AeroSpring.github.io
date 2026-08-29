@@ -2,6 +2,18 @@ const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
 let currentDistanceMeters = 0;
 
+// Регистрация A-Frame компонента для обработки нажатий
+AFRAME.registerComponent('marker-click', {
+  init: function () {
+    this.el.addEventListener('click', () => {
+      const infoTile = document.getElementById('info-tile');
+      if (infoTile) {
+        infoTile.classList.toggle('hidden');
+      }
+    });
+  }
+});
+
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -14,13 +26,25 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function updateUIData(lat, lng, accuracy) {
-  document.getElementById('gps-status').innerText = 'Активен';
-  document.getElementById('my-coords').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+// Фильтрация отображения маркера по радиусу в км
+function checkRadiusVisibility() {
+  const radiusInput = document.getElementById('radius-input');
+  const marker = document.getElementById('target-marker');
   
-  if (accuracy !== undefined) {
-    document.getElementById('gps-accuracy').innerText = `±${Math.round(accuracy)} м`;
+  if (!radiusInput || !marker) return;
+
+  const maxRadiusKm = parseFloat(radiusInput.value) || 0;
+  const currentDistanceKm = currentDistanceMeters / 1000;
+
+  if (currentDistanceKm <= maxRadiusKm) {
+    marker.setAttribute('visible', 'true');
+  } else {
+    marker.setAttribute('visible', 'false');
   }
+}
+
+function updateUIData(lat, lng) {
+  document.getElementById('my-coords').innerText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
   currentDistanceMeters = calculateDistance(lat, lng, TARGET_LAT, TARGET_LNG);
   const distText = currentDistanceMeters < 1000 
@@ -29,27 +53,27 @@ function updateUIData(lat, lng, accuracy) {
 
   document.getElementById('calc-dist').innerText = distText;
   document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+
+  checkRadiusVisibility();
 }
 
-// Отслеживание местоположения
+// Слушатели GPS
 window.addEventListener('gps-camera-update-position', (e) => {
-  updateUIData(e.detail.position.latitude, e.detail.position.longitude, e.detail.position.accuracy);
+  updateUIData(e.detail.position.latitude, e.detail.position.longitude);
 });
 
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(
-    (pos) => updateUIData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+    (pos) => updateUIData(pos.coords.latitude, pos.coords.longitude),
     null,
     { enableHighAccuracy: true }
   );
 }
 
-// Обработка нажатия на маркер
-window.onload = () => {
-  const marker = document.getElementById('target-marker');
-  const infoTile = document.getElementById('info-tile');
-
-  marker.addEventListener('click', () => {
-    infoTile.classList.toggle('hidden');
-  });
-};
+// Отслеживание изменения радиуса в инпуте
+document.addEventListener('DOMContentLoaded', () => {
+  const radiusInput = document.getElementById('radius-input');
+  if (radiusInput) {
+    radiusInput.addEventListener('input', checkRadiusVisibility);
+  }
+});
