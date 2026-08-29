@@ -1,5 +1,6 @@
 const TARGET_LAT = 44.970635;
 const TARGET_LNG = 41.153389;
+let currentDistanceMeters = 0;
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -21,20 +22,34 @@ function updateUIData(lat, lng, accuracy) {
     document.getElementById('gps-accuracy').innerText = `±${Math.round(accuracy)} м`;
   }
 
-  const distanceMeters = calculateDistance(lat, lng, TARGET_LAT, TARGET_LNG);
-  document.getElementById('calc-dist').innerText = `${Math.round(distanceMeters)} м`;
+  currentDistanceMeters = calculateDistance(lat, lng, TARGET_LAT, TARGET_LNG);
+  const distText = currentDistanceMeters < 1000 
+    ? `${Math.round(currentDistanceMeters)} м` 
+    : `${(currentDistanceMeters / 1000).toFixed(2)} км`;
+
+  document.getElementById('calc-dist').innerText = distText;
+  document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 }
 
-// 1. Основной поток от AR.js
+// Отслеживание местоположения
 window.addEventListener('gps-camera-update-position', (e) => {
   updateUIData(e.detail.position.latitude, e.detail.position.longitude, e.detail.position.accuracy);
 });
 
-// 2. Прямой дублирующий опрос GPS
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(
     (pos) => updateUIData(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
-    (err) => { document.getElementById('gps-status').innerText = `Ошибка: ${err.message}`; },
+    null,
     { enableHighAccuracy: true }
   );
 }
+
+// Обработка нажатия на маркер
+window.onload = () => {
+  const marker = document.getElementById('target-marker');
+  const infoTile = document.getElementById('info-tile');
+
+  marker.addEventListener('click', () => {
+    infoTile.classList.toggle('hidden');
+  });
+};

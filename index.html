@@ -10,31 +10,45 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <a-scene
-    vr-mode-ui="enabled: false"
-    embedded
-    arjs="sourceType: webcam; debugUIEnabled: false;">
+  <!-- Информационная плитка (появляется при клике) -->
+  <div id="info-tile" class="info-tile hidden">
+    <div class="tile-title">Информация о точке</div>
+    <div id="tile-coords">Координаты: 44.970635, 41.153389</div>
+    <div id="tile-distance">Расстояние: -</div>
+  </div>
 
-    <a-camera gps-camera="minDistance: 0; maxDistance: 2000;" rotation-reader></a-camera>
-
-    <!-- Поднимаем сферу на 25 метров над землей -->
-    <a-sphere
-      id="target-marker"
-      gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
-      position="0 225 0"
-      radius="5"
-      material="color: #ff3366; shader: flat;">
-    </a-sphere>
-
-  </a-scene>
-
-  <!-- Гарантированная инфо-панель поверх всех слоев AR -->
-  <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
+  <!-- Отладочная панель -->
+  <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 12px; z-index: 999999; pointer-events: none; border: 1px solid #00ff66;">
     <div><b>Статус GPS:</b> <span id="gps-status">Поиск...</span></div>
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Точность:</b> <span id="gps-accuracy">-</span></div>
     <div><b>Дистанция:</b> <span id="calc-dist">-</span></div>
   </div>
+
+  <a-scene
+    vr-mode-ui="enabled: false"
+    embedded
+    arjs="sourceType: webcam; debugUIEnabled: false;">
+
+    <!-- Камера с поддержкой нажатий (raycaster) -->
+    <a-camera 
+      gps-camera="minDistance: 0; maxDistance: 2000;" 
+      rotation-reader
+      raycaster="objects: .clickable"
+      cursor="fuse: false; rayOrigin: mouse">
+    </a-camera>
+
+    <!-- Маркер: возвращаем высоту 4 метра и привязываем класс clickable -->
+    <a-sphere
+      id="target-marker"
+      class="clickable"
+      gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
+      position="0 4 0"
+      radius="2.5"
+      material="color: #ff3366; shader: flat;">
+    </a-sphere>
+
+  </a-scene>
 
   <script src="app.js"></script>
 </body>
