@@ -37,7 +37,6 @@ if ('geolocation' in navigator) {
   );
 }
 
-// Переключение видимости плитки при клике по хитбоксу
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
 
@@ -75,11 +74,11 @@ window.addEventListener('load', () => {
 
         const infoTile = document.getElementById('info-tile');
         if (infoTile) {
-          const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
-          infoTile.style.display = isHidden ? 'block' : 'none';
+          const isCurrentlyHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
+          infoTile.style.display = isCurrentlyHidden ? 'block' : 'none';
           
           if (statusEl) {
-            statusEl.innerText = isHidden ? 'ПОПАДАНИЕ! (Плитка открыта)' : 'ПОПАДАНИЕ! (Плитка скрыта)';
+            statusEl.innerText = isCurrentlyHidden ? 'ПОПАДАНИЕ! Плитка: ВКЛ' : 'ПОПАДАНИЕ! Плитка: ВЫКЛ';
           }
         }
       } else {
