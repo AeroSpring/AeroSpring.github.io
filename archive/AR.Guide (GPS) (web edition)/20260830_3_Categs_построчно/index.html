@@ -41,16 +41,14 @@
     <div style="margin-top: 8px; pointer-events: auto; border-top: 1px dashed rgba(0,255,102,0.4); padding-top: 6px;">
       <!-- Шапка шторки (кнопка разворачивания) -->
       <div id="category-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: rgba(0,255,102,0.1); padding: 4px 6px; border-radius: 4px;">
-        <span id="category-status-text">Категории: 4 из 4 выбрано</span>
+        <span id="category-status-text">Категории: 2 из 2 выбрано</span>
         <span id="category-arrow" style="font-weight: bold; font-size: 13px;">▼</span>
       </div>
 
-      <!-- Выпадающий список категорий в 2 колонки (скрыт по умолчанию) -->
-      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 130px; overflow-y: auto; display: none; grid-template-columns: 1fr 1fr; gap: 4px; padding-right: 2px;">
-        <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 5px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">✓ 🚗 Авторемонт</button>
-        <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 5px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">✓ 💻 ИТ-услуги</button>
-        <button id="btn-cat-beauty" class="category-btn active" data-category="beauty" style="background: #00ff66; color: #000; border: none; padding: 5px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">✓ 💄 Уход</button>
-        <button id="btn-cat-med" class="category-btn active" data-category="med" style="background: #00ff66; color: #000; border: none; padding: 5px 6px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">✓ 🏥 Медицина</button>
+      <!-- Выпадающий список категорий (скрыт по умолчанию) -->
+      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 120px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; padding-right: 2px;">
+        <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left;">✓ 🚗 Авторемонт</button>
+        <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left;">✓ 💻 ИТ-услуги</button>
       </div>
     </div>
   </div>
