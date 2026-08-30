@@ -1,28 +1,22 @@
 AFRAME.registerComponent('billboard-scale', {
   schema: {
-    multiplier: { type: 'number', default: 0.5 } // Множитель масштаба от расстояния
+    factor: { type: 'number', default: 0.2 }
   },
   tick: function () {
-    const cameraEl = document.querySelector('a-camera');
-    if (!cameraEl) return;
+    // В AR.js камера всегда в точке 0,0,0, а позиция объекта — это и есть его расстояние до нас
+    const pos = this.el.object3D.position;
+    const distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
 
-    const cameraPos = new THREE.Vector3();
-    cameraEl.object3D.getWorldPosition(cameraPos);
-
-    const objectPos = new THREE.Vector3();
-    this.el.object3D.getWorldPosition(objectPos);
-
-    const distance = cameraPos.distanceTo(objectPos);
     if (distance < 1) return;
 
-    // Прямой расчет без искусственных лимитов, которые режут размер
-    // При расстоянии 500м и множителе 0.5 масштаб будет 250
-    let scaleFactor = distance * this.data.multiplier;
+    // Масштабируем пропорционально удалению
+    let currentScale = distance * this.data.factor;
+    
+    // Задаем адекватные рамки
+    if (currentScale < 5) currentScale = 5;
+    if (currentScale > 300) currentScale = 300;
 
-    // Минимальный порог, чтобы модель не исчезала вблизи
-    if (scaleFactor < 2) scaleFactor = 2;
-
-    this.el.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    this.el.object3D.scale.set(currentScale, currentScale, currentScale);
   }
 });
 
@@ -245,8 +239,8 @@ window.addEventListener('load', () => {
 
   updateCategoryStatusText();
 
-  const modelsToLoad = [
-    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
+const modelsToLoad = [
+    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
     { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [2, 2, 2], statusElId: 'model2-status' }
   ];
 
