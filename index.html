@@ -67,15 +67,18 @@
       cursor="fuse: false; rayOrigin: mouse;">
     </a-camera>
 
-    <!-- Первая модель (Дрон) - Авторемонт -->
+    <!-- Первая модель (Дрон) - Авторемонт (Зеленый луч) -->
     <a-entity
       id="target-marker-1"
       gps-entity-place="latitude: 44.972541; longitude: 41.145972;"
       position="0 235 0"
       smooth-position
-      ground-beam="color: #00ff66; targetHeight: 235"
       data-category="auto">
       
+      <!-- Луч и точка на земле -->
+      <a-cylinder position="0 -117.5 0" radius="0.3" height="235" material="color: #00ff66; opacity: 0.7; transparent: true;"></a-cylinder>
+      <a-sphere position="0 -235 0" radius="1.5" material="color: #00ff66; opacity: 0.9; transparent: true;"></a-sphere>
+
       <a-entity id="model1-container" billboard-scale="multiplier: 0.1">
         <a-plane 
           id="hitbox-1" 
@@ -92,14 +95,17 @@
       </a-entity>
     </a-entity>
 
-    <!-- Вторая модель (Model 1C) - ИТ -->
+    <!-- Вторая модель (Model 1C) - ИТ (Голубой луч) -->
     <a-entity
       id="target-marker-2"
       gps-entity-place="latitude: 44.974651; longitude: 41.151093;"
       position="0 235 0"
       smooth-position
-      ground-beam="color: #38bdf8; targetHeight: 235"
       data-category="it">
+
+      <!-- Луч и точка на земле -->
+      <a-cylinder position="0 -117.5 0" radius="0.3" height="235" material="color: #38bdf8; opacity: 0.7; transparent: true;"></a-cylinder>
+      <a-sphere position="0 -235 0" radius="1.5" material="color: #38bdf8; opacity: 0.9; transparent: true;"></a-sphere>
 
       <a-entity id="model2-container" billboard-scale="multiplier: 0.1">
         <a-sphere 
@@ -116,15 +122,18 @@
       </a-entity>
     </a-entity>
 
-    <!-- Третья модель - Авторемонт -->
+    <!-- Третья модель - Авторемонт (Зеленый луч) -->
     <a-entity
       id="target-marker-3"
       gps-entity-place="latitude: 44.973503; longitude: 41.141933;"
       position="0 235 0"
       smooth-position
-      ground-beam="color: #00ff66; targetHeight: 235"
       data-category="auto">
       
+      <!-- Луч и точка на земле -->
+      <a-cylinder position="0 -117.5 0" radius="0.3" height="235" material="color: #00ff66; opacity: 0.7; transparent: true;"></a-cylinder>
+      <a-sphere position="0 -235 0" radius="1.5" material="color: #00ff66; opacity: 0.9; transparent: true;"></a-sphere>
+
       <a-entity id="model3-container" billboard-scale="multiplier: 0.1">
         <a-plane 
           id="hitbox-3" 
@@ -141,15 +150,18 @@
       </a-entity>
     </a-entity>
 
-    <!-- Четвертая модель - Медицина -->
+    <!-- Четвертая модель - Медицина (Красный луч) -->
     <a-entity
       id="target-marker-4"
       gps-entity-place="latitude: 44.994807; longitude: 41.127578;"
       position="0 235 0"
       smooth-position
-      ground-beam="color: #ef4444; targetHeight: 235"
       data-category="med">
       
+      <!-- Луч и точка на земле -->
+      <a-cylinder position="0 -117.5 0" radius="0.3" height="235" material="color: #ef4444; opacity: 0.7; transparent: true;"></a-cylinder>
+      <a-sphere position="0 -235 0" radius="1.5" material="color: #ef4444; opacity: 0.9; transparent: true;"></a-sphere>
+
       <a-entity id="model4-container" billboard-scale="multiplier: 0.1">
         <a-plane 
           id="hitbox-4" 
