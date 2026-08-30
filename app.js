@@ -1,4 +1,3 @@
-// Надежный вертикальный луч-цилиндр к земле с точкой
 AFRAME.registerComponent('ground-beam', {
   schema: {
     color: { type: 'color', default: '#00ff66' },
@@ -9,12 +8,10 @@ AFRAME.registerComponent('ground-beam', {
     const height = this.data.targetHeight;
     const color = this.data.color;
 
-    // Группа для луча, чтобы отвязать его от масштабирования самой модели
     const beamGroup = new THREE.Group();
 
-    // 1. Делаем луч в виде тонкого цилиндра (радиус 0.2 метра, высота — до земли)
-    const geometry = new THREE.CylinderGeometry(0.2, 0.2, height, 8);
-    // Смещаем геометрию цилиндра так, чтобы его верх был в точке (0,0,0) модели, а низ уходил на землю (-height)
+    // Цилиндр от центра модели (0,0,0) до земли (0, -height, 0)
+    const geometry = new THREE.CylinderGeometry(0.3, 0.3, height, 8);
     geometry.translate(0, -height / 2, 0);
 
     const material = new THREE.MeshBasicMaterial({
@@ -26,8 +23,8 @@ AFRAME.registerComponent('ground-beam', {
     const cylinder = new THREE.Mesh(geometry, material);
     beamGroup.add(cylinder);
 
-    // 2. Яркая точка-маркер на земле
-    const dotGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+    // Точка на земле
+    const dotGeometry = new THREE.SphereGeometry(1.5, 16, 16);
     const dotMaterial = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
