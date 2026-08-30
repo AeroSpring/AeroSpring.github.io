@@ -1,6 +1,6 @@
 AFRAME.registerComponent('billboard-scale', {
   schema: {
-    multiplier: { type: 'number', default: 0.1 } // Плавный коэффициент роста
+    multiplier: { type: 'number', default: 0.1 }
   },
   tick: function () {
     const pos = this.el.object3D.position;
@@ -8,15 +8,8 @@ AFRAME.registerComponent('billboard-scale', {
 
     if (distance < 1) return;
 
-    // Расчет масштаба: чем дальше объект, тем больше он становится, 
-    // компенсируя перспективу, но не улетая в бесконечность.
     let currentScale = distance * this.data.multiplier;
-
-    // Нижний порог для близких объектов (чтобы не были микроскопическими)
     if (currentScale < 2) currentScale = 2;
-    
-    // Верхний порог (даже при удалении на сотни километров модель 
-    // не вырастет больше определенного предела, оставаясь аккуратным маркером)
     if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
@@ -49,7 +42,6 @@ const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
 
-// Состояние всех категорий
 const activeCategories = {
   auto: true,
   it: true,
@@ -195,7 +187,6 @@ function loadModelToContainer(config) {
 }
 
 window.addEventListener('load', () => {
-  const sceneEl = document.querySelector('a-scene');
   const radiusRange = document.getElementById('radius-range');
 
   if (radiusRange) {
@@ -204,7 +195,6 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Логика открытия/закрытия шторки категорий (возвращаем flex для построчного вывода)
   const toggleHeader = document.getElementById('category-toggle-header');
   const dropdownContent = document.getElementById('category-dropdown-content');
   const arrowEl = document.getElementById('category-arrow');
@@ -217,7 +207,6 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Настройка кликов по кнопкам категорий
   const categoryButtons = document.querySelectorAll('.category-btn');
   categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -257,67 +246,32 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  const setupPointerRaycaster = () => {
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    let isClickBlocked = false;
+  // Нативная обработка кликов через встроенные события A-Frame
+  const setupAFrameClickListeners = () => {
+    const hitboxEls = document.querySelectorAll('.clickable-hitbox');
+    const statusEl = document.getElementById('click-status');
+    const infoTile = document.getElementById('info-tile');
 
-    function handlePointer(e) {
-      if (isClickBlocked) return;
-
-      const camera = sceneEl.camera;
-      const statusEl = document.getElementById('click-status');
-      if (!camera) return;
-
-      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
-      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
-      if (clientX === null || clientY === null) return;
-
-      // Принудительно обновляем матрицы мира всей сцены и камеры перед трассировкой луча
-      sceneEl.object3D.updateMatrixWorld(true);
-      camera.updateMatrixWorld(true);
-
-      mouse.x = (clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-
-      const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
-      const hitboxObjects = hitboxEls.map(el => {
+    hitboxEls.forEach(el => {
+      el.addEventListener('click', (evt) => {
         const marker = el.parentElement;
-        if (marker && marker.getAttribute('visible') === 'false') return null;
-        return el.object3D;
-      }).filter(obj => obj !== undefined && obj !== null);
+        if (marker && marker.getAttribute('visible') === 'false') return;
 
-      const intersects = raycaster.intersectObjects(hitboxObjects, true);
+        const title = el.getAttribute('data-title');
+        const lat = parseFloat(el.getAttribute('data-lat'));
+        const lng = parseFloat(el.getAttribute('data-lng'));
 
-      if (intersects.length > 0) {
-        isClickBlocked = true;
-        setTimeout(() => { isClickBlocked = false; }, 300);
+        let distText = 'Ожидание GPS...';
+        if (currentUserLat !== null && currentUserLng !== null) {
+          const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
+          distText = formatDist(meters);
+        }
 
-        const intersectedObject = intersects[0].object;
-        let matchedEl = null;
-        hitboxEls.forEach(el => {
-          if (el.object3D === intersectedObject || el.object3D.children.includes(intersectedObject) || isChildOf(intersectedObject, el.object3D)) {
-            matchedEl = el;
-          }
-        });
+        document.getElementById('tile-title').innerText = title;
+        document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
+        document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
-        const infoTile = document.getElementById('info-tile');
-        if (infoTile && matchedEl) {
-          const title = matchedEl.getAttribute('data-title');
-          const lat = parseFloat(matchedEl.getAttribute('data-lat'));
-          const lng = parseFloat(matchedEl.getAttribute('data-lng'));
-
-          let distText = 'Ожидание GPS...';
-          if (currentUserLat !== null && currentUserLng !== null) {
-            const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
-            distText = formatDist(meters);
-          }
-
-          document.getElementById('tile-title').innerText = title;
-          document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
-          document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
-
+        if (infoTile) {
           const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
           infoTile.style.display = isHidden ? 'block' : 'none';
           
@@ -325,26 +279,14 @@ window.addEventListener('load', () => {
             statusEl.innerText = isHidden ? `ПОПАДАНИЕ (${title})!` : 'Плитка скрыта';
           }
         }
-      } else {
-        if (statusEl) statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
-      }
-    }
-
-    function isChildOf(child, parent) {
-      let node = child.parent;
-      while (node) {
-        if (node === parent) return true;
-        node = node.parent;
-      }
-      return false;
-    }
-
-    window.addEventListener('pointerdown', handlePointer);
+      });
+    });
   };
 
+  const sceneEl = document.querySelector('a-scene');
   if (sceneEl.hasLoaded) {
-    setupPointerRaycaster();
+    setupAFrameClickListeners();
   } else {
-    sceneEl.addEventListener('loaded', setupPointerRaycaster);
+    sceneEl.addEventListener('loaded', setupAFrameClickListeners);
   }
 });

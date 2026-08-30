@@ -60,7 +60,12 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
+    <a-camera 
+      gps-camera="minDistance: 0; maxDistance: 100000;" 
+      rotation-reader
+      raycaster="objects: .clickable-hitbox; interval: 100;"
+      cursor="fuse: false; rayOrigin: mouse;">
+    </a-camera>
 
     <!-- Первая модель (Дрон) - категория: auto -->
     <!-- <a-entity
