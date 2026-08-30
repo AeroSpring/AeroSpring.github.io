@@ -22,7 +22,7 @@ AFRAME.registerComponent('billboard-scale', {
     let currentScale = this.data.baseScale;
     if (distance > this.data.minDist) {
       // Плавное увеличение в зависимости от расстояния (можно настроить формулу)
-      currentScale = this.data.baseScale + (distance * 10.0); 
+      currentScale = this.data.baseScale + (distance * 20.0); 
     //   if (currentScale > this.data.maxScale) {
     //     currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
     //   }
@@ -50,7 +50,7 @@ AFRAME.registerComponent('smooth-position', {
     }
 
     // const smoothingFactor = 0.08;
-    const smoothingFactor = 1.0;
+    const smoothingFactor = 0.001;
     this.el.object3D.position.lerp(this.targetPos, smoothingFactor);
   }
 });
