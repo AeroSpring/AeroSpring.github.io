@@ -22,10 +22,10 @@ AFRAME.registerComponent('billboard-scale', {
     let currentScale = this.data.baseScale;
     if (distance > this.data.minDist) {
       // Плавное увеличение в зависимости от расстояния (можно настроить формулу)
-      currentScale = this.data.baseScale + (distance * 2.0); 
-      if (currentScale > this.data.maxScale) {
-        currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
-      }
+      currentScale = this.data.baseScale + (distance * 1.0); 
+    //   if (currentScale > this.data.maxScale) {
+    //     currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
+    //   }
     }
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
