@@ -3,6 +3,9 @@ AFRAME.registerComponent('billboard-scale', {
     multiplier: { type: 'number', default: 0.1 }
   },
   tick: function () {
+    const cameraEl = document.querySelector('a-camera');
+    if (!cameraEl) return;
+
     const pos = this.el.object3D.position;
     const distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
 
@@ -13,6 +16,9 @@ AFRAME.registerComponent('billboard-scale', {
     if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
+
+    // Жестко разворачиваем весь маркер к камере, чтобы плоский хитбокс всегда был перпендикулярен взгляду
+    this.el.object3D.lookAt(cameraEl.object3D.position);
   }
 });
 

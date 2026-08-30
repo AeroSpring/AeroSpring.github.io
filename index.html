@@ -96,16 +96,20 @@
       billboard-scale="multiplier: 0.1"
       data-category="auto">
       <a-entity id="model1-container"></a-entity>
-        <a-sphere 
-          id="hitbox-1" 
-          class="clickable-hitbox" 
-          radius="50"
-          material="opacity: 0.5; transparent: true; color: #ff0000; side: double;"
-          data-title="Дрон (Авторемонт)"
-          data-lat="44.972541"
-          data-lng="41.145972"
-          data-dist-id="dist-1">
-        </a-sphere>
+      
+      <!-- Заменяем сферу на плоский хитбокс, который идеально ловит касания -->
+      <a-plane 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        width="30" 
+        height="30"
+        material="opacity: 0.3; transparent: true; color: #ff0000; side: double;"
+        rotation="0 0 0"
+        data-title="Дрон (Авторемонт)"
+        data-lat="44.972541"
+        data-lng="41.145972"
+        data-dist-id="dist-1">
+      </a-plane>
     </a-entity>
 
     <!-- Вторая модель (Model 1C) - категория: it -->
