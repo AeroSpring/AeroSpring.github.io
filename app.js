@@ -40,13 +40,38 @@ function formatDist(meters) {
   return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
+// Превращаем линейное положение ползунка (0 - 100) в логарифмическое значение от 1 до 1000 км
+function getRadiusFromSlider(sliderValue) {
+  const minKm = 1;
+  const maxKm = 1000;
+  const minLog = Math.log10(minKm);
+  const maxLog = Math.log10(maxKm);
+  const scale = (maxLog - minLog) / 100;
+  return Math.pow(10, minLog + scale * sliderValue);
+}
+
 function updateUIData(userLat, userLng) {
   currentUserLat = userLat;
   currentUserLng = userLng;
 
   document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
 
-  const maxRadiusKm = parseFloat(document.getElementById('radius-input').value) || 0;
+  const radiusRange = document.getElementById('radius-range');
+  const radiusValueEl = document.getElementById('radius-value');
+  
+  let maxRadiusKm = 50;
+  if (radiusRange) {
+    const sliderVal = parseFloat(radiusRange.value);
+    maxRadiusKm = getRadiusFromSlider(sliderVal);
+    
+    if (radiusValueEl) {
+      if (maxRadiusKm < 10) {
+        radiusValueEl.innerText = `${maxRadiusKm.toFixed(1)} км`;
+      } else {
+        radiusValueEl.innerText = `${Math.round(maxRadiusKm)} км`;
+      }
+    }
+  }
 
   const hitboxes = document.querySelectorAll('.clickable-hitbox');
   hitboxes.forEach(hb => {
@@ -121,10 +146,10 @@ function loadModelToContainer(config) {
 
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
-  const radiusInput = document.getElementById('radius-input');
+  const radiusRange = document.getElementById('radius-range');
 
-  if (radiusInput) {
-    radiusInput.addEventListener('input', () => {
+  if (radiusRange) {
+    radiusRange.addEventListener('input', () => {
       if (currentUserLat !== null && currentUserLng !== null) {
         updateUIData(currentUserLat, currentUserLng);
       }
@@ -191,7 +216,6 @@ window.addEventListener('load', () => {
           const lat = parseFloat(matchedEl.getAttribute('data-lat'));
           const lng = parseFloat(matchedEl.getAttribute('data-lng'));
 
-          // Вычисляем дистанцию заново прямо при клике
           let distText = 'Ожидание GPS...';
           if (currentUserLat !== null && currentUserLng !== null) {
             const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
