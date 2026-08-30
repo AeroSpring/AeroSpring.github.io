@@ -1,3 +1,46 @@
+// Компонент вертикального луча к земле
+AFRAME.registerComponent('ground-beam', {
+  schema: {
+    color: { type: 'color', default: '#00ff66' },
+    targetHeight: { type: 'number', default: 235 } // Высота, на которой висит модель
+  },
+  init: function () {
+    const el = this.el;
+    const height = this.data.targetHeight;
+    const color = this.data.color;
+
+    // 1. Создаем геометрию линии от (0, 0, 0) модели до (0, -height, 0) на земле
+    const points = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, -height, 0)
+    ];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    // Тонкая полупрозрачная линия с «неоновым» свечением
+    const material = new THREE.LineBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.6,
+      linewidth: 2 // В Three.js толщина линий на WebGL часто ограничена 1px на уровне драйверов, но полупрозрачность даст отличный эффект
+    });
+
+    const line = new THREE.Line(geometry, material);
+    el.object3D.add(line);
+
+    // 2. Создаем точку на земле (на конце луча)
+    const dotGeometry = new THREE.SphereGeometry(1.5, 16, 16);
+    const dotMaterial = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.8
+    });
+    const dotMesh = new THREE.Mesh(dotGeometry, dotMaterial);
+    // Смещаем точку ровно на уровень земли относительно маркера
+    dotMesh.position.set(0, -height, 0);
+    el.object3D.add(dotMesh);
+  }
+});
+
 AFRAME.registerComponent('billboard-scale', {
   schema: {
     multiplier: { type: 'number', default: 0.1 }
@@ -239,8 +282,8 @@ window.addEventListener('load', () => {
   const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
     { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [1, 1, 1], statusElId: 'model2-status' },
-    { containerId: 'model3-container', url: 'assets/engine_base/engine_base.glb', scale: [10, 10, 10], statusElId: 'model3-status' },
-    { containerId: 'model4-container', url: 'assets/diagnostic_group/diagnostic_group.glb', scale: [10, 10, 10], statusElId: 'model4-status' },
+    { containerId: 'model3-container', url: 'assets/engine_base/engine_base.glb', scale: [50, 50, 50], statusElId: 'model3-status' },
+    { containerId: 'model4-container', url: 'assets/House/House.gltf', scale: [50, 50, 50], statusElId: 'model4-status' },
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
