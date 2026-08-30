@@ -1,6 +1,6 @@
 AFRAME.registerComponent('billboard-scale', {
   schema: {
-    targetSize: { type: 'number', default: 5 } // Желаемый условный размер в пространстве кадра
+    multiplier: { type: 'number', default: 0.5 } // Множитель масштаба от расстояния
   },
   tick: function () {
     const cameraEl = document.querySelector('a-camera');
@@ -13,17 +13,14 @@ AFRAME.registerComponent('billboard-scale', {
     this.el.object3D.getWorldPosition(objectPos);
 
     const distance = cameraPos.distanceTo(objectPos);
-
-    // Если расстояние слишком маленькое, избегаем деления на ноль
     if (distance < 1) return;
 
-    // Магия: масштабируем объект прямо пропорционально расстоянию до камеры,
-    // чтобы его видимый размер на экране оставался стабильным (или рос по мере удаления)
-    let scaleFactor = distance * 100.1; // Настрой этот коэффициент (0.1 или больше), чтобы сделать модель крупнее
+    // Прямой расчет без искусственных лимитов, которые режут размер
+    // При расстоянии 500м и множителе 0.5 масштаб будет 250
+    let scaleFactor = distance * this.data.multiplier;
 
-    // Ограничим минимальный и максимальный масштаб, чтобы не ломать рендер
+    // Минимальный порог, чтобы модель не исчезала вблизи
     if (scaleFactor < 2) scaleFactor = 2;
-    if (scaleFactor > 100) scaleFactor = 100; // Потолок для больших расстояний
 
     this.el.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
   }
