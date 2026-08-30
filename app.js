@@ -2,7 +2,7 @@ AFRAME.registerComponent('billboard-scale', {
   schema: {
     baseScale: { type: 'number', default: 2 }, // Базовый размер вблизи
     minDist: { type: 'number', default: 10 },    // Расстояние, с которого начинаем увеличивать (в метрах)
-    maxScale: { type: 'number', default: 50 }   // Максимальный масштаб на большом расстоянии
+    maxScale: { type: 'number', default: 100 }   // Максимальный масштаб на большом расстоянии
   },
   tick: function () {
     const cameraEl = document.querySelector('a-camera');
@@ -22,7 +22,7 @@ AFRAME.registerComponent('billboard-scale', {
     let currentScale = this.data.baseScale;
     if (distance > this.data.minDist) {
       // Плавное увеличение в зависимости от расстояния (можно настроить формулу)
-      currentScale = this.data.baseScale + (distance * 0.001); 
+      currentScale = this.data.baseScale + (distance * 100.0); 
     //   if (currentScale > this.data.maxScale) {
     //     currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
     //   }
@@ -50,7 +50,7 @@ AFRAME.registerComponent('smooth-position', {
     }
 
     // const smoothingFactor = 0.08;
-    const smoothingFactor = 0.01;
+    const smoothingFactor = 0.1;
     this.el.object3D.position.lerp(this.targetPos, smoothingFactor);
   }
 });
