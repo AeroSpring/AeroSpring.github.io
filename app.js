@@ -256,7 +256,6 @@ window.addEventListener('load', () => {
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      // Игнорируем клики по элементам интерфейса
       if (e.target.closest('#ui-container') || e.target.closest('#info-tile') || e.target.closest('.category-dropdown')) {
         return;
       }
@@ -278,7 +277,7 @@ window.addEventListener('load', () => {
       const markers = document.querySelectorAll('a-entity[gps-entity-place]');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 60; // Строгий точечный радиус по размеру модели на экране
+      const hitRadiusPixels = 60; // Строгий размер по модели
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -297,23 +296,22 @@ window.addEventListener('load', () => {
         }
       });
 
-      const isTileOpen = infoTile && infoTile.style.display === 'block';
+      // Надежная проверка видимости плитки через вычисляемый стиль
+      const isTileOpen = infoTile && window.getComputedStyle(infoTile).display !== 'none';
 
       if (closestMarker) {
         const hitbox = closestMarker.querySelector('.clickable-hitbox') || closestMarker;
         const title = hitbox.getAttribute('data-title') || 'Объект';
 
-        // Если плитка уже открыта и кликнули по этой же модели — закрываем её
         if (isTileOpen && document.getElementById('tile-title').innerText === title) {
           infoTile.style.display = 'none';
           if (statusEl) {
-            statusEl.innerText = `Плитка закрыта`;
+            statusEl.innerText = `Плитка закрыта (повторный клик)`;
             statusEl.style.color = '#94a3b8';
           }
           return;
         }
 
-        // Открываем плитку для выбранного объекта
         const lat = parseFloat(hitbox.getAttribute('data-lat'));
         const lng = parseFloat(hitbox.getAttribute('data-lng'));
 
@@ -335,7 +333,6 @@ window.addEventListener('load', () => {
           statusEl.style.color = '#00ff66';
         }
       } else {
-        // Кликнули мимо модели в пустоту — если плитка открыта, закрываем её
         if (isTileOpen) {
           infoTile.style.display = 'none';
           if (statusEl) {
