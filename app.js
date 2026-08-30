@@ -251,8 +251,7 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Железобетонная проверка касаний через 2D-проекцию (Screen-Space Proximity)
-  // Избавляет от любых проблем с Three.js Raycaster и матрицами AR.js в пространстве
+  // Абсолютно надежная проекция без фильтров по z-индексу и с огромным радиусом захвата
   const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
@@ -281,7 +280,7 @@ window.addEventListener('load', () => {
       const markers = document.querySelectorAll('a-entity[gps-entity-place]');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 120; // Щедрый радиус зоны клика вокруг объекта на экране (учитывает палец и AR-погрешность)
+      const hitRadiusPixels = 250; // Увеличенный радиус зоны клика (полэкрана вокруг центра объекта)
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -290,7 +289,7 @@ window.addEventListener('load', () => {
         marker.object3D.getWorldPosition(worldPos);
 
         const vector = worldPos.project(camera);
-        if (vector.z > 1) return; // Объект позади камеры
+        // Убрали проверку vector.z > 1, чтобы объекты не отсекались ложно
 
         const screenX = (vector.x *  .5 + .5) * window.innerWidth;
         const screenY = (vector.y * -.5 + .5) * window.innerHeight;
@@ -322,7 +321,7 @@ window.addEventListener('load', () => {
           infoTile.style.display = 'block';
         }
         if (statusEl) {
-          statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
+          statusEl.innerText = `ПОПАДАНИЕ (${title})! Растояние до тапа: ${Math.round(minDistanceToTap)}px`;
           statusEl.style.color = '#00ff66';
         }
       } else {
