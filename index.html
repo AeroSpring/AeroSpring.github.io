@@ -63,10 +63,9 @@
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
     <!-- Первая модель (Дрон) - категория: auto -->
-      <!-- gps-entity-place="latitude: 44.970635; longitude: 41.153389;" -->
-    <a-entity
+    <!-- <a-entity
       id="target-marker-1"
-      gps-entity-place="latitude: 44.996010; longitude: 41.127986;"
+      gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0"
       scale="2 2 2"
       smooth-position
@@ -82,13 +81,31 @@
         data-lng="41.153389"
         data-dist-id="dist-1">
       </a-sphere>
+    </a-entity> -->
+    <a-entity
+      id="target-marker-1"
+      gps-entity-place="latitude: 44.996010; longitude: 41.127986;"
+      position="0 235 0"
+      scale="4 4 4"
+      smooth-position
+      data-category="auto">
+      <a-entity id="model1-container"></a-entity>
+      <a-sphere 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        radius="8" 
+        material="opacity: 0; transparent: true;"
+        data-title="Дрон (Авторемонт)"
+        data-lat="44.996010"
+        data-lng="41.127986"
+        data-dist-id="dist-1">
+      </a-sphere>
     </a-entity>
 
     <!-- Вторая модель (Model 1C) - категория: it -->
-      <!-- gps-entity-place="latitude: 44.970218; longitude: 41.152996;" -->
-    <a-entity
+    <!-- <a-entity
       id="target-marker-2"
-      gps-entity-place="latitude: 44.973081; longitude: 41.129081;"
+      gps-entity-place="latitude: 44.970218; longitude: 41.152996;"
       position="0 220 0"
       scale="2 2 2"
       smooth-position
@@ -102,6 +119,25 @@
         data-title="Модель 1C (ИТ-услуги)"
         data-lat="44.970218"
         data-lng="41.152996"
+        data-dist-id="dist-2">
+      </a-sphere>
+    </a-entity> -->
+    <a-entity
+      id="target-marker-2"
+      gps-entity-place="latitude: 44.973081; longitude: 41.129081;"
+      position="0 235 0"
+      scale="4 4 4"
+      smooth-position
+      data-category="it">
+      <a-entity id="model2-container"></a-entity>
+      <a-sphere 
+        id="hitbox-2" 
+        class="clickable-hitbox" 
+        radius="12" 
+        material="opacity: 0; transparent: true;"
+        data-title="Модель 1C (ИТ-услуги)"
+        data-lat="44.973081"
+        data-lng="41.129081"
         data-dist-id="dist-2">
       </a-sphere>
     </a-entity>
