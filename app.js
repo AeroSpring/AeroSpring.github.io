@@ -46,8 +46,14 @@ AFRAME.registerComponent('billboard-scale', {
     const cameraEl = document.querySelector('a-camera');
     if (!cameraEl) return;
 
-    const pos = this.el.object3D.position;
-    const distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+    // Считаем реальное расстояние в мировых координатах до камеры
+    const worldPos = new THREE.Vector3();
+    this.el.object3D.getWorldPosition(worldPos);
+
+    const cameraWorldPos = new THREE.Vector3();
+    cameraEl.object3D.getWorldPosition(cameraWorldPos);
+
+    const distance = worldPos.distanceTo(cameraWorldPos);
 
     if (distance < 1) return;
 
@@ -56,7 +62,7 @@ AFRAME.registerComponent('billboard-scale', {
     if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
-    this.el.object3D.lookAt(cameraEl.object3D.position);
+    this.el.object3D.lookAt(cameraWorldPos);
   }
 });
 
