@@ -23,7 +23,7 @@
     <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
   </div>
 
-  <!-- Отладочная панель с ползунком и фильтром категорий -->
+  <!-- Отладочная панель с логарифмическим ползунком радиуса -->
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
@@ -36,12 +36,6 @@
       <input type="range" id="radius-range" min="0" max="100" value="50" step="0.1" style="flex-grow: 1; accent-color: #00ff66; cursor: pointer;">
       <span id="radius-value" style="margin-left: 8px; color: #38bdf8; min-width: 60px; text-align: right;">- км</span>
     </div>
-
-    <!-- Фильтры категорий (по умолчанию активны) -->
-    <div style="margin-top: 8px; pointer-events: auto; display: flex; gap: 8px; justify-content: center;">
-      <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer;">🚗 Авторемонт</button>
-      <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer;">💻 ИТ-услуги</button>
-    </div>
   </div>
 
   <a-scene
@@ -51,42 +45,40 @@
 
     <a-camera gps-camera="minDistance: 0; maxDistance: 100000;" rotation-reader></a-camera>
 
-    <!-- Первая модель (Дрон) - категория: auto -->
+    <!-- Первая модель (Дрон) -->
     <a-entity
       id="target-marker-1"
       gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
       position="0 225 0"
       scale="2 2 2"
-      smooth-position
-      data-category="auto">
+      smooth-position>
       <a-entity id="model1-container"></a-entity>
       <a-sphere 
         id="hitbox-1" 
         class="clickable-hitbox" 
         radius="8" 
         material="opacity: 0; transparent: true;"
-        data-title="Дрон (Авторемонт)"
+        data-title="Дрон (Главный)"
         data-lat="44.970635"
         data-lng="41.153389"
         data-dist-id="dist-1">
       </a-sphere>
     </a-entity>
 
-    <!-- Вторая модель (Model 1C) - категория: it -->
+    <!-- Вторая модель (Model 1C) -->
     <a-entity
       id="target-marker-2"
       gps-entity-place="latitude: 44.970218; longitude: 41.152996;"
       position="0 220 0"
       scale="2 2 2"
-      smooth-position
-      data-category="it">
+      smooth-position>
       <a-entity id="model2-container"></a-entity>
       <a-sphere 
         id="hitbox-2" 
         class="clickable-hitbox" 
         radius="12" 
         material="opacity: 0; transparent: true;"
-        data-title="Модель 1C (ИТ-услуги)"
+        data-title="Модель 1C"
         data-lat="44.970218"
         data-lng="41.152996"
         data-dist-id="dist-2">

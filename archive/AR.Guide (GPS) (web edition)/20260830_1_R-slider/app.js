@@ -24,12 +24,6 @@ const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
 
-// Состояние категорий (по умолчанию все активны для радости рекламодателей)
-const activeCategories = {
-  auto: true,
-  it: true
-};
-
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -46,6 +40,7 @@ function formatDist(meters) {
   return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
+// Превращаем линейное положение ползунка (0 - 100) в логарифмическое значение от 1 до 1000 км
 function getRadiusFromSlider(sliderValue) {
   const minKm = 1;
   const maxKm = 1000;
@@ -56,11 +51,10 @@ function getRadiusFromSlider(sliderValue) {
 }
 
 function updateUIData(userLat, userLng) {
-  if (userLat !== null && userLng !== null) {
-    currentUserLat = userLat;
-    currentUserLng = userLng;
-    document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
-  }
+  currentUserLat = userLat;
+  currentUserLng = userLng;
+
+  document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
 
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
@@ -84,28 +78,19 @@ function updateUIData(userLat, userLng) {
     const lat = parseFloat(hb.getAttribute('data-lat'));
     const lng = parseFloat(hb.getAttribute('data-lng'));
     const distId = hb.getAttribute('data-dist-id');
-    const marker = hb.parentElement;
-    const category = marker.getAttribute('data-category');
+    const markerId = hb.parentElement.id;
+    const marker = document.getElementById(markerId);
 
-    let distMeters = 0;
-    let distKm = 0;
+    const distMeters = calculateDistance(userLat, userLng, lat, lng);
+    const distKm = distMeters / 1000;
 
-    if (currentUserLat !== null && currentUserLng !== null) {
-      distMeters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
-      distKm = distMeters / 1000;
-
-      const distEl = document.getElementById(distId);
-      if (distEl) {
-        distEl.innerText = formatDist(distMeters);
-      }
+    const distEl = document.getElementById(distId);
+    if (distEl) {
+      distEl.innerText = formatDist(distMeters);
     }
 
-    // Проверяем оба условия: попадание в радиус И активность категории
-    const isWithinRadius = distKm <= maxRadiusKm;
-    const isCategoryActive = activeCategories[category] === true;
-
     if (marker) {
-      marker.setAttribute('visible', (isWithinRadius && isCategoryActive) ? 'true' : 'false');
+      marker.setAttribute('visible', distKm <= maxRadiusKm ? 'true' : 'false');
     }
   });
 }
@@ -165,28 +150,11 @@ window.addEventListener('load', () => {
 
   if (radiusRange) {
     radiusRange.addEventListener('input', () => {
-      updateUIData(currentUserLat, currentUserLng);
+      if (currentUserLat !== null && currentUserLng !== null) {
+        updateUIData(currentUserLat, currentUserLng);
+      }
     });
   }
-
-  // Настройка интерактивных кнопок категорий
-  const categoryButtons = document.querySelectorAll('.category-btn');
-  categoryButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.getAttribute('data-category');
-      activeCategories[cat] = !activeCategories[cat];
-
-      if (activeCategories[cat]) {
-        btn.style.background = '#00ff66';
-        btn.style.color = '#000';
-      } else {
-        btn.style.background = '#334155';
-        btn.style.color = '#94a3b8';
-      }
-
-      updateUIData(currentUserLat, currentUserLng);
-    });
-  });
 
   const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
@@ -226,12 +194,7 @@ window.addEventListener('load', () => {
       raycaster.setFromCamera(mouse, camera);
 
       const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
-      const hitboxObjects = hitboxEls.map(el => {
-        // Учитываем только видимые хитбоксы (прошедшие фильтры)
-        const marker = el.parentElement;
-        if (marker && marker.getAttribute('visible') === 'false') return null;
-        return el.object3D;
-      }).filter(obj => obj !== undefined && obj !== null);
+      const hitboxObjects = hitboxEls.map(el => el.object3D).filter(obj => obj !== undefined);
 
       const intersects = raycaster.intersectObjects(hitboxObjects, true);
 
