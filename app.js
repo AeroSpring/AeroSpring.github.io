@@ -16,8 +16,6 @@ AFRAME.registerComponent('billboard-scale', {
     if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
-
-    // Жестко разворачиваем весь маркер к камере, чтобы плоский хитбокс всегда был перпендикулярен взгляду
     this.el.object3D.lookAt(cameraEl.object3D.position);
   }
 });
@@ -193,6 +191,7 @@ function loadModelToContainer(config) {
 }
 
 window.addEventListener('load', () => {
+  const sceneEl = document.querySelector('a-scene');
   const radiusRange = document.getElementById('radius-range');
 
   if (radiusRange) {
@@ -252,47 +251,81 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Нативная обработка кликов через встроенные события A-Frame
-  const setupAFrameClickListeners = () => {
-    const hitboxEls = document.querySelectorAll('.clickable-hitbox');
+  // Нативная надежная обработка касаний через window.pointerdown и Raycaster
+  const setupNativePointerRaycaster = () => {
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
 
-    hitboxEls.forEach(el => {
-      el.addEventListener('click', (evt) => {
+    window.addEventListener('pointerdown', (e) => {
+      const camera = sceneEl.camera;
+      if (!camera) return;
+
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
+      if (clientX === null || clientY === null) return;
+
+      sceneEl.object3D.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+
+      mouse.x = (clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
+      const hitboxObjects = hitboxEls.map(el => {
         const marker = el.parentElement;
-        if (marker && marker.getAttribute('visible') === 'false') return;
+        if (marker && marker.getAttribute('visible') === 'false') return null;
+        return el.object3D;
+      }).filter(obj => obj !== undefined && obj !== null);
 
-        const title = el.getAttribute('data-title');
-        const lat = parseFloat(el.getAttribute('data-lat'));
-        const lng = parseFloat(el.getAttribute('data-lng'));
+      const intersects = raycaster.intersectObjects(hitboxObjects, true);
 
-        let distText = 'Ожидание GPS...';
-        if (currentUserLat !== null && currentUserLng !== null) {
-          const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
-          distText = formatDist(meters);
-        }
+      if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        let matchedEl = null;
+        hitboxEls.forEach(el => {
+          if (el.object3D === intersectedObject || el.object3D.children.includes(intersectedObject)) {
+            matchedEl = el;
+          }
+        });
 
-        document.getElementById('tile-title').innerText = title;
-        document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
-        document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+        if (matchedEl) {
+          const title = matchedEl.getAttribute('data-title');
+          const lat = parseFloat(matchedEl.getAttribute('data-lat'));
+          const lng = parseFloat(matchedEl.getAttribute('data-lng'));
 
-        if (infoTile) {
-          const isHidden = infoTile.style.display === 'none' || infoTile.style.display === '';
-          infoTile.style.display = isHidden ? 'block' : 'none';
-          
+          let distText = 'Ожидание GPS...';
+          if (currentUserLat !== null && currentUserLng !== null) {
+            const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
+            distText = formatDist(meters);
+          }
+
+          document.getElementById('tile-title').innerText = title;
+          document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
+          document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+
+          if (infoTile) {
+            infoTile.style.display = 'block';
+          }
           if (statusEl) {
-            statusEl.innerText = isHidden ? `ПОПАДАНИЕ (${title})!` : 'Плитка скрыта';
+            statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
+            statusEl.style.color = '#00ff66';
           }
         }
-      });
+      } else {
+        if (statusEl) {
+          statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
+          statusEl.style.color = '#ff3366';
+        }
+      }
     });
   };
 
-  const sceneEl = document.querySelector('a-scene');
   if (sceneEl.hasLoaded) {
-    setupAFrameClickListeners();
+    setupNativePointerRaycaster();
   } else {
-    sceneEl.addEventListener('loaded', setupAFrameClickListeners);
+    sceneEl.addEventListener('loaded', setupNativePointerRaycaster);
   }
 });
