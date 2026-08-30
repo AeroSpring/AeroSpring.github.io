@@ -24,10 +24,12 @@ const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
 
-// Состояние категорий (всего 2 категории, легко масштабировать хоть до 20)
+// Состояние всех категорий
 const activeCategories = {
   auto: true,
-  it: true
+  it: true,
+  beauty: true,
+  med: true
 };
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -55,7 +57,6 @@ function getRadiusFromSlider(sliderValue) {
   return Math.pow(10, minLog + scale * sliderValue);
 }
 
-// Обновление текста состояния выбранных категорий в шапке шторки
 function updateCategoryStatusText() {
   const total = Object.keys(activeCategories).length;
   const selectedCount = Object.values(activeCategories).filter(Boolean).length;
@@ -178,7 +179,7 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Логика открытия/закрытия шторки категорий
+  // Логика открытия/закрытия шторки категорий (возвращаем flex для построчного вывода)
   const toggleHeader = document.getElementById('category-toggle-header');
   const dropdownContent = document.getElementById('category-dropdown-content');
   const arrowEl = document.getElementById('category-arrow');
@@ -198,7 +199,6 @@ window.addEventListener('load', () => {
       const cat = btn.getAttribute('data-category');
       activeCategories[cat] = !activeCategories[cat];
 
-      // Меняем стили кнопки и галочку в тексте
       let text = btn.innerText.replace('✓ ', '').replace('✗ ', '');
       if (activeCategories[cat]) {
         btn.style.background = '#00ff66';
