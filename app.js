@@ -19,11 +19,11 @@ AFRAME.registerComponent('billboard-scale', {
 
     // Магия: масштабируем объект прямо пропорционально расстоянию до камеры,
     // чтобы его видимый размер на экране оставался стабильным (или рос по мере удаления)
-    let scaleFactor = distance * 0.1; // Настрой этот коэффициент (0.1 или больше), чтобы сделать модель крупнее
+    let scaleFactor = distance * 100.1; // Настрой этот коэффициент (0.1 или больше), чтобы сделать модель крупнее
 
     // Ограничим минимальный и максимальный масштаб, чтобы не ломать рендер
     if (scaleFactor < 2) scaleFactor = 2;
-    if (scaleFactor > 50) scaleFactor = 50; // Потолок для больших расстояний
+    if (scaleFactor > 100) scaleFactor = 100; // Потолок для больших расстояний
 
     this.el.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
   }
