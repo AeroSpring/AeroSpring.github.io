@@ -95,16 +95,18 @@
       smooth-position
       billboard-scale="multiplier: 0.1"
       data-category="auto">
+      
+      <!-- Сама 3D модель -->
       <a-entity id="model1-container"></a-entity>
       
-      <!-- Заменяем сферу на плоский хитбокс, который идеально ловит касания -->
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-plane 
         id="hitbox-1" 
         class="clickable-hitbox" 
-        width="30" 
-        height="30"
-        material="opacity: 0.3; transparent: true; color: #ff0000; side: double;"
-        rotation="0 0 0"
+        width="8" 
+        height="8"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Дрон (Авторемонт)"
         data-lat="44.972541"
         data-lng="41.145972"
