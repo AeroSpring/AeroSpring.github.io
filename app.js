@@ -24,7 +24,7 @@ const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
 
-// Состояние всех категорий (включая новые заготовки)
+// Состояние всех категорий
 const activeCategories = {
   auto: true,
   it: true,
@@ -179,7 +179,7 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Логика открытия/закрытия шторки категорий (используем grid для 2 колонок)
+  // Логика открытия/закрытия шторки категорий (возвращаем flex для построчного вывода)
   const toggleHeader = document.getElementById('category-toggle-header');
   const dropdownContent = document.getElementById('category-dropdown-content');
   const arrowEl = document.getElementById('category-arrow');
@@ -187,7 +187,7 @@ window.addEventListener('load', () => {
   if (toggleHeader && dropdownContent) {
     toggleHeader.addEventListener('click', () => {
       const isHidden = dropdownContent.style.display === 'none' || dropdownContent.style.display === '';
-      dropdownContent.style.display = isHidden ? 'grid' : 'none';
+      dropdownContent.style.display = isHidden ? 'flex' : 'none';
       arrowEl.innerText = isHidden ? '▲' : '▼';
     });
   }
