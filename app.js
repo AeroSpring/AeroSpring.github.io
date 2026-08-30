@@ -256,7 +256,7 @@ window.addEventListener('load', () => {
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      // Игнорируем клики по элементам интерфейса (панели управления, кнопкам), чтобы они не закрывали плитку
+      // Игнорируем клики по элементам интерфейса
       if (e.target.closest('#ui-container') || e.target.closest('#info-tile') || e.target.closest('.category-dropdown')) {
         return;
       }
@@ -278,7 +278,7 @@ window.addEventListener('load', () => {
       const markers = document.querySelectorAll('a-entity[gps-entity-place]');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 250;
+      const hitRadiusPixels = 60; // Строгий точечный радиус по размеру модели на экране
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -303,7 +303,7 @@ window.addEventListener('load', () => {
         const hitbox = closestMarker.querySelector('.clickable-hitbox') || closestMarker;
         const title = hitbox.getAttribute('data-title') || 'Объект';
 
-        // Если плитка уже открыта и кликнули ровно по этой же модели — закрываем её
+        // Если плитка уже открыта и кликнули по этой же модели — закрываем её
         if (isTileOpen && document.getElementById('tile-title').innerText === title) {
           infoTile.style.display = 'none';
           if (statusEl) {
@@ -313,7 +313,7 @@ window.addEventListener('load', () => {
           return;
         }
 
-        // Иначе открываем или переключаем на новый объект
+        // Открываем плитку для выбранного объекта
         const lat = parseFloat(hitbox.getAttribute('data-lat'));
         const lng = parseFloat(hitbox.getAttribute('data-lng'));
 
@@ -335,7 +335,7 @@ window.addEventListener('load', () => {
           statusEl.style.color = '#00ff66';
         }
       } else {
-        // Кликнули мимо всех объектов — если плитка была открыта, закрываем её
+        // Кликнули мимо модели в пустоту — если плитка открыта, закрываем её
         if (isTileOpen) {
           infoTile.style.display = 'none';
           if (statusEl) {
