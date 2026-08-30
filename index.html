@@ -29,6 +29,8 @@
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
     <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-1">-</span>)</div>
     <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-2">-</span>)</div>
+    <div><b>Ремонт двигателей и КПП:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-3">-</span>)</div>
+    <div><b>Медицинский домик:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-4">-</span>)</div>
     
     <!-- Ползунок радиуса -->
     <div style="margin-top: 8px; pointer-events: auto; display: flex; align-items: center; justify-content: space-between;">
@@ -66,6 +68,7 @@
       raycaster="objects: .clickable-hitbox; interval: 100;"
       cursor="fuse: false; rayOrigin: mouse;">
     </a-camera>
+
 
     <!-- Первая модель (Дрон) - категория: auto -->
     <!-- <a-entity
@@ -106,13 +109,14 @@
         width="8" 
         height="8"
         position="0 0 0"
-        material="opacity: 0.25; transparent: true; side: double; shader: flat;"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Дрон (Авторемонт)"
         data-lat="44.972541"
         data-lng="41.145972"
         data-dist-id="dist-1">
       </a-plane>
     </a-entity>
+
 
     <!-- Вторая модель (Model 1C) - категория: it -->
     <!-- <a-entity
@@ -141,18 +145,79 @@
       smooth-position
       billboard-scale="multiplier: 1.0"
       data-category="it">
+
+      <!-- Сама 3D модель -->
       <a-entity id="model2-container"></a-entity>
+
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-sphere 
         id="hitbox-2" 
         class="clickable-hitbox" 
-        radius="20"
-        material="opacity: 0.5; transparent: true;"
+        width="8" 
+        height="8"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Модель 1C (ИТ-услуги)"
         data-lat="44.974651"
         data-lng="41.151093"
         data-dist-id="dist-2">
       </a-sphere>
     </a-entity>
+
+
+    <a-entity
+      id="target-marker-3"
+      gps-entity-place="latitude: 44.973503; longitude: 41.141933;"
+      position="0 235 0"
+      smooth-position
+      billboard-scale="multiplier: 0.1"
+      data-category="auto">
+      
+      <!-- Сама 3D модель -->
+      <a-entity id="model3-container"></a-entity>
+      
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
+      <a-plane 
+        id="hitbox-3" 
+        class="clickable-hitbox" 
+        width="8
+        height="8"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Ремонт двигателей и КПП"
+        data-lat="44.973503"
+        data-lng="41.141933"
+        data-dist-id="dist-3">
+      </a-plane>
+    </a-entity>
+    
+
+    <a-entity
+      id="target-marker-4"
+      gps-entity-place="latitude: 44.994807; longitude: 41.127578;"
+      position="0 235 0"
+      smooth-position
+      billboard-scale="multiplier: 0.1"
+      data-category="med">
+      
+      <!-- Сама 3D модель -->
+      <a-entity id="model4-container"></a-entity>
+      
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
+      <a-plane 
+        id="hitbox-4" 
+        class="clickable-hitbox" 
+        width="8" 
+        height="8"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Медицинский домик"
+        data-lat="44.994807"
+        data-lng="41.127578"
+        data-dist-id="dist-4">
+      </a-plane>
+    </a-entity>
+
 
   </a-scene>
 
