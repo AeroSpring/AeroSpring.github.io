@@ -251,7 +251,7 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Нативная надежная обработка касаний через window.pointerdown и Raycaster
+  // Жесткий фикс: безопасный поиск камеры AR.js/A-Frame и обработка pointerdown
   const setupNativePointerRaycaster = () => {
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
@@ -259,14 +259,25 @@ window.addEventListener('load', () => {
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      const camera = sceneEl.camera;
-      if (!camera) return;
+      // Надежно вытаскиваем камеру через компоненты A-Frame или сцену
+      const cameraEl = document.querySelector('a-camera') || document.querySelector('[camera]');
+      const camera = cameraEl && cameraEl.components && cameraEl.components.camera 
+        ? cameraEl.components.camera.camera 
+        : (sceneEl ? sceneEl.camera : null);
+
+      if (!camera) {
+        if (statusEl) {
+          statusEl.innerText = 'ОШИБКА: Камера не инициализирована';
+          statusEl.style.color = '#ff3366';
+        }
+        return;
+      }
 
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
       const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
       if (clientX === null || clientY === null) return;
 
-      sceneEl.object3D.updateMatrixWorld(true);
+      if (sceneEl) sceneEl.object3D.updateMatrixWorld(true);
       camera.updateMatrixWorld(true);
 
       mouse.x = (clientX / window.innerWidth) * 2 - 1;
@@ -323,9 +334,11 @@ window.addEventListener('load', () => {
     });
   };
 
-  if (sceneEl.hasLoaded) {
+  if (sceneEl && sceneEl.hasLoaded) {
     setupNativePointerRaycaster();
-  } else {
+  } else if (sceneEl) {
     sceneEl.addEventListener('loaded', setupNativePointerRaycaster);
+  } else {
+    setupNativePointerRaycaster();
   }
 });
