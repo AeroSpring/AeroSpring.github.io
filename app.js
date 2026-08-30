@@ -244,7 +244,7 @@ window.addEventListener('load', () => {
 
 const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
-    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [1, 1, 1], statusElId: 'model2-status' }
+    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [20, 20, 20], statusElId: 'model2-status' }
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
