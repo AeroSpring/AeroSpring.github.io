@@ -1,43 +1,43 @@
-// Компонент вертикального луча к земле
+// Надежный вертикальный луч-цилиндр к земле с точкой
 AFRAME.registerComponent('ground-beam', {
   schema: {
     color: { type: 'color', default: '#00ff66' },
-    targetHeight: { type: 'number', default: 235 } // Высота, на которой висит модель
+    targetHeight: { type: 'number', default: 235 }
   },
   init: function () {
     const el = this.el;
     const height = this.data.targetHeight;
     const color = this.data.color;
 
-    // 1. Создаем геометрию линии от (0, 0, 0) модели до (0, -height, 0) на земле
-    const points = [
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, -height, 0)
-    ];
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    
-    // Тонкая полупрозрачная линия с «неоновым» свечением
-    const material = new THREE.LineBasicMaterial({
+    // Группа для луча, чтобы отвязать его от масштабирования самой модели
+    const beamGroup = new THREE.Group();
+
+    // 1. Делаем луч в виде тонкого цилиндра (радиус 0.2 метра, высота — до земли)
+    const geometry = new THREE.CylinderGeometry(0.2, 0.2, height, 8);
+    // Смещаем геометрию цилиндра так, чтобы его верх был в точке (0,0,0) модели, а низ уходил на землю (-height)
+    geometry.translate(0, -height / 2, 0);
+
+    const material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.6,
-      linewidth: 2 // В Three.js толщина линий на WebGL часто ограничена 1px на уровне драйверов, но полупрозрачность даст отличный эффект
+      opacity: 0.7
     });
 
-    const line = new THREE.Line(geometry, material);
-    el.object3D.add(line);
+    const cylinder = new THREE.Mesh(geometry, material);
+    beamGroup.add(cylinder);
 
-    // 2. Создаем точку на земле (на конце луча)
-    const dotGeometry = new THREE.SphereGeometry(1.5, 16, 16);
+    // 2. Яркая точка-маркер на земле
+    const dotGeometry = new THREE.SphereGeometry(1.2, 16, 16);
     const dotMaterial = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.9
     });
     const dotMesh = new THREE.Mesh(dotGeometry, dotMaterial);
-    // Смещаем точку ровно на уровень земли относительно маркера
     dotMesh.position.set(0, -height, 0);
-    el.object3D.add(dotMesh);
+    beamGroup.add(dotMesh);
+
+    el.object3D.add(beamGroup);
   }
 });
 
