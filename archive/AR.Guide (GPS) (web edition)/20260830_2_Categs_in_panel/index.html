@@ -23,7 +23,7 @@
     <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
   </div>
 
-  <!-- Отладочная панель -->
+  <!-- Отладочная панель с ползунком и фильтром категорий -->
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
     <div><b>Мои GPS:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
@@ -37,19 +37,10 @@
       <span id="radius-value" style="margin-left: 8px; color: #38bdf8; min-width: 60px; text-align: right;">- км</span>
     </div>
 
-    <!-- Блок категорий со шторкой -->
-    <div style="margin-top: 8px; pointer-events: auto; border-top: 1px dashed rgba(0,255,102,0.4); padding-top: 6px;">
-      <!-- Шапка шторки (кнопка разворачивания) -->
-      <div id="category-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: rgba(0,255,102,0.1); padding: 4px 6px; border-radius: 4px;">
-        <span id="category-status-text">Категории: 2 из 2 выбрано</span>
-        <span id="category-arrow" style="font-weight: bold; font-size: 13px;">▼</span>
-      </div>
-
-      <!-- Выпадающий список категорий (скрыт по умолчанию) -->
-      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 120px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; padding-right: 2px;">
-        <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left;">✓ 🚗 Авторемонт</button>
-        <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left;">✓ 💻 ИТ-услуги</button>
-      </div>
+    <!-- Фильтры категорий (по умолчанию активны) -->
+    <div style="margin-top: 8px; pointer-events: auto; display: flex; gap: 8px; justify-content: center;">
+      <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer;">🚗 Авторемонт</button>
+      <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer;">💻 ИТ-услуги</button>
     </div>
   </div>
 

@@ -24,7 +24,7 @@ const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
 
-// Состояние категорий (всего 2 категории, легко масштабировать хоть до 20)
+// Состояние категорий (по умолчанию все активны для радости рекламодателей)
 const activeCategories = {
   auto: true,
   it: true
@@ -53,16 +53,6 @@ function getRadiusFromSlider(sliderValue) {
   const maxLog = Math.log10(maxKm);
   const scale = (maxLog - minLog) / 100;
   return Math.pow(10, minLog + scale * sliderValue);
-}
-
-// Обновление текста состояния выбранных категорий в шапке шторки
-function updateCategoryStatusText() {
-  const total = Object.keys(activeCategories).length;
-  const selectedCount = Object.values(activeCategories).filter(Boolean).length;
-  const statusTextEl = document.getElementById('category-status-text');
-  if (statusTextEl) {
-    statusTextEl.innerText = `Категории: ${selectedCount} из ${total} выбрано`;
-  }
 }
 
 function updateUIData(userLat, userLng) {
@@ -110,6 +100,7 @@ function updateUIData(userLat, userLng) {
       }
     }
 
+    // Проверяем оба условия: попадание в радиус И активность категории
     const isWithinRadius = distKm <= maxRadiusKm;
     const isCategoryActive = activeCategories[category] === true;
 
@@ -178,44 +169,24 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Логика открытия/закрытия шторки категорий
-  const toggleHeader = document.getElementById('category-toggle-header');
-  const dropdownContent = document.getElementById('category-dropdown-content');
-  const arrowEl = document.getElementById('category-arrow');
-
-  if (toggleHeader && dropdownContent) {
-    toggleHeader.addEventListener('click', () => {
-      const isHidden = dropdownContent.style.display === 'none' || dropdownContent.style.display === '';
-      dropdownContent.style.display = isHidden ? 'flex' : 'none';
-      arrowEl.innerText = isHidden ? '▲' : '▼';
-    });
-  }
-
-  // Настройка кликов по кнопкам категорий
+  // Настройка интерактивных кнопок категорий
   const categoryButtons = document.querySelectorAll('.category-btn');
   categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const cat = btn.getAttribute('data-category');
       activeCategories[cat] = !activeCategories[cat];
 
-      // Меняем стили кнопки и галочку в тексте
-      let text = btn.innerText.replace('✓ ', '').replace('✗ ', '');
       if (activeCategories[cat]) {
         btn.style.background = '#00ff66';
         btn.style.color = '#000';
-        btn.innerText = `✓ ${text}`;
       } else {
         btn.style.background = '#334155';
         btn.style.color = '#94a3b8';
-        btn.innerText = `✗ ${text}`;
       }
 
-      updateCategoryStatusText();
       updateUIData(currentUserLat, currentUserLng);
     });
   });
-
-  updateCategoryStatusText();
 
   const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [2, 2, 2], statusElId: 'model-status' },
@@ -256,6 +227,7 @@ window.addEventListener('load', () => {
 
       const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
       const hitboxObjects = hitboxEls.map(el => {
+        // Учитываем только видимые хитбоксы (прошедшие фильтры)
         const marker = el.parentElement;
         if (marker && marker.getAttribute('visible') === 'false') return null;
         return el.object3D;
