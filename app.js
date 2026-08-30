@@ -251,15 +251,13 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Жесткий фикс: безопасный поиск камеры AR.js/A-Frame и обработка pointerdown
-  const setupNativePointerRaycaster = () => {
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+  // Железобетонная проверка касаний через 2D-проекцию (Screen-Space Proximity)
+  // Избавляет от любых проблем с Three.js Raycaster и матрицами AR.js в пространстве
+  const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      // Надежно вытаскиваем камеру через компоненты A-Frame или сцену
       const cameraEl = document.querySelector('a-camera') || document.querySelector('[camera]');
       const camera = cameraEl && cameraEl.components && cameraEl.components.camera 
         ? cameraEl.components.camera.camera 
@@ -280,50 +278,52 @@ window.addEventListener('load', () => {
       if (sceneEl) sceneEl.object3D.updateMatrixWorld(true);
       camera.updateMatrixWorld(true);
 
-      mouse.x = (clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
+      const markers = document.querySelectorAll('a-entity[gps-entity-place]');
+      let closestMarker = null;
+      let minDistanceToTap = Infinity;
+      const hitRadiusPixels = 120; // Щедрый радиус зоны клика вокруг объекта на экране (учитывает палец и AR-погрешность)
 
-      const hitboxEls = Array.from(document.querySelectorAll('.clickable-hitbox'));
-      const hitboxObjects = hitboxEls.map(el => {
-        const marker = el.parentElement;
-        if (marker && marker.getAttribute('visible') === 'false') return null;
-        return el.object3D;
-      }).filter(obj => obj !== undefined && obj !== null);
+      markers.forEach(marker => {
+        if (marker.getAttribute('visible') === 'false') return;
 
-      const intersects = raycaster.intersectObjects(hitboxObjects, true);
+        const worldPos = new THREE.Vector3();
+        marker.object3D.getWorldPosition(worldPos);
 
-      if (intersects.length > 0) {
-        const intersectedObject = intersects[0].object;
-        let matchedEl = null;
-        hitboxEls.forEach(el => {
-          if (el.object3D === intersectedObject || el.object3D.children.includes(intersectedObject)) {
-            matchedEl = el;
-          }
-        });
+        const vector = worldPos.project(camera);
+        if (vector.z > 1) return; // Объект позади камеры
 
-        if (matchedEl) {
-          const title = matchedEl.getAttribute('data-title');
-          const lat = parseFloat(matchedEl.getAttribute('data-lat'));
-          const lng = parseFloat(matchedEl.getAttribute('data-lng'));
+        const screenX = (vector.x *  .5 + .5) * window.innerWidth;
+        const screenY = (vector.y * -.5 + .5) * window.innerHeight;
 
-          let distText = 'Ожидание GPS...';
-          if (currentUserLat !== null && currentUserLng !== null) {
-            const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
-            distText = formatDist(meters);
-          }
+        const dist = Math.hypot(screenX - clientX, screenY - clientY);
+        if (dist < hitRadiusPixels && dist < minDistanceToTap) {
+          minDistanceToTap = dist;
+          closestMarker = marker;
+        }
+      });
 
-          document.getElementById('tile-title').innerText = title;
-          document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
-          document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+      if (closestMarker) {
+        const hitbox = closestMarker.querySelector('.clickable-hitbox') || closestMarker;
+        const title = hitbox.getAttribute('data-title') || 'Объект';
+        const lat = parseFloat(hitbox.getAttribute('data-lat'));
+        const lng = parseFloat(hitbox.getAttribute('data-lng'));
 
-          if (infoTile) {
-            infoTile.style.display = 'block';
-          }
-          if (statusEl) {
-            statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
-            statusEl.style.color = '#00ff66';
-          }
+        let distText = 'Ожидание GPS...';
+        if (currentUserLat !== null && currentUserLng !== null) {
+          const meters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
+          distText = formatDist(meters);
+        }
+
+        document.getElementById('tile-title').innerText = title;
+        document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
+        document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
+
+        if (infoTile) {
+          infoTile.style.display = 'block';
+        }
+        if (statusEl) {
+          statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
+          statusEl.style.color = '#00ff66';
         }
       } else {
         if (statusEl) {
@@ -335,10 +335,10 @@ window.addEventListener('load', () => {
   };
 
   if (sceneEl && sceneEl.hasLoaded) {
-    setupNativePointerRaycaster();
+    setupScreenSpaceClickDetection();
   } else if (sceneEl) {
-    sceneEl.addEventListener('loaded', setupNativePointerRaycaster);
+    sceneEl.addEventListener('loaded', setupScreenSpaceClickDetection);
   } else {
-    setupNativePointerRaycaster();
+    setupScreenSpaceClickDetection();
   }
 });
