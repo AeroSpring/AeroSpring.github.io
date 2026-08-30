@@ -1,14 +1,11 @@
 AFRAME.registerComponent('billboard-scale', {
   schema: {
-    baseScale: { type: 'number', default: 2 }, // Базовый размер вблизи 2
-    minDist: { type: 'number', default: 1 },    // Расстояние, с которого начинаем увеличивать (в метрах) 10
-    maxScale: { type: 'number', default: 1000 }   // Максимальный масштаб на большом расстоянии 15
+    targetSize: { type: 'number', default: 5 } // Желаемый условный размер в пространстве кадра
   },
   tick: function () {
     const cameraEl = document.querySelector('a-camera');
     if (!cameraEl) return;
 
-    // Получаем мировые позиции камеры и объекта
     const cameraPos = new THREE.Vector3();
     cameraEl.object3D.getWorldPosition(cameraPos);
 
@@ -17,18 +14,18 @@ AFRAME.registerComponent('billboard-scale', {
 
     const distance = cameraPos.distanceTo(objectPos);
 
-    // Рассчитываем коэффициент масштабирования
-    // Если объект ближе minDist, держим baseScale. Если дальше — пропорционально увеличиваем.
-    let currentScale = this.data.baseScale;
-    if (distance > this.data.minDist) {
-      // Плавное увеличение в зависимости от расстояния (можно настроить формулу)
-      currentScale = this.data.baseScale + (distance * 0.001); 
-    //   if (currentScale > this.data.maxScale) {
-    //     currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
-    //   }
-    }
+    // Если расстояние слишком маленькое, избегаем деления на ноль
+    if (distance < 1) return;
 
-    this.el.object3D.scale.set(currentScale, currentScale, currentScale);
+    // Магия: масштабируем объект прямо пропорционально расстоянию до камеры,
+    // чтобы его видимый размер на экране оставался стабильным (или рос по мере удаления)
+    let scaleFactor = distance * 0.1; // Настрой этот коэффициент (0.1 или больше), чтобы сделать модель крупнее
+
+    // Ограничим минимальный и максимальный масштаб, чтобы не ломать рендер
+    if (scaleFactor < 2) scaleFactor = 2;
+    if (scaleFactor > 50) scaleFactor = 50; // Потолок для больших расстояний
+
+    this.el.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
   }
 });
 
