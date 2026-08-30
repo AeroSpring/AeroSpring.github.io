@@ -1,20 +1,23 @@
 AFRAME.registerComponent('billboard-scale', {
   schema: {
-    factor: { type: 'number', default: 0.2 }
+    multiplier: { type: 'number', default: 0.1 } // Плавный коэффициент роста
   },
   tick: function () {
-    // В AR.js камера всегда в точке 0,0,0, а позиция объекта — это и есть его расстояние до нас
     const pos = this.el.object3D.position;
     const distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
 
     if (distance < 1) return;
 
-    // Масштабируем пропорционально удалению
-    let currentScale = distance * this.data.factor;
+    // Расчет масштаба: чем дальше объект, тем больше он становится, 
+    // компенсируя перспективу, но не улетая в бесконечность.
+    let currentScale = distance * this.data.multiplier;
+
+    // Нижний порог для близких объектов (чтобы не были микроскопическими)
+    if (currentScale < 2) currentScale = 2;
     
-    // Задаем адекватные рамки
-    if (currentScale < 5) currentScale = 5;
-    if (currentScale > 300) currentScale = 300;
+    // Верхний порог (даже при удалении на сотни километров модель 
+    // не вырастет больше определенного предела, оставаясь аккуратным маркером)
+    if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
   }
