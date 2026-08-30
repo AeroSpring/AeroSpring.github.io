@@ -242,7 +242,7 @@ window.addEventListener('load', () => {
 
   updateCategoryStatusText();
 
-const modelsToLoad = [
+  const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
     { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [1, 1, 1], statusElId: 'model2-status' }
   ];
@@ -273,6 +273,8 @@ const modelsToLoad = [
       const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
       if (clientX === null || clientY === null) return;
 
+      // Принудительно обновляем матрицы мира всей сцены и камеры перед трассировкой луча
+      sceneEl.object3D.updateMatrixWorld(true);
       camera.updateMatrixWorld(true);
 
       mouse.x = (clientX / window.innerWidth) * 2 - 1;
