@@ -251,24 +251,22 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Абсолютно надежная проекция без фильтров по z-индексу и с огромным радиусом захвата
   const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
+      // Игнорируем клики по элементам интерфейса (панели управления, кнопкам), чтобы они не закрывали плитку
+      if (e.target.closest('#ui-container') || e.target.closest('#info-tile') || e.target.closest('.category-dropdown')) {
+        return;
+      }
+
       const cameraEl = document.querySelector('a-camera') || document.querySelector('[camera]');
       const camera = cameraEl && cameraEl.components && cameraEl.components.camera 
         ? cameraEl.components.camera.camera 
         : (sceneEl ? sceneEl.camera : null);
 
-      if (!camera) {
-        if (statusEl) {
-          statusEl.innerText = 'ОШИБКА: Камера не инициализирована';
-          statusEl.style.color = '#ff3366';
-        }
-        return;
-      }
+      if (!camera) return;
 
       const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
       const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : null);
@@ -280,7 +278,7 @@ window.addEventListener('load', () => {
       const markers = document.querySelectorAll('a-entity[gps-entity-place]');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 250; // Увеличенный радиус зоны клика (полэкрана вокруг центра объекта)
+      const hitRadiusPixels = 250;
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -289,8 +287,6 @@ window.addEventListener('load', () => {
         marker.object3D.getWorldPosition(worldPos);
 
         const vector = worldPos.project(camera);
-        // Убрали проверку vector.z > 1, чтобы объекты не отсекались ложно
-
         const screenX = (vector.x *  .5 + .5) * window.innerWidth;
         const screenY = (vector.y * -.5 + .5) * window.innerHeight;
 
@@ -301,9 +297,23 @@ window.addEventListener('load', () => {
         }
       });
 
+      const isTileOpen = infoTile && infoTile.style.display === 'block';
+
       if (closestMarker) {
         const hitbox = closestMarker.querySelector('.clickable-hitbox') || closestMarker;
         const title = hitbox.getAttribute('data-title') || 'Объект';
+
+        // Если плитка уже открыта и кликнули ровно по этой же модели — закрываем её
+        if (isTileOpen && document.getElementById('tile-title').innerText === title) {
+          infoTile.style.display = 'none';
+          if (statusEl) {
+            statusEl.innerText = `Плитка закрыта`;
+            statusEl.style.color = '#94a3b8';
+          }
+          return;
+        }
+
+        // Иначе открываем или переключаем на новый объект
         const lat = parseFloat(hitbox.getAttribute('data-lat'));
         const lng = parseFloat(hitbox.getAttribute('data-lng'));
 
@@ -321,13 +331,22 @@ window.addEventListener('load', () => {
           infoTile.style.display = 'block';
         }
         if (statusEl) {
-          statusEl.innerText = `ПОПАДАНИЕ (${title})! Растояние до тапа: ${Math.round(minDistanceToTap)}px`;
+          statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
           statusEl.style.color = '#00ff66';
         }
       } else {
-        if (statusEl) {
-          statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
-          statusEl.style.color = '#ff3366';
+        // Кликнули мимо всех объектов — если плитка была открыта, закрываем её
+        if (isTileOpen) {
+          infoTile.style.display = 'none';
+          if (statusEl) {
+            statusEl.innerText = `Плитка закрыта (клик мимо)`;
+            statusEl.style.color = '#94a3b8';
+          }
+        } else {
+          if (statusEl) {
+            statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
+            statusEl.style.color = '#ff3366';
+          }
         }
       }
     });
