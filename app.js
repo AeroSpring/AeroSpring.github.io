@@ -2,7 +2,7 @@ AFRAME.registerComponent('billboard-scale', {
   schema: {
     baseScale: { type: 'number', default: 2 }, // Базовый размер вблизи
     minDist: { type: 'number', default: 10 },    // Расстояние, с которого начинаем увеличивать (в метрах)
-    maxScale: { type: 'number', default: 15 }   // Максимальный масштаб на большом расстоянии
+    maxScale: { type: 'number', default: 50 }   // Максимальный масштаб на большом расстоянии
   },
   tick: function () {
     const cameraEl = document.querySelector('a-camera');
