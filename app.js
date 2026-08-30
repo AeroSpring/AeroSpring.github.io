@@ -1,3 +1,37 @@
+AFRAME.registerComponent('billboard-scale', {
+  schema: {
+    baseScale: { type: 'number', default: 2 }, // Базовый размер вблизи
+    minDist: { type: 'number', default: 10 },    // Расстояние, с которого начинаем увеличивать (в метрах)
+    maxScale: { type: 'number', default: 15 }   // Максимальный масштаб на большом расстоянии
+  },
+  tick: function () {
+    const cameraEl = document.querySelector('a-camera');
+    if (!cameraEl) return;
+
+    // Получаем мировые позиции камеры и объекта
+    const cameraPos = new THREE.Vector3();
+    cameraEl.object3D.getWorldPosition(cameraPos);
+
+    const objectPos = new THREE.Vector3();
+    this.el.object3D.getWorldPosition(objectPos);
+
+    const distance = cameraPos.distanceTo(objectPos);
+
+    // Рассчитываем коэффициент масштабирования
+    // Если объект ближе minDist, держим baseScale. Если дальше — пропорционально увеличиваем.
+    let currentScale = this.data.baseScale;
+    if (distance > this.data.minDist) {
+      // Плавное увеличение в зависимости от расстояния (можно настроить формулу)
+      currentScale = this.data.baseScale + (distance * 0.015); 
+      if (currentScale > this.data.maxScale) {
+        currentScale = this.data.maxScale; // Ограничиваем потолок, чтобы модель не закрывала полнеба
+      }
+    }
+
+    this.el.object3D.scale.set(currentScale, currentScale, currentScale);
+  }
+});
+
 AFRAME.registerComponent('smooth-position', {
   init: function () {
     this.targetPos = new THREE.Vector3();
