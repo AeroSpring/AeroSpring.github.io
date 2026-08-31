@@ -60,32 +60,28 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Увеличили maxDistance и far у камеры до 10000 км, чтобы объекты в Воронеже не отсекались -->
     <a-camera 
       gps-camera="minDistance: 0; maxDistance: 10000000;" 
-      camera="far: 10000000"
-      rotation-reader
-      raycaster="objects: .clickable-hitbox; interval: 100;"
-      cursor="fuse: false; rayOrigin: mouse;">
+      camera="near: 0.1; far: 100000;"
+      rotation-reader>
     </a-camera>
 
     <!-- Первая модель (Дрон в Воронеже) - Авторемонт -->
     <a-entity
       id="target-marker-1"
-      gps-entity-place="latitude: 51.672602; longitude: 39.237782;"
-      position="0 235 0"
-      smooth-position
-      billboard-scale="multiplier: 0.1"
-      ground-beam="color: #00ff66; targetHeight: 235"
-      data-category="auto">
+      class="ar-gps-marker"
+      data-lat="51.672602"
+      data-lng="39.237782"
+      data-category="auto"
+      position="0 0 0">
       
       <a-entity id="model1-container"></a-entity>
       
       <a-plane 
         id="hitbox-1" 
         class="clickable-hitbox" 
-        width="8" 
-        height="8"
+        width="6" 
+        height="6"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Дрон (Авторемонт)"
@@ -98,45 +94,44 @@
     <!-- Вторая модель (Model 1C) - ИТ -->
     <a-entity
       id="target-marker-2"
-      gps-entity-place="latitude: 44.980121; longitude: 41.156828;"
-      position="0 235 0"
-      smooth-position
-      billboard-scale="multiplier: 0.1"
-      ground-beam="color: #38bdf8; targetHeight: 235"
-      data-category="it">
+      class="ar-gps-marker"
+      data-lat="44.980121"
+      data-lng="41.156828"
+      data-category="it"
+      position="0 0 0">
 
       <a-entity id="model2-container"></a-entity>
 
-      <a-sphere 
+      <a-plane 
         id="hitbox-2" 
         class="clickable-hitbox" 
-        radius="8" 
+        width="6" 
+        height="6"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Модель 1C (ИТ-услуги)"
         data-lat="44.980121"
         data-lng="41.156828"
         data-dist-id="dist-2">
-      </a-sphere>
+      </a-plane>
     </a-entity>
 
     <!-- Третья модель - Авторемонт -->
     <a-entity
       id="target-marker-3"
-      gps-entity-place="latitude: 44.970499; longitude: 41.153234;"
-      position="0 235 0"
-      smooth-position
-      billboard-scale="multiplier: 0.1"
-      ground-beam="color: #00ff66; targetHeight: 235"
-      data-category="auto">
+      class="ar-gps-marker"
+      data-lat="44.970499"
+      data-lng="41.153234"
+      data-category="auto"
+      position="0 0 0">
       
       <a-entity id="model3-container"></a-entity>
       
       <a-plane 
         id="hitbox-3" 
         class="clickable-hitbox" 
-        width="8" 
-        height="8"
+        width="6" 
+        height="6"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Ремонт двигателей и КПП"
@@ -149,20 +144,19 @@
     <!-- Четвертая модель (Фито) - Медицина -->
     <a-entity
       id="target-marker-4"
-      gps-entity-place="latitude: 44.989088; longitude: 41.161151;"
-      position="0 235 0"
-      smooth-position
-      billboard-scale="multiplier: 0.1"
-      ground-beam="color: #ef4444; targetHeight: 235"
-      data-category="med">
+      class="ar-gps-marker"
+      data-lat="44.989088"
+      data-lng="41.161151"
+      data-category="med"
+      position="0 0 0">
       
       <a-entity id="model4-container"></a-entity>
       
       <a-plane 
         id="hitbox-4" 
         class="clickable-hitbox" 
-        width="8" 
-        height="8"
+        width="6" 
+        height="6"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Фито"

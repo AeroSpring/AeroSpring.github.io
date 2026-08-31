@@ -1,88 +1,3 @@
-// Компонент вертикального луча к земле
-AFRAME.registerComponent('ground-beam', {
-  schema: {
-    color: { type: 'color', default: '#00ff66' },
-    targetHeight: { type: 'number', default: 235 }
-  },
-  init: function () {
-    const el = this.el;
-    const height = this.data.targetHeight;
-    const color = this.data.color;
-
-    const beamGroup = new THREE.Group();
-
-    // Цилиндр-луч от модели до земли
-    const geometry = new THREE.CylinderGeometry(0.2, 0.2, height, 8);
-    geometry.translate(0, -height / 2, 0);
-
-    const material = new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 0.6
-    });
-
-    const cylinder = new THREE.Mesh(geometry, material);
-    beamGroup.add(cylinder);
-
-    // Точка на земле
-    const dotGeometry = new THREE.SphereGeometry(1.2, 16, 16);
-    const dotMaterial = new THREE.MeshBasicMaterial({
-      color: color,
-      transparent: true,
-      opacity: 0.8
-    });
-    const dotMesh = new THREE.Mesh(dotGeometry, dotMaterial);
-    dotMesh.position.set(0, -height, 0);
-    beamGroup.add(dotMesh);
-
-    el.object3D.add(beamGroup);
-  }
-});
-
-AFRAME.registerComponent('billboard-scale', {
-  schema: {
-    multiplier: { type: 'number', default: 0.1 }
-  },
-  tick: function () {
-    const cameraEl = document.querySelector('a-camera');
-    if (!cameraEl) return;
-
-    const pos = this.el.object3D.position;
-    const distance = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
-
-    if (distance < 1) return;
-
-    // Плавное масштабирование с учетом расстояния (без жесткого обрезания в 150 для дальних объектов)
-    let currentScale = distance * this.data.multiplier;
-    if (currentScale < 2) currentScale = 2;
-
-    this.el.object3D.scale.set(currentScale, currentScale, currentScale);
-    this.el.object3D.lookAt(cameraEl.object3D.position);
-  }
-});
-
-AFRAME.registerComponent('smooth-position', {
-  init: function () {
-    this.targetPos = new THREE.Vector3();
-    this.initialized = false;
-  },
-  tick: function () {
-    const currentPositionAttr = this.el.getAttribute('position');
-    if (!currentPositionAttr) return;
-
-    this.targetPos.set(currentPositionAttr.x, currentPositionAttr.y, currentPositionAttr.z);
-
-    if (!this.initialized) {
-      this.el.object3D.position.copy(this.targetPos);
-      this.initialized = true;
-      return;
-    }
-
-    const smoothingFactor = 0.08;
-    this.el.object3D.position.lerp(this.targetPos, smoothingFactor);
-  }
-});
-
 const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
@@ -104,6 +19,15 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
+}
+
+function calculateBearing(lat1, lon1, lat2, lon2) {
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+  const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+            Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+  let brng = Math.atan2(y, x) * 180 / Math.PI;
+  return (brng + 360) % 360;
 }
 
 function formatDist(meters) {
@@ -128,67 +52,65 @@ function updateCategoryStatusText() {
   }
 }
 
-function updateUIData(userLat, userLng) {
-  if (userLat !== null && userLng !== null) {
-    currentUserLat = userLat;
-    currentUserLng = userLng;
-    document.getElementById('my-coords').innerText = `${userLat.toFixed(6)}, ${userLng.toFixed(6)}`;
-  }
+// Надежный менеджер позиций и масштабов без сбоев WebGL float
+function updateMarkersPositionAndScale() {
+  if (currentUserLat === null || currentUserLng === null) return;
 
-  const radiusRange = document.getElementById('radius-range');
-  const radiusValueEl = document.getElementById('radius-value');
-  
-  let maxRadiusKm = 50;
-  if (radiusRange) {
-    const sliderVal = parseFloat(radiusRange.value);
-    maxRadiusKm = getRadiusFromSlider(sliderVal);
-    
-    if (radiusValueEl) {
-      if (maxRadiusKm < 10) {
-        radiusValueEl.innerText = `${maxRadiusKm.toFixed(1)} км`;
-      } else {
-        radiusValueEl.innerText = `${Math.round(maxRadiusKm)} км`;
-      }
-    }
-  }
+  const markers = document.querySelectorAll('.ar-gps-marker');
+  const cameraEl = document.querySelector('a-camera');
+  if (!cameraEl) return;
 
-  const hitboxes = document.querySelectorAll('.clickable-hitbox');
-  hitboxes.forEach(hb => {
-    const lat = parseFloat(hb.getAttribute('data-lat'));
-    const lng = parseFloat(hb.getAttribute('data-lng'));
-    const distId = hb.getAttribute('data-dist-id');
-    const marker = hb.parentElement;
+  markers.forEach(marker => {
+    const targetLat = parseFloat(marker.getAttribute('data-lat'));
+    const targetLng = parseFloat(marker.getAttribute('data-lng'));
     const category = marker.getAttribute('data-category');
+    const distId = marker.querySelector('.clickable-hitbox').getAttribute('data-dist-id');
 
-    let distMeters = 0;
-    let distKm = 0;
-
-    if (currentUserLat !== null && currentUserLng !== null) {
-      distMeters = calculateDistance(currentUserLat, currentUserLng, lat, lng);
-      distKm = distMeters / 1000;
-
-      const distEl = document.getElementById(distId);
-      if (distEl) {
-        distEl.innerText = formatDist(distMeters);
-      }
+    const realMeters = calculateDistance(currentUserLat, currentUserLng, targetLat, targetLng);
+    const distEl = document.getElementById(distId);
+    if (distEl) {
+      distEl.innerText = formatDist(realMeters);
     }
 
-    // Видимость теперь зависит ТОЛЬКО от выбранных категорий (все модели видны независимо от расстояния)
     const isCategoryActive = activeCategories[category] === true;
+    marker.setAttribute('visible', isCategoryActive ? 'true' : 'false');
 
-    if (marker) {
-      marker.setAttribute('visible', isCategoryActive ? 'true' : 'false');
-    }
+    if (!isCategoryActive) return;
+
+    // Вычисляем азимут для направления на объект в поле зрения камеры
+    const bearing = calculateBearing(currentUserLat, currentUserLng, targetLat, targetLng);
+    
+    // Фиксируем визуальное расстояние в безопасной зоне (например, 25 метров), 
+    // чтобы Three.js не ломал геометрию из-за огромных чисел (предотвращает мерцание и куски моделей)
+    const safeVisualDist = 25;
+    const angleRad = (bearing - 90) * (Math.PI / 180);
+    const posX = Math.cos(angleRad) * safeVisualDist;
+    const posZ = -Math.sin(angleRad) * safeVisualDist;
+
+    marker.object3D.position.set(posX, 2, posZ);
+
+    // Масштаб: чем дальше реальный объект, тем он меньше (на 1000 км в 4 раза меньше базового)
+    // Базовый масштаб для каждой модели берем из конфига, здесь применяем множитель расстояния
+    const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 10;
+    
+    // Коэффициент уменьшения при удалении (на 1000 км уменьшается примерно в 4 раза)
+    const distanceKm = realMeters / 1000;
+    const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
+    const finalScale = baseScale * scaleFactor;
+
+    marker.object3D.scale.set(finalScale, finalScale, finalScale);
+    marker.object3D.lookAt(cameraEl.object3D.position);
   });
 }
 
-window.addEventListener('gps-camera-update-position', (e) => {
-  updateUIData(e.detail.position.latitude, e.detail.position.longitude);
-});
-
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(
-    (pos) => updateUIData(pos.coords.latitude, pos.coords.longitude),
+    (pos) => {
+      currentUserLat = pos.coords.latitude;
+      currentUserLng = pos.coords.longitude;
+      document.getElementById('my-coords').innerText = `${currentUserLat.toFixed(6)}, ${currentUserLng.toFixed(6)}`;
+      updateMarkersPositionAndScale();
+    },
     null,
     { enableHighAccuracy: true }
   );
@@ -198,6 +120,11 @@ function loadModelToContainer(config) {
   const loader = new THREE.GLTFLoader();
   const container = document.getElementById(config.containerId);
   const statusEl = document.getElementById(config.statusElId);
+  const markerEl = document.getElementById(config.markerId);
+
+  if (markerEl) {
+    markerEl.dataset.baseScale = config.baseScale;
+  }
 
   loader.load(
     config.url,
@@ -208,7 +135,7 @@ function loadModelToContainer(config) {
       }
 
       const model = gltf.scene;
-      model.scale.set(...config.scale);
+      model.scale.set(1, 1, 1); // Базовый размер внутри контейнера
       container.object3D.add(model);
 
       const animations = gltf.animations;
@@ -226,7 +153,7 @@ function loadModelToContainer(config) {
         statusEl.innerText = 'ОШИБКА';
         statusEl.style.color = '#ff3366';
       }
-      console.error(`Ошибка загрузки модели (${config.url}):`, error);
+      console.error(`Ошибка загрузки (${config.url}):`, error);
     }
   );
 }
@@ -237,7 +164,7 @@ window.addEventListener('load', () => {
 
   if (radiusRange) {
     radiusRange.addEventListener('input', () => {
-      updateUIData(currentUserLat, currentUserLng);
+      updateMarkersPositionAndScale();
     });
   }
 
@@ -271,17 +198,17 @@ window.addEventListener('load', () => {
       }
 
       updateCategoryStatusText();
-      updateUIData(currentUserLat, currentUserLng);
+      updateMarkersPositionAndScale();
     });
   });
 
   updateCategoryStatusText();
 
   const modelsToLoad = [
-    { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
-    { containerId: 'model2-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model2-status' },
-    { containerId: 'model3-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model3-status' },
-    { containerId: 'model4-container', url: 'assets/animated_venus/animated_venus.glb', scale: [10, 10, 10], statusElId: 'model4-status' },
+    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', baseScale: 5, statusElId: 'model-status' },
+    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', baseScale: 3, statusElId: 'model2-status' },
+    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', baseScale: 2, statusElId: 'model3-status' },
+    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', baseScale: 2, statusElId: 'model4-status' },
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
@@ -294,12 +221,13 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
+  // Надежная система определения нажатий на экране
   const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('#ui-container') || e.target.closest('#info-tile') || e.target.closest('.category-dropdown')) {
+      if (e.target.closest('#debug-panel') || e.target.closest('#info-tile')) {
         return;
       }
 
@@ -317,10 +245,10 @@ window.addEventListener('load', () => {
       if (sceneEl) sceneEl.object3D.updateMatrixWorld(true);
       camera.updateMatrixWorld(true);
 
-      const markers = document.querySelectorAll('a-entity[gps-entity-place]');
+      const markers = document.querySelectorAll('.ar-gps-marker');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 60;
+      const hitRadiusPixels = 80;
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -329,8 +257,6 @@ window.addEventListener('load', () => {
         marker.object3D.getWorldPosition(worldPos);
 
         const vector = worldPos.project(camera);
-        
-        // Игнорируем объекты, находящиеся позади камеры
         if (vector.z > 1) return;
 
         const screenX = (vector.x *  .5 + .5) * window.innerWidth;
@@ -346,13 +272,13 @@ window.addEventListener('load', () => {
       const isTileOpen = infoTile && window.getComputedStyle(infoTile).display !== 'none';
 
       if (closestMarker) {
-        const hitbox = closestMarker.querySelector('.clickable-hitbox') || closestMarker;
+        const hitbox = closestMarker.querySelector('.clickable-hitbox');
         const title = hitbox.getAttribute('data-title') || 'Объект';
 
         if (isTileOpen && document.getElementById('tile-title').innerText === title) {
           infoTile.style.display = 'none';
           if (statusEl) {
-            statusEl.innerText = `Плитка закрыта (повторный клик)`;
+            statusEl.innerText = `Плитка закрыта`;
             statusEl.style.color = '#94a3b8';
           }
           return;
@@ -375,21 +301,16 @@ window.addEventListener('load', () => {
           infoTile.style.display = 'block';
         }
         if (statusEl) {
-          statusEl.innerText = `ПОПАДАНИЕ (${title})!`;
+          statusEl.innerText = `ВЫБРАНО: ${title}`;
           statusEl.style.color = '#00ff66';
         }
       } else {
         if (isTileOpen) {
           infoTile.style.display = 'none';
-          if (statusEl) {
-            statusEl.innerText = `Плитка закрыта (клик мимо)`;
-            statusEl.style.color = '#94a3b8';
-          }
-        } else {
-          if (statusEl) {
-            statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
-            statusEl.style.color = '#ff3366';
-          }
+        }
+        if (statusEl) {
+          statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
+          statusEl.style.color = '#ff3366';
         }
       }
     });
