@@ -279,7 +279,7 @@ window.addEventListener('load', () => {
 
   const modelsToLoad = [
     { containerId: 'model1-container', url: 'assets/drone/drone.glb', scale: [50, 50, 50], statusElId: 'model-status' },
-    { containerId: 'model2-container', url: 'assets/model1C/model1C.glb', scale: [20, 20, 20], statusElId: 'model2-status' },
+    { containerId: 'model2-container', url: 'assets/earth_cartoon/earth_cartoon.glb', scale: [20, 20, 20], statusElId: 'model2-status' },
     { containerId: 'model3-container', url: 'assets/earth_cartoon/earth_cartoon.glb', scale: [10, 10, 10], statusElId: 'model3-status' },
     { containerId: 'model4-container', url: 'assets/animated_venus/animated_venus.glb', scale: [10, 10, 10], statusElId: 'model4-status' },
   ];
