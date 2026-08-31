@@ -34,6 +34,15 @@ function formatDist(meters) {
   return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
+function getRadiusFromSlider(sliderValue) {
+  const minKm = 1;
+  const maxKm = 1000;
+  const minLog = Math.log10(minKm);
+  const maxLog = Math.log10(maxKm);
+  const scale = (maxLog - minLog) / 100;
+  return Math.pow(10, minLog + scale * sliderValue);
+}
+
 function updateCategoryStatusText() {
   const total = Object.keys(activeCategories).length;
   const selectedCount = Object.values(activeCategories).filter(Boolean).length;
@@ -44,32 +53,43 @@ function updateCategoryStatusText() {
 }
 
 function updateMarkersPositionAndScale() {
-  if (currentUserLat === null || currentUserLng === null) return;
-
   const markers = document.querySelectorAll('.ar-gps-marker');
   const cameraEl = document.querySelector('a-camera');
-  if (!cameraEl) return;
+  const radiusRange = document.getElementById('radius-range');
+  const maxRadiusKm = radiusRange ? getRadiusFromSlider(parseFloat(radiusRange.value)) : 1000;
+  const maxRadiusMeters = maxRadiusKm * 1000;
 
   markers.forEach(marker => {
     const targetLat = parseFloat(marker.getAttribute('data-lat'));
     const targetLng = parseFloat(marker.getAttribute('data-lng'));
     const category = marker.getAttribute('data-category');
     const distId = marker.querySelector('.clickable-hitbox').getAttribute('data-dist-id');
+    const distEl = document.getElementById(distId);
+
+    const isCategoryActive = activeCategories[category] === true;
+
+    if (currentUserLat === null || currentUserLng === null) {
+      if (distEl) distEl.innerText = 'Ожидание GPS...';
+      marker.setAttribute('visible', isCategoryActive);
+      marker.object3D.visible = isCategoryActive;
+      return;
+    }
 
     const realMeters = calculateDistance(currentUserLat, currentUserLng, targetLat, targetLng);
-    const distEl = document.getElementById(distId);
     if (distEl) {
       distEl.innerText = formatDist(realMeters);
     }
 
-    const isCategoryActive = activeCategories[category] === true;
-    marker.setAttribute('visible', isCategoryActive ? 'true' : 'false');
+    const isInRadius = realMeters <= maxRadiusMeters;
+    const shouldBeVisible = isCategoryActive && isInRadius;
 
-    if (!isCategoryActive) return;
+    marker.setAttribute('visible', shouldBeVisible);
+    marker.object3D.visible = shouldBeVisible;
+
+    if (!shouldBeVisible || !cameraEl) return;
 
     const bearing = calculateBearing(currentUserLat, currentUserLng, targetLat, targetLng);
     
-    // Фиксированное расстояние в поле зрения, чтобы избежать переполнения буфера глубины
     const safeVisualDist = 20;
     const angleRad = (bearing - 90) * (Math.PI / 180);
     const posX = Math.cos(angleRad) * safeVisualDist;
@@ -79,7 +99,6 @@ function updateMarkersPositionAndScale() {
 
     const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 1;
     const distanceKm = realMeters / 1000;
-    // Плавное уменьшение при удалении (на 1000 км в 4 раза меньше)
     const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
     const finalScale = baseScale * scaleFactor;
 
@@ -96,9 +115,14 @@ if ('geolocation' in navigator) {
       document.getElementById('my-coords').innerText = `${currentUserLat.toFixed(6)}, ${currentUserLng.toFixed(6)}`;
       updateMarkersPositionAndScale();
     },
-    null,
+    (err) => {
+      console.warn('Ошибка геолокации:', err);
+      updateMarkersPositionAndScale();
+    },
     { enableHighAccuracy: true }
   );
+} else {
+  updateMarkersPositionAndScale();
 }
 
 function loadModelToContainer(config) {
@@ -117,27 +141,23 @@ function loadModelToContainer(config) {
 
       const model = gltf.scene;
 
-      // Автоматическое центрирование и нормализация масштаба модели
       const box = new THREE.Box3().setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
 
-      // Смещаем центр модели в начало координат контейнера, чтобы камера не оказывалась внутри
       model.position.sub(center);
 
-      // Вычисляем максимальный габарит и приводим к удобному размеру (~3 метра)
       const maxDim = Math.max(size.x, size.y, size.z);
       const targetSize = 3.0; 
       let autoScale = maxDim > 0 ? targetSize / maxDim : 1;
-      autoScale *= config.scaleMultiplier; // Пользовательский коэффициент
+      autoScale *= config.scaleMultiplier;
 
       model.scale.set(autoScale, autoScale, autoScale);
 
       if (markerEl) {
-        markerEl.dataset.baseScale = 1; // Управляется внутри через autoScale
+        markerEl.dataset.baseScale = 1;
       }
 
-      // Исправление проблемы "темноты" внутри: включаем двусторонний рендеринг материалов
       model.traverse((node) => {
         if (node.isMesh && node.material) {
           if (Array.isArray(node.material)) {
@@ -177,9 +197,31 @@ function loadModelToContainer(config) {
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusRange = document.getElementById('radius-range');
+  const radiusValueEl = document.getElementById('radius-value');
+
+  // Восстанавливаем позицию ползунка из памяти устройства
+  const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
+  if (radiusRange && savedRadiusVal !== null) {
+    radiusRange.value = savedRadiusVal;
+  }
+
+  const updateRadiusDisplay = () => {
+    if (radiusRange && radiusValueEl) {
+      const val = parseFloat(radiusRange.value);
+      const radiusKm = getRadiusFromSlider(val);
+      if (radiusKm >= 10) {
+        radiusValueEl.innerText = `${Math.round(radiusKm)} км`;
+      } else {
+        radiusValueEl.innerText = `${radiusKm.toFixed(1)} км`;
+      }
+    }
+  };
 
   if (radiusRange) {
+    updateRadiusDisplay();
     radiusRange.addEventListener('input', () => {
+      localStorage.setItem('ar_radius_slider_val', radiusRange.value);
+      updateRadiusDisplay();
       updateMarkersPositionAndScale();
     });
   }
@@ -220,7 +262,6 @@ window.addEventListener('load', () => {
 
   updateCategoryStatusText();
 
-  // scaleMultiplier позволяет подстроить относительный размер конкретных моделей
   const modelsToLoad = [
     { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status' },
     { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status' },
@@ -267,7 +308,8 @@ window.addEventListener('load', () => {
       const hitRadiusPixels = 80;
 
       markers.forEach(marker => {
-        if (marker.getAttribute('visible') === 'false') return;
+        const isVisibleAttr = marker.getAttribute('visible');
+        if (isVisibleAttr === false || isVisibleAttr === 'false' || !marker.object3D.visible) return;
 
         const worldPos = new THREE.Vector3();
         marker.object3D.getWorldPosition(worldPos);
