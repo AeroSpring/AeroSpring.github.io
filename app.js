@@ -34,6 +34,16 @@ function formatDist(meters) {
   return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
+// Функция для перевода значения слайдера в километры (логарифмическая шкала)
+function getRadiusFromSlider(sliderValue) {
+  const minKm = 1;
+  const maxKm = 1000;
+  const minLog = Math.log10(minKm);
+  const maxLog = Math.log10(maxKm);
+  const scale = (maxLog - minLog) / 100;
+  return Math.pow(10, minLog + scale * sliderValue);
+}
+
 function updateCategoryStatusText() {
   const total = Object.keys(activeCategories).length;
   const selectedCount = Object.values(activeCategories).filter(Boolean).length;
@@ -69,7 +79,6 @@ function updateMarkersPositionAndScale() {
 
     const bearing = calculateBearing(currentUserLat, currentUserLng, targetLat, targetLng);
     
-    // Фиксированное расстояние в поле зрения, чтобы избежать переполнения буфера глубины
     const safeVisualDist = 20;
     const angleRad = (bearing - 90) * (Math.PI / 180);
     const posX = Math.cos(angleRad) * safeVisualDist;
@@ -79,7 +88,6 @@ function updateMarkersPositionAndScale() {
 
     const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 1;
     const distanceKm = realMeters / 1000;
-    // Плавное уменьшение при удалении (на 1000 км в 4 раза меньше)
     const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
     const finalScale = baseScale * scaleFactor;
 
@@ -117,27 +125,23 @@ function loadModelToContainer(config) {
 
       const model = gltf.scene;
 
-      // Автоматическое центрирование и нормализация масштаба модели
       const box = new THREE.Box3().setFromObject(model);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
 
-      // Смещаем центр модели в начало координат контейнера, чтобы камера не оказывалась внутри
       model.position.sub(center);
 
-      // Вычисляем максимальный габарит и приводим к удобному размеру (~3 метра)
       const maxDim = Math.max(size.x, size.y, size.z);
       const targetSize = 3.0; 
       let autoScale = maxDim > 0 ? targetSize / maxDim : 1;
-      autoScale *= config.scaleMultiplier; // Пользовательский коэффициент
+      autoScale *= config.scaleMultiplier;
 
       model.scale.set(autoScale, autoScale, autoScale);
 
       if (markerEl) {
-        markerEl.dataset.baseScale = 1; // Управляется внутри через autoScale
+        markerEl.dataset.baseScale = 1;
       }
 
-      // Исправление проблемы "темноты" внутри: включаем двусторонний рендеринг материалов
       model.traverse((node) => {
         if (node.isMesh && node.material) {
           if (Array.isArray(node.material)) {
@@ -177,9 +181,25 @@ function loadModelToContainer(config) {
 window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusRange = document.getElementById('radius-range');
+  const radiusValueEl = document.getElementById('radius-value');
+
+  // Функция обновления текста радиуса
+  const updateRadiusDisplay = () => {
+    if (radiusRange && radiusValueEl) {
+      const val = parseFloat(radiusRange.value);
+      const radiusKm = getRadiusFromSlider(val);
+      if (radiusKm >= 10) {
+        radiusValueEl.innerText = `${Math.round(radiusKm)} км`;
+      } else {
+        radiusValueEl.innerText = `${radiusKm.toFixed(1)} км`;
+      }
+    }
+  };
 
   if (radiusRange) {
+    updateRadiusDisplay();
     radiusRange.addEventListener('input', () => {
+      updateRadiusDisplay();
       updateMarkersPositionAndScale();
     });
   }
@@ -220,7 +240,6 @@ window.addEventListener('load', () => {
 
   updateCategoryStatusText();
 
-  // scaleMultiplier позволяет подстроить относительный размер конкретных моделей
   const modelsToLoad = [
     { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status' },
     { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status' },
