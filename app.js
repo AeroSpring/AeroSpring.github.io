@@ -1,7 +1,6 @@
 const mixers = [];
 let currentUserLat = null;
 let currentUserLng = null;
-let currentUserElevation = 0; // Высота пользователя
 
 const activeCategories = {
   auto: true,
@@ -44,33 +43,12 @@ function getRadiusFromSlider(sliderValue) {
   return Math.pow(10, minLog + scale * sliderValue);
 }
 
-// Функция автоматического запроса высоты рельефа через бесплатный Open-Meteo API
-async function fetchElevationForMarkers() {
-  const markers = document.querySelectorAll('.ar-gps-marker');
-  let lats = [];
-  let lngs = [];
-
-  markers.forEach(marker => {
-    lats.push(marker.getAttribute('data-lat'));
-    lngs.push(marker.getAttribute('data-lng'));
-  });
-
-  try {
-    // Запрос высоты для всех точек сразу
-    const url = `https://api.open-meteo.com/v1/elevation?latitude=${lats.join(',')}&longitude=${lngs.join(',')}`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data && data.elevation) {
-      markers.forEach((marker, index) => {
-        const groundElevation = data.elevation[index] || 0;
-        marker.dataset.elevation = groundElevation;
-        console.log(`Точка ${index + 1}: высота рельефа = ${groundElevation} м`);
-      });
-    }
-  } catch (e) {
-    console.warn('Не удалось подгрузить высоту рельефа, используем стандартную земную плоскость:', e);
-    markers.forEach(marker => marker.dataset.elevation = 0);
+function updateCategoryStatusText() {
+  const total = Object.keys(activeCategories).length;
+  const selectedCount = Object.values(activeCategories).filter(Boolean).length;
+  const statusTextEl = document.getElementById('category-status-text');
+  if (statusTextEl) {
+    statusTextEl.innerText = `Категории: ${selectedCount} из ${total} выбрано`;
   }
 }
 
@@ -84,7 +62,6 @@ function updateMarkersPositionAndScale() {
   markers.forEach(marker => {
     const targetLat = parseFloat(marker.getAttribute('data-lat'));
     const targetLng = parseFloat(marker.getAttribute('data-lng'));
-    const targetElevation = parseFloat(marker.dataset.elevation || 0);
     const category = marker.getAttribute('data-category');
     const distId = marker.querySelector('.clickable-hitbox').getAttribute('data-dist-id');
     const distEl = document.getElementById(distId);
@@ -118,12 +95,7 @@ function updateMarkersPositionAndScale() {
     const posX = Math.cos(angleRad) * safeVisualDist;
     const posZ = -Math.sin(angleRad) * safeVisualDist;
 
-    // Учитываем разницу высот рельефа между точкой и пользователем
-    // Базовая высота объекта на уровне глаз (1.5м) + перепад высот рельефа
-    const heightDifference = targetElevation - currentUserElevation;
-    const posY = 1.5 + heightDifference;
-
-    marker.object3D.position.set(posX, posY, posZ);
+    marker.object3D.position.set(posX, 1.5, posZ);
 
     const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 1;
     const distanceKm = realMeters / 1000;
@@ -202,17 +174,6 @@ function loadModelToContainer(config) {
 
       container.object3D.add(model);
 
-      // Генерируем луч (вертикальную линию) от модели (Y = 0) вниз до кольца на земле
-      const beamHeight = Math.abs(config.groundOffset || 3.0);
-      const beamYOffset = -beamHeight / 2;
-      
-      const beamEl = document.createElement('a-cylinder');
-      beamEl.setAttribute('radius', '0.03');
-      beamEl.setAttribute('height', beamHeight);
-      beamEl.setAttribute('position', `0 ${beamYOffset} 0`);
-      beamEl.setAttribute('material', 'color: #00ff66; shader: flat; transparent: true; opacity: 0.6;');
-      markerEl.appendChild(beamEl);
-
       const animations = gltf.animations;
       if (animations && animations.length > 0) {
         const mixer = new THREE.AnimationMixer(model);
@@ -233,14 +194,12 @@ function loadModelToContainer(config) {
   );
 }
 
-window.addEventListener('load', async () => {
-  // Сначала подгружаем высоты рельефа для всех точек из открытой базы данных
-  await fetchElevationForMarkers();
-
+window.addEventListener('load', () => {
   const sceneEl = document.querySelector('a-scene');
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
 
+  // Восстанавливаем позицию ползунка из памяти устройства
   const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
   if (radiusRange && savedRadiusVal !== null) {
     radiusRange.value = savedRadiusVal;
@@ -304,10 +263,10 @@ window.addEventListener('load', async () => {
   updateCategoryStatusText();
 
   const modelsToLoad = [
-    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status', groundOffset: -3.0 },
-    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status', groundOffset: -3.0 },
-    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', scaleMultiplier: 1.0, statusElId: 'model3-status', groundOffset: -3.0 },
-    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', scaleMultiplier: 1.0, statusElId: 'model4-status', groundOffset: -3.0 },
+    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status' },
+    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status' },
+    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', scaleMultiplier: 1.0, statusElId: 'model3-status' },
+    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', scaleMultiplier: 1.0, statusElId: 'model4-status' },
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
@@ -352,10 +311,10 @@ window.addEventListener('load', async () => {
         const isVisibleAttr = marker.getAttribute('visible');
         if (isVisibleAttr === false || isVisibleAttr === 'false' || !marker.object3D.visible) return;
 
-        $worldPos = new THREE.Vector3();
-        marker.object3D.getWorldPosition($worldPos);
+        const worldPos = new THREE.Vector3();
+        marker.object3D.getWorldPosition(worldPos);
 
-        const vector = $worldPos.project(camera);
+        const vector = worldPos.project(camera);
         if (vector.z > 1) return;
 
         const screenX = (vector.x *  .5 + .5) * window.innerWidth;
