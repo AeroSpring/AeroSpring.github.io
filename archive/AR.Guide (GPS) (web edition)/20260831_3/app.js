@@ -70,8 +70,7 @@ function updateMarkersPositionAndScale() {
 
     if (currentUserLat === null || currentUserLng === null) {
       if (distEl) distEl.innerText = 'Ожидание GPS...';
-      marker.setAttribute('visible', isCategoryActive);
-      marker.object3D.visible = isCategoryActive;
+      marker.setAttribute('visible', isCategoryActive ? 'true' : 'false');
       return;
     }
 
@@ -80,11 +79,11 @@ function updateMarkersPositionAndScale() {
       distEl.innerText = formatDist(realMeters);
     }
 
+    // Проверяем попадание в выбранный радиус слайдера и активность категории
     const isInRadius = realMeters <= maxRadiusMeters;
     const shouldBeVisible = isCategoryActive && isInRadius;
 
-    marker.setAttribute('visible', shouldBeVisible);
-    marker.object3D.visible = shouldBeVisible;
+    marker.setAttribute('visible', shouldBeVisible ? 'true' : 'false');
 
     if (!shouldBeVisible || !cameraEl) return;
 
@@ -117,6 +116,7 @@ if ('geolocation' in navigator) {
     },
     (err) => {
       console.warn('Ошибка геолокации:', err);
+      // Даже без GPS принудительно показываем модели на экране для отладки
       updateMarkersPositionAndScale();
     },
     { enableHighAccuracy: true }
@@ -301,9 +301,7 @@ window.addEventListener('load', () => {
       const hitRadiusPixels = 80;
 
       markers.forEach(marker => {
-        // Жесткая проверка видимости: исключаем скрытые слайдером или категориями маркеры
-        const isVisibleAttr = marker.getAttribute('visible');
-        if (isVisibleAttr === false || isVisibleAttr === 'false' || !marker.object3D.visible) return;
+        if (marker.getAttribute('visible') === 'false') return;
 
         const worldPos = new THREE.Vector3();
         marker.object3D.getWorldPosition(worldPos);
