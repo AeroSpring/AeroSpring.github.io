@@ -34,15 +34,6 @@ function formatDist(meters) {
   return meters < 1000 ? `${Math.round(meters)} м` : `${(meters / 1000).toFixed(2)} км`;
 }
 
-function getRadiusFromSlider(sliderValue) {
-  const minKm = 1;
-  const maxKm = 1000;
-  const minLog = Math.log10(minKm);
-  const maxLog = Math.log10(maxKm);
-  const scale = (maxLog - minLog) / 100;
-  return Math.pow(10, minLog + scale * sliderValue);
-}
-
 function updateCategoryStatusText() {
   const total = Object.keys(activeCategories).length;
   const selectedCount = Object.values(activeCategories).filter(Boolean).length;
@@ -52,7 +43,6 @@ function updateCategoryStatusText() {
   }
 }
 
-// Надежный менеджер позиций и масштабов без сбоев WebGL float
 function updateMarkersPositionAndScale() {
   if (currentUserLat === null || currentUserLng === null) return;
 
@@ -77,24 +67,19 @@ function updateMarkersPositionAndScale() {
 
     if (!isCategoryActive) return;
 
-    // Вычисляем азимут для направления на объект в поле зрения камеры
     const bearing = calculateBearing(currentUserLat, currentUserLng, targetLat, targetLng);
     
-    // Фиксируем визуальное расстояние в безопасной зоне (например, 25 метров), 
-    // чтобы Three.js не ломал геометрию из-за огромных чисел (предотвращает мерцание и куски моделей)
-    const safeVisualDist = 25;
+    // Фиксированное расстояние в поле зрения, чтобы избежать переполнения буфера глубины
+    const safeVisualDist = 20;
     const angleRad = (bearing - 90) * (Math.PI / 180);
     const posX = Math.cos(angleRad) * safeVisualDist;
     const posZ = -Math.sin(angleRad) * safeVisualDist;
 
-    marker.object3D.position.set(posX, 2, posZ);
+    marker.object3D.position.set(posX, 1.5, posZ);
 
-    // Масштаб: чем дальше реальный объект, тем он меньше (на 1000 км в 4 раза меньше базового)
-    // Базовый масштаб для каждой модели берем из конфига, здесь применяем множитель расстояния
-    const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 10;
-    
-    // Коэффициент уменьшения при удалении (на 1000 км уменьшается примерно в 4 раза)
+    const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 1;
     const distanceKm = realMeters / 1000;
+    // Плавное уменьшение при удалении (на 1000 км в 4 раза меньше)
     const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
     const finalScale = baseScale * scaleFactor;
 
@@ -122,10 +107,6 @@ function loadModelToContainer(config) {
   const statusEl = document.getElementById(config.statusElId);
   const markerEl = document.getElementById(config.markerId);
 
-  if (markerEl) {
-    markerEl.dataset.baseScale = config.baseScale;
-  }
-
   loader.load(
     config.url,
     (gltf) => {
@@ -135,7 +116,42 @@ function loadModelToContainer(config) {
       }
 
       const model = gltf.scene;
-      model.scale.set(1, 1, 1); // Базовый размер внутри контейнера
+
+      // Автоматическое центрирование и нормализация масштаба модели
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+
+      // Смещаем центр модели в начало координат контейнера, чтобы камера не оказывалась внутри
+      model.position.sub(center);
+
+      // Вычисляем максимальный габарит и приводим к удобному размеру (~3 метра)
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const targetSize = 3.0; 
+      let autoScale = maxDim > 0 ? targetSize / maxDim : 1;
+      autoScale *= config.scaleMultiplier; // Пользовательский коэффициент
+
+      model.scale.set(autoScale, autoScale, autoScale);
+
+      if (markerEl) {
+        markerEl.dataset.baseScale = 1; // Управляется внутри через autoScale
+      }
+
+      // Исправление проблемы "темноты" внутри: включаем двусторонний рендеринг материалов
+      model.traverse((node) => {
+        if (node.isMesh && node.material) {
+          if (Array.isArray(node.material)) {
+            node.material.forEach(mat => {
+              mat.side = THREE.DoubleSide;
+              mat.needsUpdate = true;
+            });
+          } else {
+            node.material.side = THREE.DoubleSide;
+            node.material.needsUpdate = true;
+          }
+        }
+      });
+
       container.object3D.add(model);
 
       const animations = gltf.animations;
@@ -204,11 +220,12 @@ window.addEventListener('load', () => {
 
   updateCategoryStatusText();
 
+  // scaleMultiplier позволяет подстроить относительный размер конкретных моделей
   const modelsToLoad = [
-    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', baseScale: 5, statusElId: 'model-status' },
-    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', baseScale: 3, statusElId: 'model2-status' },
-    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', baseScale: 2, statusElId: 'model3-status' },
-    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', baseScale: 2, statusElId: 'model4-status' },
+    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status' },
+    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status' },
+    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', scaleMultiplier: 1.0, statusElId: 'model3-status' },
+    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', scaleMultiplier: 1.0, statusElId: 'model4-status' },
   ];
 
   modelsToLoad.forEach(config => loadModelToContainer(config));
@@ -221,7 +238,6 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Надежная система определения нажатий на экране
   const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
