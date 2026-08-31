@@ -30,7 +30,7 @@
     <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-1">-</span>)</div>
     <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-2">-</span>)</div>
     <div><b>Ремонт двигателей и КПП:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-3">-</span>)</div>
-    <div><b>Фито:</b> <span id="model4-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-4">-</span>)</div>
+    <div><b>Фито:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-4">-</span>)</div>
     
     <!-- Ползунок радиуса -->
     <div style="margin-top: 8px; pointer-events: auto; display: flex; align-items: center; justify-content: space-between;">
@@ -41,12 +41,14 @@
 
     <!-- Блок категорий со шторкой -->
     <div style="margin-top: 8px; pointer-events: auto; border-top: 1px dashed rgba(0,255,102,0.4); padding-top: 6px;">
+      <!-- Шапка шторки (кнопка разворачивания) -->
       <div id="category-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: rgba(0,255,102,0.1); padding: 4px 6px; border-radius: 4px;">
         <span id="category-status-text">Категории: 4 из 4 выбрано</span>
         <span id="category-arrow" style="font-weight: bold; font-size: 13px;">▼</span>
       </div>
 
-      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 140px; overflow-y: auto; flex-direction: column; gap: 4px; padding-right: 2px;">
+      <!-- Выпадающий список категорий по одной на строку -->
+      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 140px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; padding-right: 2px;">
         <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 🚗 Авторемонт</button>
         <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 💻 ИТ-услуги</button>
         <button id="btn-cat-beauty" class="category-btn active" data-category="beauty" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 💄 Уход за собой</button>
@@ -60,27 +62,47 @@
     embedded
     arjs="sourceType: webcam; debugUIEnabled: false;">
 
-    <!-- Увеличили maxDistance и far у камеры до 10000 км, чтобы объекты в Воронеже не отсекались -->
     <a-camera 
-      gps-camera="minDistance: 0; maxDistance: 10000000;" 
-      camera="far: 10000000"
+      gps-camera="minDistance: 0; maxDistance: 100000;" 
       rotation-reader
       raycaster="objects: .clickable-hitbox; interval: 100;"
       cursor="fuse: false; rayOrigin: mouse;">
     </a-camera>
 
-    <!-- Первая модель (Дрон в Воронеже) - Авторемонт -->
+
+    <!-- Первая модель (Дрон) - категория: auto -->
+    <!-- <a-entity
+      id="target-marker-1"
+      gps-entity-place="latitude: 44.970635; longitude: 41.153389;"
+      position="0 225 0"
+      scale="2 2 2"
+      smooth-position
+      data-category="auto">
+      <a-entity id="model1-container"></a-entity>
+      <a-sphere 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        radius="8" 
+        material="opacity: 0; transparent: true;"
+        data-title="Дрон (Авторемонт)"
+        data-lat="44.970635"
+        data-lng="41.153389"
+        data-dist-id="dist-1">
+      </a-sphere>
+    </a-entity> -->
+        <!-- material="opacity: 0.25; transparent: true; color: #ff0000;" -->
     <a-entity
       id="target-marker-1"
       gps-entity-place="latitude: 51.672602; longitude: 39.237782;"
       position="0 235 0"
       smooth-position
       billboard-scale="multiplier: 0.1"
-      ground-beam="color: #00ff66; targetHeight: 235"
       data-category="auto">
       
+      <!-- Сама 3D модель -->
       <a-entity id="model1-container"></a-entity>
       
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-plane 
         id="hitbox-1" 
         class="clickable-hitbox" 
@@ -95,22 +117,44 @@
       </a-plane>
     </a-entity>
 
-    <!-- Вторая модель (Model 1C) - ИТ -->
+
+    <!-- Вторая модель (Model 1C) - категория: it -->
+    <!-- <a-entity
+      id="target-marker-2"
+      gps-entity-place="latitude: 44.970218; longitude: 41.152996;"
+      position="0 220 0"
+      scale="2 2 2"
+      smooth-position
+      data-category="it">
+      <a-entity id="model2-container"></a-entity>
+      <a-sphere 
+        id="hitbox-2" 
+        class="clickable-hitbox" 
+        radius="12" 
+        material="opacity: 0; transparent: true;"
+        data-title="Модель 1C (ИТ-услуги)"
+        data-lat="44.970218"
+        data-lng="41.152996"
+        data-dist-id="dist-2">
+      </a-sphere>
+    </a-entity> -->
     <a-entity
       id="target-marker-2"
       gps-entity-place="latitude: 44.980121; longitude: 41.156828;"
       position="0 235 0"
       smooth-position
       billboard-scale="multiplier: 0.1"
-      ground-beam="color: #38bdf8; targetHeight: 235"
       data-category="it">
 
+      <!-- Сама 3D модель -->
       <a-entity id="model2-container"></a-entity>
 
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-sphere 
         id="hitbox-2" 
         class="clickable-hitbox" 
-        radius="8" 
+        width="8" 
+        height="8"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
         data-title="Модель 1C (ИТ-услуги)"
@@ -120,22 +164,23 @@
       </a-sphere>
     </a-entity>
 
-    <!-- Третья модель - Авторемонт -->
+
     <a-entity
       id="target-marker-3"
       gps-entity-place="latitude: 44.970499; longitude: 41.153234;"
       position="0 235 0"
       smooth-position
       billboard-scale="multiplier: 0.1"
-      ground-beam="color: #00ff66; targetHeight: 235"
       data-category="auto">
       
+      <!-- Сама 3D модель -->
       <a-entity id="model3-container"></a-entity>
       
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-plane 
         id="hitbox-3" 
         class="clickable-hitbox" 
-        width="8" 
+        width="8
         height="8"
         position="0 0 0"
         material="opacity: 0.0; transparent: true; side: double; shader: flat;"
@@ -145,19 +190,20 @@
         data-dist-id="dist-3">
       </a-plane>
     </a-entity>
+    
 
-    <!-- Четвертая модель (Фито) - Медицина -->
     <a-entity
       id="target-marker-4"
       gps-entity-place="latitude: 44.989088; longitude: 41.161151;"
       position="0 235 0"
       smooth-position
       billboard-scale="multiplier: 0.1"
-      ground-beam="color: #ef4444; targetHeight: 235"
       data-category="med">
       
+      <!-- Сама 3D модель -->
       <a-entity id="model4-container"></a-entity>
       
+      <!-- Увеличиваем хитбокс и центрируем его, чтобы он покрывал весь объем дрона -->
       <a-plane 
         id="hitbox-4" 
         class="clickable-hitbox" 
@@ -171,6 +217,7 @@
         data-dist-id="dist-4">
       </a-plane>
     </a-entity>
+
 
   </a-scene>
 

@@ -2,40 +2,42 @@
 AFRAME.registerComponent('ground-beam', {
   schema: {
     color: { type: 'color', default: '#00ff66' },
-    targetHeight: { type: 'number', default: 235 }
+    targetHeight: { type: 'number', default: 235 } // Высота, на которой висит модель
   },
   init: function () {
     const el = this.el;
     const height = this.data.targetHeight;
     const color = this.data.color;
 
-    const beamGroup = new THREE.Group();
-
-    // Цилиндр-луч от модели до земли
-    const geometry = new THREE.CylinderGeometry(0.2, 0.2, height, 8);
-    geometry.translate(0, -height / 2, 0);
-
-    const material = new THREE.MeshBasicMaterial({
+    // 1. Создаем геометрию линии от (0, 0, 0) модели до (0, -height, 0) на земле
+    const points = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, -height, 0)
+    ];
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    
+    // Тонкая полупрозрачная линия с «неоновым» свечением
+    const material = new THREE.LineBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.6
+      opacity: 0.6,
+      linewidth: 2 // В Three.js толщина линий на WebGL часто ограничена 1px на уровне драйверов, но полупрозрачность даст отличный эффект
     });
 
-    const cylinder = new THREE.Mesh(geometry, material);
-    beamGroup.add(cylinder);
+    const line = new THREE.Line(geometry, material);
+    el.object3D.add(line);
 
-    // Точка на земле
-    const dotGeometry = new THREE.SphereGeometry(1.2, 16, 16);
+    // 2. Создаем точку на земле (на конце луча)
+    const dotGeometry = new THREE.SphereGeometry(1.5, 16, 16);
     const dotMaterial = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
       opacity: 0.8
     });
     const dotMesh = new THREE.Mesh(dotGeometry, dotMaterial);
+    // Смещаем точку ровно на уровень земли относительно маркера
     dotMesh.position.set(0, -height, 0);
-    beamGroup.add(dotMesh);
-
-    el.object3D.add(beamGroup);
+    el.object3D.add(dotMesh);
   }
 });
 
@@ -52,9 +54,9 @@ AFRAME.registerComponent('billboard-scale', {
 
     if (distance < 1) return;
 
-    // Плавное масштабирование с учетом расстояния (без жесткого обрезания в 150 для дальних объектов)
     let currentScale = distance * this.data.multiplier;
     if (currentScale < 2) currentScale = 2;
+    if (currentScale > 150) currentScale = 150;
 
     this.el.object3D.scale.set(currentScale, currentScale, currentScale);
     this.el.object3D.lookAt(cameraEl.object3D.position);
@@ -173,11 +175,11 @@ function updateUIData(userLat, userLng) {
       }
     }
 
-    // Видимость теперь зависит ТОЛЬКО от выбранных категорий (все модели видны независимо от расстояния)
+    const isWithinRadius = distKm <= maxRadiusKm;
     const isCategoryActive = activeCategories[category] === true;
 
     if (marker) {
-      marker.setAttribute('visible', isCategoryActive ? 'true' : 'false');
+      marker.setAttribute('visible', (isWithinRadius && isCategoryActive) ? 'true' : 'false');
     }
   });
 }
@@ -320,7 +322,7 @@ window.addEventListener('load', () => {
       const markers = document.querySelectorAll('a-entity[gps-entity-place]');
       let closestMarker = null;
       let minDistanceToTap = Infinity;
-      const hitRadiusPixels = 60;
+      const hitRadiusPixels = 60; // Строгий размер по модели
 
       markers.forEach(marker => {
         if (marker.getAttribute('visible') === 'false') return;
@@ -329,10 +331,6 @@ window.addEventListener('load', () => {
         marker.object3D.getWorldPosition(worldPos);
 
         const vector = worldPos.project(camera);
-        
-        // Игнорируем объекты, находящиеся позади камеры
-        if (vector.z > 1) return;
-
         const screenX = (vector.x *  .5 + .5) * window.innerWidth;
         const screenY = (vector.y * -.5 + .5) * window.innerHeight;
 
@@ -343,6 +341,7 @@ window.addEventListener('load', () => {
         }
       });
 
+      // Надежная проверка видимости плитки через вычисляемый стиль
       const isTileOpen = infoTile && window.getComputedStyle(infoTile).display !== 'none';
 
       if (closestMarker) {
