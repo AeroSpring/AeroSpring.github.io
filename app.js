@@ -9,9 +9,6 @@ const activeCategories = {
   med: true
 };
 
-const raycaster = new THREE.Raycaster();
-const downDirection = new THREE.Vector3(0, -1, 0);
-
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -110,40 +107,6 @@ function updateMarkersPositionAndScale() {
   });
 }
 
-// Функция проецирования луча вниз для привязки кольца к земле под объектом
-function updateGroundProjections() {
-  const markers = document.querySelectorAll('.ar-gps-marker');
-  
-  markers.forEach(marker => {
-    if (!marker.object3D.visible) return;
-
-    const containerEl = marker.querySelector('[id$="-container"]');
-    const projectorEl = marker.querySelector('[id^="ground-projector"]');
-
-    if (!containerEl || !projectorEl) return;
-
-    // Виртуальная плоскость земли на уровне y = 0 относительно маркера
-    const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    
-    const modelWorldPos = new THREE.Vector3();
-    containerEl.object3D.getWorldPosition(modelWorldPos);
-
-    // Запускаем луч чуть выше объекта строго вниз
-    raycaster.set(modelWorldPos.clone().add(new THREE.Vector3(0, 2, 0)), downDirection);
-
-    const intersectionPoint = new THREE.Vector3();
-    const hit = raycaster.ray.intersectPlane(groundPlane, intersectionPoint);
-
-    if (hit) {
-      marker.object3D.worldToLocal(intersectionPoint);
-      projectorEl.object3D.position.copy(intersectionPoint);
-      projectorEl.object3D.visible = true;
-    } else {
-      projectorEl.object3D.visible = false;
-    }
-  });
-}
-
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition(
     (pos) => {
@@ -236,7 +199,6 @@ window.addEventListener('load', () => {
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
 
-  // Восстанавливаем позицию ползунка из памяти устройства
   const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
   if (radiusRange && savedRadiusVal !== null) {
     radiusRange.value = savedRadiusVal;
@@ -313,9 +275,6 @@ window.addEventListener('load', () => {
     requestAnimationFrame(animateTicker);
     const delta = clock.getDelta();
     mixers.forEach(mixer => mixer.update(delta));
-    
-    // Обновляем проекции лучей на землю каждый кадр
-    updateGroundProjections();
   };
   animateTicker();
 
