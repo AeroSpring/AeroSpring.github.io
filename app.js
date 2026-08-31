@@ -199,6 +199,12 @@ window.addEventListener('load', () => {
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
 
+  // Восстанавливаем позицию ползунка из памяти устройства
+  const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
+  if (radiusRange && savedRadiusVal !== null) {
+    radiusRange.value = savedRadiusVal;
+  }
+
   const updateRadiusDisplay = () => {
     if (radiusRange && radiusValueEl) {
       const val = parseFloat(radiusRange.value);
@@ -214,6 +220,7 @@ window.addEventListener('load', () => {
   if (radiusRange) {
     updateRadiusDisplay();
     radiusRange.addEventListener('input', () => {
+      localStorage.setItem('ar_radius_slider_val', radiusRange.value);
       updateRadiusDisplay();
       updateMarkersPositionAndScale();
     });
@@ -301,7 +308,6 @@ window.addEventListener('load', () => {
       const hitRadiusPixels = 80;
 
       markers.forEach(marker => {
-        // Жесткая проверка видимости: исключаем скрытые слайдером или категориями маркеры
         const isVisibleAttr = marker.getAttribute('visible');
         if (isVisibleAttr === false || isVisibleAttr === 'false' || !marker.object3D.visible) return;
 
