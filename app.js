@@ -199,7 +199,6 @@ window.addEventListener('load', () => {
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
 
-  // Восстанавливаем позицию ползунка из памяти устройства
   const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
   if (radiusRange && savedRadiusVal !== null) {
     radiusRange.value = savedRadiusVal;
@@ -331,7 +330,7 @@ window.addEventListener('load', () => {
 
       if (closestMarker) {
         const hitbox = closestMarker.querySelector('.clickable-hitbox');
-        const title = hitbox.getAttribute('data-title') || 'Объект';
+        const title = hitbox.dataset.title || 'Объект';
 
         if (isTileOpen && document.getElementById('tile-title').innerText === title) {
           infoTile.style.display = 'none';
@@ -342,9 +341,9 @@ window.addEventListener('load', () => {
           return;
         }
 
-        const lat = parseFloat(hitbox.getAttribute('data-lat'));
-        const lng = parseFloat(hitbox.getAttribute('data-lng'));
-        const siteUrl = hitbox.getAttribute('data-url') || '#';
+        const lat = parseFloat(hitbox.dataset.lat);
+        const lng = parseFloat(hitbox.dataset.lng);
+        const siteUrl = hitbox.dataset.url || '#';
 
         let distText = 'Ожидание GPS...';
         if (currentUserLat !== null && currentUserLng !== null) {
@@ -356,7 +355,6 @@ window.addEventListener('load', () => {
         document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
         document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
-        // Динамическое обновление ссылки на маршрут и сайт
         const routeBtn = document.getElementById('tile-route-btn');
         if (routeBtn) {
           routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
