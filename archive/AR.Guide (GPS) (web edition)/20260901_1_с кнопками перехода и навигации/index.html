@@ -22,6 +22,7 @@
     <div id="tile-coords" style="margin: 4px 0;">Координаты: -</div>
     <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
     
+    <!-- Кнопки действий -->
     <div style="display: flex; gap: 8px; margin-top: 14px;">
       <a id="tile-route-btn" href="#" target="_blank" style="flex: 1; background: #00ff66; color: #000; text-decoration: none; padding: 8px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; text-align: center;">Маршрут</a>
       <a id="tile-site-btn" href="#" target="_blank" style="flex: 1; background: #38bdf8; color: #000; text-decoration: none; padding: 8px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; text-align: center;">На сайт</a>
@@ -32,8 +33,10 @@
   <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
     <div><b>GPS координаты:</b> <span id="my-coords">Ожидание...</span></div>
     <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div>
-    <div><b>Всего точек в базе:</b> <span id="total-points">4</span></div>
-    <div><b>Загружено моделей:</b> <span id="loaded-count">0</span></div>
+    <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-1">-</span>)</div>
+    <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-2">-</span>)</div>
+    <div><b>Ремонт двигателей и КПП:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-3">-</span>)</div>
+    <div><b>Фито:</b> <span id="model4-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-4">-</span>)</div>
     
     <!-- Ползунок радиуса -->
     <div style="margin-top: 8px; pointer-events: auto; display: flex; align-items: center; justify-content: space-between;">
@@ -70,8 +73,109 @@
       rotation-reader>
     </a-camera>
 
-    <!-- Сюда динамически добавляются маркеры объектов -->
-    <a-entity id="objects-container"></a-entity>
+    <!-- Первая модель (Дрон в Воронеже) - Авторемонт -->
+    <a-entity
+      id="target-marker-1"
+      class="ar-gps-marker"
+      data-lat="51.672602"
+      data-lng="39.237782"
+      data-category="auto"
+      position="0 0 0">
+      
+      <a-entity id="model1-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Дрон (Авторемонт)"
+        data-lat="51.672602"
+        data-lng="39.237782"
+        data-url="https://autoknowledge.tech/ru/pages/36"
+        data-dist-id="dist-1">
+      </a-plane>
+    </a-entity>
+
+    <!-- Вторая модель (Model 1C) - ИТ -->
+    <a-entity
+      id="target-marker-2"
+      class="ar-gps-marker"
+      data-lat="45.013888"
+      data-lng="41.131294"
+      data-category="it"
+      position="0 0 0">
+
+      <a-entity id="model2-container"></a-entity>
+
+      <a-plane 
+        id="hitbox-2" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Модель 1C (ИТ-услуги)"
+        data-lat="45.013888"
+        data-lng="41.131294"
+        data-url="https://autoknowledge.tech/ru/pages/33"
+        data-dist-id="dist-2">
+      </a-plane>
+    </a-entity>
+
+    <!-- Третья модель - Авторемонт -->
+    <a-entity
+      id="target-marker-3"
+      class="ar-gps-marker"
+      data-lat="44.970499"
+      data-lng="41.153234"
+      data-category="auto"
+      position="0 0 0">
+      
+      <a-entity id="model3-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-3" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Ремонт двигателей и КПП"
+        data-lat="44.970499"
+        data-lng="41.153234"
+        data-url="https://autoknowledge.tech/ru/pages/34"
+        data-dist-id="dist-3">
+      </a-plane>
+    </a-entity>
+
+    <!-- Четвертая модель (Фито) - Медицина -->
+    <a-entity
+      id="target-marker-4"
+      class="ar-gps-marker"
+      data-lat="44.989088"
+      data-lng="41.161151"
+      data-category="med"
+      position="0 0 0">
+      
+      <a-entity id="model4-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-4" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Фито"
+        data-lat="44.989088"
+        data-lng="41.161151"
+        data-url="https://autoknowledge.tech/ru/pages/35"
+        data-dist-id="dist-4">
+      </a-plane>
+    </a-entity>
 
   </a-scene>
 

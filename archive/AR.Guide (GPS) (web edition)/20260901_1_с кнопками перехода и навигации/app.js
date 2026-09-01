@@ -9,52 +9,6 @@ const activeCategories = {
   med: true
 };
 
-// База данных объектов (тысячи объектов могут храниться здесь или прилетать с бэкенда)
-const poiDatabase = [
-  {
-    id: 'poi-1',
-    title: 'Дрон (Авторемонт)',
-    lat: 51.672602,
-    lng: 39.237782,
-    category: 'auto',
-    url: 'assets/drone/drone.glb',
-    siteUrl: 'https://autoknowledge.tech/ru/pages/36',
-    scaleMultiplier: 1.0
-  },
-  {
-    id: 'poi-2',
-    title: 'Модель 1C (ИТ-услуги)',
-    lat: 45.013888,
-    lng: 41.131294,
-    category: 'it',
-    url: 'assets/model1C/model1C.glb',
-    siteUrl: 'https://autoknowledge.tech/ru/pages/33',
-    scaleMultiplier: 1.0
-  },
-  {
-    id: 'poi-3',
-    title: 'Ремонт двигателей и КПП',
-    lat: 44.970499,
-    lng: 41.153234,
-    category: 'auto',
-    url: 'assets/earth_cartoon/earth_cartoon.glb',
-    siteUrl: 'https://autoknowledge.tech/ru/pages/34',
-    scaleMultiplier: 1.0
-  },
-  {
-    id: 'poi-4',
-    title: 'Фито',
-    lat: 44.989088,
-    lng: 41.161151,
-    category: 'med',
-    url: 'assets/animated_venus/animated_venus.glb',
-    siteUrl: 'https://autoknowledge.tech/ru/pages/35',
-    scaleMultiplier: 1.0
-  }
-];
-
-const loadedPois = new Set(); // Хранилище ID уже загруженных моделей
-
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -98,131 +52,58 @@ function updateCategoryStatusText() {
   }
 }
 
-// Загрузка конкретной 3D-модели
-function spawnPoiModel(poi) {
-  if (loadedPois.has(poi.id)) return;
-  loadedPois.add(poi.id);
-
-  const containerEl = document.getElementById('objects-container');
-  if (!containerEl) return;
-
-  // Создаем маркер-контейнер
-  const marker = document.createElement('a-entity');
-  marker.id = `target-${poi.id}`;
-  marker.className = 'ar-gps-marker';
-  marker.setAttribute('data-id', poi.id);
-  marker.setAttribute('data-lat', poi.lat);
-  marker.setAttribute('data-lng', poi.lng);
-  marker.setAttribute('data-category', poi.category);
-
-  // Контейнер под саму GLTF модель
-  const modelContainer = document.createElement('a-entity');
-  marker.appendChild(modelContainer);
-
-  // Хитбоксы для клика
-  const hitbox = document.createElement('a-plane');
-  hitbox.className = 'clickable-hitbox';
-  hitbox.setAttribute('width', '6');
-  hitbox.setAttribute('height', '6');
-  hitbox.setAttribute('material', 'opacity: 0.0; transparent: true; side: double; shader: flat;');
-  hitbox.setAttribute('data-title', poi.title);
-  hitbox.setAttribute('data-lat', poi.lat);
-  hitbox.setAttribute('data-lng', poi.lng);
-  hitbox.setAttribute('data-url', poi.siteUrl);
-  marker.appendChild(hitbox);
-
-  containerEl.appendChild(marker);
-
-  // Грузим GLTF
-  const loader = new THREE.GLTFLoader();
-  loader.load(
-    poi.url,
-    (gltf) => {
-      const model = gltf.scene;
-      const box = new THREE.Box3().setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-
-      model.position.sub(center);
-
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const targetSize = 3.0; 
-      let autoScale = maxDim > 0 ? targetSize / maxDim : 1;
-      autoScale *= poi.scaleMultiplier;
-      model.scale.set(autoScale, autoScale, autoScale);
-
-      model.traverse((node) => {
-        if (node.isMesh && node.material) {
-          if (Array.isArray(node.material)) {
-            node.material.forEach(mat => { mat.side = THREE.DoubleSide; mat.needsUpdate = true; });
-          } else {
-            node.material.side = THREE.DoubleSide;
-            node.material.needsUpdate = true;
-          }
-        }
-      });
-
-      modelContainer.object3D.add(model);
-
-      if (gltf.animations && gltf.animations.length > 0) {
-        const mixer = new THREE.AnimationMixer(model);
-        const action = mixer.clipAction(gltf.animations[0]);
-        action.setLoop(THREE.LoopRepeat);
-        action.play();
-        mixers.push(mixer);
-      }
-
-      const loadedCountEl = document.getElementById('loaded-count');
-      if (loadedCountEl) loadedCountEl.innerText = loadedPois.size;
-    },
-    undefined,
-    (err) => console.error(`Ошибка загрузки модели ${poi.id}:`, err)
-  );
-}
-
-// Главный цикл проверки расстояний и ленивой загрузки
 function updateMarkersPositionAndScale() {
+  const markers = document.querySelectorAll('.ar-gps-marker');
   const cameraEl = document.querySelector('a-camera');
   const radiusRange = document.getElementById('radius-range');
   const maxRadiusKm = radiusRange ? getRadiusFromSlider(parseFloat(radiusRange.value)) : 1000;
   const maxRadiusMeters = maxRadiusKm * 1000;
 
-  poiDatabase.forEach(poi => {
-    const isCategoryActive = activeCategories[poi.category] === true;
+  markers.forEach(marker => {
+    const targetLat = parseFloat(marker.getAttribute('data-lat'));
+    const targetLng = parseFloat(marker.getAttribute('data-lng'));
+    const category = marker.getAttribute('data-category');
+    const distId = marker.querySelector('.clickable-hitbox').getAttribute('data-dist-id');
+    const distEl = document.getElementById(distId);
 
-    if (currentUserLat === null || currentUserLng === null) return;
+    const isCategoryActive = activeCategories[category] === true;
 
-    const realMeters = calculateDistance(currentUserLat, currentUserLng, poi.lat, poi.lng);
+    if (currentUserLat === null || currentUserLng === null) {
+      if (distEl) distEl.innerText = 'Ожидание GPS...';
+      marker.setAttribute('visible', isCategoryActive);
+      marker.object3D.visible = isCategoryActive;
+      return;
+    }
+
+    const realMeters = calculateDistance(currentUserLat, currentUserLng, targetLat, targetLng);
+    if (distEl) {
+      distEl.innerText = formatDist(realMeters);
+    }
+
     const isInRadius = realMeters <= maxRadiusMeters;
-    const shouldBeLoaded = isCategoryActive && isInRadius;
+    const shouldBeVisible = isCategoryActive && isInRadius;
 
-    // ЛЕНИВАЯ ЗАГРУЗКА: Если объект попал в радиус и категорию — подгружаем, если еще не загружен
-    if (shouldBeLoaded && !loadedPois.has(poi.id)) {
-      spawnPoiModel(poi);
-    }
+    marker.setAttribute('visible', shouldBeVisible);
+    marker.object3D.visible = shouldBeVisible;
 
-    // Управляем видимостью уже созданных маркеров
-    const marker = document.getElementById(`target-${poi.id}`);
-    if (marker) {
-      const isVisible = shouldBeLoaded;
-      marker.setAttribute('visible', isVisible);
-      marker.object3D.visible = isVisible;
+    if (!shouldBeVisible || !cameraEl) return;
 
-      if (isVisible && cameraEl) {
-        const bearing = calculateBearing(currentUserLat, currentUserLng, poi.lat, poi.lng);
-        const safeVisualDist = 20;
-        const angleRad = (bearing - 90) * (Math.PI / 180);
-        const posX = -Math.cos(angleRad) * safeVisualDist;
-        const posZ = Math.sin(angleRad) * safeVisualDist;
+    const bearing = calculateBearing(currentUserLat, currentUserLng, targetLat, targetLng);
+    
+    const safeVisualDist = 20;
+    const angleRad = (bearing - 90) * (Math.PI / 180);
+    const posX = -Math.cos(angleRad) * safeVisualDist;
+    const posZ = Math.sin(angleRad) * safeVisualDist;
 
-        marker.object3D.position.set(posX, 1.5, posZ);
+    marker.object3D.position.set(posX, 1.5, posZ);
 
-        const distanceKm = realMeters / 1000;
-        const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
-        marker.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        marker.object3D.lookAt(cameraEl.object3D.position);
-      }
-    }
+    const baseScale = marker.dataset.baseScale ? parseFloat(marker.dataset.baseScale) : 1;
+    const distanceKm = realMeters / 1000;
+    const scaleFactor = Math.max(0.25, 1 / (1 + distanceKm * 0.003)); 
+    const finalScale = baseScale * scaleFactor;
+
+    marker.object3D.scale.set(finalScale, finalScale, finalScale);
+    marker.object3D.lookAt(cameraEl.object3D.position);
   });
 }
 
@@ -234,8 +115,82 @@ if ('geolocation' in navigator) {
       document.getElementById('my-coords').innerText = `${currentUserLat.toFixed(6)}, ${currentUserLng.toFixed(6)}`;
       updateMarkersPositionAndScale();
     },
-    (err) => console.warn('Ошибка геолокации:', err),
+    (err) => {
+      console.warn('Ошибка геолокации:', err);
+      updateMarkersPositionAndScale();
+    },
     { enableHighAccuracy: true }
+  );
+} else {
+  updateMarkersPositionAndScale();
+}
+
+function loadModelToContainer(config) {
+  const loader = new THREE.GLTFLoader();
+  const container = document.getElementById(config.containerId);
+  const statusEl = document.getElementById(config.statusElId);
+  const markerEl = document.getElementById(config.markerId);
+
+  loader.load(
+    config.url,
+    (gltf) => {
+      if (statusEl) {
+        statusEl.innerText = 'OK';
+        statusEl.style.color = '#00ff66';
+      }
+
+      const model = gltf.scene;
+
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+
+      model.position.sub(center);
+
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const targetSize = 3.0; 
+      let autoScale = maxDim > 0 ? targetSize / maxDim : 1;
+      autoScale *= config.scaleMultiplier;
+
+      model.scale.set(autoScale, autoScale, autoScale);
+
+      if (markerEl) {
+        markerEl.dataset.baseScale = 1;
+      }
+
+      model.traverse((node) => {
+        if (node.isMesh && node.material) {
+          if (Array.isArray(node.material)) {
+            node.material.forEach(mat => {
+              mat.side = THREE.DoubleSide;
+              mat.needsUpdate = true;
+            });
+          } else {
+            node.material.side = THREE.DoubleSide;
+            node.material.needsUpdate = true;
+          }
+        }
+      });
+
+      container.object3D.add(model);
+
+      const animations = gltf.animations;
+      if (animations && animations.length > 0) {
+        const mixer = new THREE.AnimationMixer(model);
+        const action = mixer.clipAction(animations[0]);
+        action.setLoop(THREE.LoopRepeat);
+        action.play();
+        mixers.push(mixer);
+      }
+    },
+    undefined,
+    (error) => {
+      if (statusEl) {
+        statusEl.innerText = 'ОШИБКА';
+        statusEl.style.color = '#ff3366';
+      }
+      console.error(`Ошибка загрузки (${config.url}):`, error);
+    }
   );
 }
 
@@ -244,16 +199,20 @@ window.addEventListener('load', () => {
   const radiusRange = document.getElementById('radius-range');
   const radiusValueEl = document.getElementById('radius-value');
 
-  document.getElementById('total-points').innerText = poiDatabase.length;
-
   const savedRadiusVal = localStorage.getItem('ar_radius_slider_val');
-  if (radiusRange && savedRadiusVal !== null) radiusRange.value = savedRadiusVal;
+  if (radiusRange && savedRadiusVal !== null) {
+    radiusRange.value = savedRadiusVal;
+  }
 
   const updateRadiusDisplay = () => {
     if (radiusRange && radiusValueEl) {
       const val = parseFloat(radiusRange.value);
       const radiusKm = getRadiusFromSlider(val);
-      radiusValueEl.innerText = radiusKm >= 10 ? `${Math.round(radiusKm)} км` : `${radiusKm.toFixed(1)} км`;
+      if (radiusKm >= 10) {
+        radiusValueEl.innerText = `${Math.round(radiusKm)} км`;
+      } else {
+        radiusValueEl.innerText = `${radiusKm.toFixed(1)} км`;
+      }
     }
   };
 
@@ -266,7 +225,6 @@ window.addEventListener('load', () => {
     });
   }
 
-  // Шторка категорий
   const toggleHeader = document.getElementById('category-toggle-header');
   const dropdownContent = document.getElementById('category-dropdown-content');
   const arrowEl = document.getElementById('category-arrow');
@@ -279,14 +237,22 @@ window.addEventListener('load', () => {
     });
   }
 
-  document.querySelectorAll('.category-btn').forEach(btn => {
+  const categoryButtons = document.querySelectorAll('.category-btn');
+  categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const cat = btn.getAttribute('data-category');
       activeCategories[cat] = !activeCategories[cat];
+
       let text = btn.innerText.replace('✓ ', '').replace('✗ ', '');
-      btn.style.background = activeCategories[cat] ? '#00ff66' : '#334155';
-      btn.style.color = activeCategories[cat] ? '#000' : '#94a3b8';
-      btn.innerText = `${activeCategories[cat] ? '✓' : '✗'} ${text}`;
+      if (activeCategories[cat]) {
+        btn.style.background = '#00ff66';
+        btn.style.color = '#000';
+        btn.innerText = `✓ ${text}`;
+      } else {
+        btn.style.background = '#334155';
+        btn.style.color = '#94a3b8';
+        btn.innerText = `✗ ${text}`;
+      }
 
       updateCategoryStatusText();
       updateMarkersPositionAndScale();
@@ -294,6 +260,15 @@ window.addEventListener('load', () => {
   });
 
   updateCategoryStatusText();
+
+  const modelsToLoad = [
+    { containerId: 'model1-container', markerId: 'target-marker-1', url: 'assets/drone/drone.glb', scaleMultiplier: 1.0, statusElId: 'model-status' },
+    { containerId: 'model2-container', markerId: 'target-marker-2', url: 'assets/model1C/model1C.glb', scaleMultiplier: 1.0, statusElId: 'model2-status' },
+    { containerId: 'model3-container', markerId: 'target-marker-3', url: 'assets/earth_cartoon/earth_cartoon.glb', scaleMultiplier: 1.0, statusElId: 'model3-status' },
+    { containerId: 'model4-container', markerId: 'target-marker-4', url: 'assets/animated_venus/animated_venus.glb', scaleMultiplier: 1.0, statusElId: 'model4-status' },
+  ];
+
+  modelsToLoad.forEach(config => loadModelToContainer(config));
 
   const clock = new THREE.Clock();
   const animateTicker = () => {
@@ -303,13 +278,14 @@ window.addEventListener('load', () => {
   };
   animateTicker();
 
-  // Обработка кликов по динамическим элементам
   const setupScreenSpaceClickDetection = () => {
     const statusEl = document.getElementById('click-status');
     const infoTile = document.getElementById('info-tile');
 
     window.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('#debug-panel') || e.target.closest('#info-tile')) return;
+      if (e.target.closest('#debug-panel') || e.target.closest('#info-tile')) {
+        return;
+      }
 
       const cameraEl = document.querySelector('a-camera') || document.querySelector('[camera]');
       const camera = cameraEl && cameraEl.components && cameraEl.components.camera 
@@ -331,7 +307,8 @@ window.addEventListener('load', () => {
       const hitRadiusPixels = 80;
 
       markers.forEach(marker => {
-        if (!marker.object3D.visible) return;
+        const isVisibleAttr = marker.getAttribute('visible');
+        if (isVisibleAttr === false || isVisibleAttr === 'false' || !marker.object3D.visible) return;
 
         const worldPos = new THREE.Vector3();
         marker.object3D.getWorldPosition(worldPos);
@@ -357,6 +334,10 @@ window.addEventListener('load', () => {
 
         if (isTileOpen && document.getElementById('tile-title').innerText === title) {
           infoTile.style.display = 'none';
+          if (statusEl) {
+            statusEl.innerText = `Плитка закрыта`;
+            statusEl.style.color = '#94a3b8';
+          }
           return;
         }
 
@@ -374,15 +355,40 @@ window.addEventListener('load', () => {
         document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
         document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
-        document.getElementById('tile-route-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        document.getElementById('tile-site-btn').href = siteUrl;
+        const routeBtn = document.getElementById('tile-route-btn');
+        if (routeBtn) {
+          routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        }
 
-        if (infoTile) infoTile.style.display = 'block';
+        const siteBtn = document.getElementById('tile-site-btn');
+        if (siteBtn) {
+          siteBtn.href = siteUrl;
+        }
+
+        if (infoTile) {
+          infoTile.style.display = 'block';
+        }
+        if (statusEl) {
+          statusEl.innerText = `ВЫБРАНО: ${title}`;
+          statusEl.style.color = '#00ff66';
+        }
       } else {
-        if (isTileOpen) infoTile.style.display = 'none';
+        if (isTileOpen) {
+          infoTile.style.display = 'none';
+        }
+        if (statusEl) {
+          statusEl.innerText = `Мимо [X:${Math.round(clientX)}, Y:${Math.round(clientY)}]`;
+          statusEl.style.color = '#ff3366';
+        }
       }
     });
   };
 
-  setupScreenSpaceClickDetection();
+  if (sceneEl && sceneEl.hasLoaded) {
+    setupScreenSpaceClickDetection();
+  } else if (sceneEl) {
+    sceneEl.addEventListener('loaded', setupScreenSpaceClickDetection);
+  } else {
+    setupScreenSpaceClickDetection();
+  }
 });
