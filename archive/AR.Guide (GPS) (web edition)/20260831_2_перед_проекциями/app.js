@@ -92,8 +92,8 @@ function updateMarkersPositionAndScale() {
     
     const safeVisualDist = 20;
     const angleRad = (bearing - 90) * (Math.PI / 180);
-    const posX = Math.cos(angleRad) * safeVisualDist;
-    const posZ = -Math.sin(angleRad) * safeVisualDist;
+    const posX = -Math.cos(angleRad) * safeVisualDist;
+    const posZ = Math.sin(angleRad) * safeVisualDist;
 
     marker.object3D.position.set(posX, 1.5, posZ);
 
