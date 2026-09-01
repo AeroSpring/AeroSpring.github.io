@@ -355,6 +355,12 @@ window.addEventListener('load', () => {
         document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
         document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
+        // Динамическое обновление ссылки на построение маршрута
+        const routeBtn = document.getElementById('tile-route-btn');
+        if (routeBtn) {
+          routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        }
+
         if (infoTile) {
           infoTile.style.display = 'block';
         }
