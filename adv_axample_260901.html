@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AR Guide GPS</title>
+
+  <!-- A-Frame -->
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <!-- AR.js -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <!-- GLTFLoader для Three.js r137 -->
+  <script src="https://unpkg.com/three@0.137.0/examples/js/loaders/GLTFLoader.js"></script>
+  
+  <link rel="stylesheet" href="adv_axample_260901_style.css">
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+  <!-- Информационная плитка -->
+  <div id="info-tile" style="display: none; position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.95); color: #ffffff; padding: 16px 20px; border-radius: 14px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; z-index: 999999; width: 80%; max-width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: auto;">
+    <div id="tile-title" style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #38bdf8;">Информация о точке</div>
+    <div id="tile-coords" style="margin: 4px 0;">Координаты: -</div>
+    <div id="tile-distance" style="margin: 4px 0;">Расстояние: -</div>
+  </div>
+
+  <!-- Отладочная панель -->
+  <div id="debug-panel" style="position: fixed; top: 12px; left: 12px; right: 12px; background: rgba(0, 0, 0, 0.85); color: #00ff66; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; z-index: 999999; border: 1px solid #00ff66;">
+    <div><b>GPS координаты:</b> <span id="my-coords">Ожидание...</span></div>
+    <!-- <div><b>Касание:</b> <span id="click-status">Ожидание клика...</span></div> -->
+    <!-- <div><b>Дрон 1:</b> <span id="model-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-1">-</span>)</div> -->
+    <!-- <div><b>Модель 1C:</b> <span id="model2-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-2">-</span>)</div> -->
+    <!-- <div><b>Ремонт двигателей и КПП:</b> <span id="model3-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-3">-</span>)</div> -->
+    <!-- <div><b>Фито:</b> <span id="model4-status" style="color: #ffff00;">Загрузка...</span> (<span id="dist-4">-</span>)</div> -->
+    
+    <!-- Ползунок радиуса -->
+    <div style="margin-top: 8px; pointer-events: auto; display: flex; align-items: center; justify-content: space-between;">
+      <label for="radius-range" style="margin-right: 6px;"><b>Радиус:</b></label>
+      <input type="range" id="radius-range" min="0" max="100" value="50" step="0.1" style="flex-grow: 1; accent-color: #00ff66; cursor: pointer;">
+      <span id="radius-value" style="margin-left: 8px; color: #38bdf8; min-width: 60px; text-align: right;">- км</span>
+    </div>
+
+    <!-- Блок категорий со шторкой -->
+    <div style="margin-top: 8px; pointer-events: auto; border-top: 1px dashed rgba(0,255,102,0.4); padding-top: 6px;">
+      <div id="category-toggle-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: rgba(0,255,102,0.1); padding: 4px 6px; border-radius: 4px;">
+        <span id="category-status-text">Категории: 4 из 4 выбрано</span>
+        <span id="category-arrow" style="font-weight: bold; font-size: 13px;">▼</span>
+      </div>
+
+      <div id="category-dropdown-content" style="display: none; margin-top: 6px; max-height: 140px; overflow-y: auto; flex-direction: column; gap: 4px; padding-right: 2px;">
+        <button id="btn-cat-auto" class="category-btn active" data-category="auto" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 🚗 Авторемонт</button>
+        <button id="btn-cat-it" class="category-btn active" data-category="it" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 💻 ИТ-услуги</button>
+        <button id="btn-cat-beauty" class="category-btn active" data-category="beauty" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 💄 Уход за собой</button>
+        <button id="btn-cat-med" class="category-btn active" data-category="med" style="background: #00ff66; color: #000; border: none; padding: 5px 8px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: bold; cursor: pointer; text-align: left; width: 100%;">✓ 🏥 Медицина</button>
+      </div>
+    </div>
+  </div>
+
+  <a-scene
+    vr-mode-ui="enabled: false"
+    embedded
+    arjs="sourceType: webcam; debugUIEnabled: false;"
+    light="defaultLightsEnabled: true">
+
+    <a-camera 
+      gps-camera="minDistance: 0; maxDistance: 10000000;" 
+      camera="near: 0.1; far: 100000;"
+      rotation-reader>
+    </a-camera>
+
+    <!-- Первая модель (Дрон в Воронеже) - Авторемонт -->
+    <a-entity
+      id="target-marker-1"
+      class="ar-gps-marker"
+      data-lat="51.672602"
+      data-lng="39.237782"
+      data-category="auto"
+      position="0 0 0">
+      
+      <a-entity id="model1-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-1" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Дрон (Авторемонт)"
+        data-lat="51.672602"
+        data-lng="39.237782"
+        data-dist-id="dist-1">
+      </a-plane>
+    </a-entity>
+
+    <!-- Вторая модель (Model 1C) - ИТ -->
+    <a-entity
+      id="target-marker-2"
+      class="ar-gps-marker"
+      data-lat="45.013888"
+      data-lng="41.131294"
+      data-category="it"
+      position="0 0 0">
+
+      <a-entity id="model2-container"></a-entity>
+
+      <a-plane 
+        id="hitbox-2" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Модель 1C (ИТ-услуги)"
+        data-lat="45.013888"
+        data-lng="41.131294"
+        data-dist-id="dist-2">
+      </a-plane>
+    </a-entity>
+
+    <!-- Третья модель - Авторемонт -->
+    <a-entity
+      id="target-marker-3"
+      class="ar-gps-marker"
+      data-lat="44.970499"
+      data-lng="41.153234"
+      data-category="auto"
+      position="0 0 0">
+      
+      <a-entity id="model3-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-3" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Ремонт двигателей и КПП"
+        data-lat="44.970499"
+        data-lng="41.153234"
+        data-dist-id="dist-3">
+      </a-plane>
+    </a-entity>
+
+    <!-- Четвертая модель (Фито) - Медицина -->
+    <a-entity
+      id="target-marker-4"
+      class="ar-gps-marker"
+      data-lat="44.989088"
+      data-lng="41.161151"
+      data-category="med"
+      position="0 0 0">
+      
+      <a-entity id="model4-container"></a-entity>
+      
+      <a-plane 
+        id="hitbox-4" 
+        class="clickable-hitbox" 
+        width="6" 
+        height="6"
+        position="0 0 0"
+        material="opacity: 0.0; transparent: true; side: double; shader: flat;"
+        data-title="Фито"
+        data-lat="44.989088"
+        data-lng="41.161151"
+        data-dist-id="dist-4">
+      </a-plane>
+    </a-entity>
+
+  </a-scene>
+
+  <script src="adv_axample_260901_app.js"></script>
+</body>
+</html>
