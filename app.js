@@ -344,6 +344,7 @@ window.addEventListener('load', () => {
 
         const lat = parseFloat(hitbox.getAttribute('data-lat'));
         const lng = parseFloat(hitbox.getAttribute('data-lng'));
+        const siteUrl = hitbox.getAttribute('data-url') || '#';
 
         let distText = 'Ожидание GPS...';
         if (currentUserLat !== null && currentUserLng !== null) {
@@ -355,10 +356,15 @@ window.addEventListener('load', () => {
         document.getElementById('tile-coords').innerText = `Координаты: ${lat}, ${lng}`;
         document.getElementById('tile-distance').innerText = `Расстояние: ${distText}`;
 
-        // Динамическое обновление ссылки на построение маршрута
+        // Динамическое обновление ссылки на маршрут и сайт
         const routeBtn = document.getElementById('tile-route-btn');
         if (routeBtn) {
           routeBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        }
+
+        const siteBtn = document.getElementById('tile-site-btn');
+        if (siteBtn) {
+          siteBtn.href = siteUrl;
         }
 
         if (infoTile) {
