@@ -11,9 +11,10 @@ const activeCategories = {
 
 // База данных объектов (тысячи объектов могут храниться здесь или прилетать с бэкенда)
 const poiDatabase = [
+  // Армавир
   {
     id: 'poi-1',
-    title: 'Дрон (Авторемонт)',
+    title: 'Авторемонт',
     lat: 51.672602,
     lng: 39.237782,
     category: 'auto',
@@ -23,7 +24,7 @@ const poiDatabase = [
   },
   {
     id: 'poi-2',
-    title: 'Модель 1C (ИТ-услуги)',
+    title: 'ИТ-услуги 1С',
     lat: 45.013888,
     lng: 41.131294,
     category: 'it',
@@ -50,7 +51,133 @@ const poiDatabase = [
     url: 'assets/animated_venus/animated_venus.glb',
     siteUrl: 'https://autoknowledge.tech/ru/pages/35',
     scaleMultiplier: 1.0
-  }
+  },
+
+  // Москва
+  {
+    id: 'poi-21',
+    title: 'Авторемонт (Сколково)',
+    lat: 55.690777,
+    lng: 37.347615,
+    category: 'auto',
+    url: 'assets/drone/drone.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/36',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-22',
+    title: 'ИТ-услуги 1С',
+    lat: 55.832466,
+    lng: 37.627483,
+    category: 'it',
+    url: 'assets/model1C/model1C.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/33',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-23',
+    title: 'Ремонт двигателей и КПП',
+    lat: 55.755046,
+    lng: 37.675149,
+    category: 'auto',
+    url: 'assets/earth_cartoon/earth_cartoon.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/34',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-24',
+    title: 'Фито',
+    lat: 55.784717,
+    lng: 37.615695,
+    category: 'med',
+    url: 'assets/animated_venus/animated_venus.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/35',
+    scaleMultiplier: 1.0
+  },
+
+  // С.Петербург
+  {
+    id: 'poi-31',
+    title: 'Авторемонт (Александровская колонна)',
+    lat: 59.938596,
+    lng: 30.316432,
+    category: 'auto',
+    url: 'assets/drone/drone.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/36',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-32',
+    title: 'ИТ-услуги 1С (Яблоневый сад)',
+    lat: 59.863311,
+    lng: 30.363718,
+    category: 'it',
+    url: 'assets/model1C/model1C.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/33',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-33',
+    title: 'Ремонт двигателей и КПП',
+    lat: 59.953499,
+    lng: 30.314097,
+    category: 'auto',
+    url: 'assets/earth_cartoon/earth_cartoon.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/34',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-34',
+    title: 'Фито (Викторная оранжерея)',
+    lat: 59.969335,
+    lng: 30.324118,
+    category: 'med',
+    url: 'assets/animated_venus/animated_venus.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/35',
+    scaleMultiplier: 1.0
+  },
+
+  // Новосибирск
+  {
+    id: 'poi-41',
+    title: 'Авторемонт (Аквапарк)',
+    lat: 55.019934,
+    lng: 82.885092,
+    category: 'auto',
+    url: 'assets/drone/drone.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/36',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-42',
+    title: 'ИТ-услуги 1С (Михайловская набережная)',
+    lat: 55.006194,
+    lng: 82.937931,
+    category: 'it',
+    url: 'assets/model1C/model1C.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/33',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-43',
+    title: 'Ремонт двигателей и КПП (много воды)',
+    lat: 54.997813,
+    lng: 82.910019,
+    category: 'auto',
+    url: 'assets/earth_cartoon/earth_cartoon.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/34',
+    scaleMultiplier: 1.0
+  },
+  {
+    id: 'poi-44 (Дендропарк)',
+    title: 'Фито',
+    lat: 55.059916,
+    lng: 82.887384,
+    category: 'med',
+    url: 'assets/animated_venus/animated_venus.glb',
+    siteUrl: 'https://autoknowledge.tech/ru/pages/35',
+    scaleMultiplier: 1.0
+  },
 ];
 
 const loadedPois = new Set(); // Хранилище ID уже загруженных моделей
